@@ -1,0 +1,11 @@
+load("//project:junit5.bzl", "kt_junit5_test")
+
+kt_junit5_test(
+    name = "maven",
+    size = "small",
+    srcs = glob(["**/*.kt"]),
+    test_package = "org.virtuslab.bazelsteward.maven",
+    deps = [
+        "//maven/src/main/kotlin/org/virtuslab/bazelsteward/maven"
+    ],
+)

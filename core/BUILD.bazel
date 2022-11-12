@@ -1,0 +1,5 @@
+alias(
+  name = "core",
+  actual = "//core/src/main/kotlin/org/virtuslab/bazelsteward/core",
+  visibility = ["//visibility:public"],
+)
