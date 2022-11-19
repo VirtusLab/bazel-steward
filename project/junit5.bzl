@@ -1,3 +1,5 @@
+# based on JetBrains/bazel-bsp integration
+
 load("@rules_java//java:defs.bzl", "java_test")
 load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
