@@ -4,6 +4,6 @@ kt_junit5_test(
     srcs = glob(["**/*.kt"]),
     test_package = "org.virtuslab.bazelsteward.app",
     deps = [
-        "//app/src/main/kotlin/org/virtuslab/bazelsteward/app"
+        "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
     ],
 )

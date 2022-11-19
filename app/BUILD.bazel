@@ -1,10 +1,12 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
 java_binary(
     name = "app",
     main_class = "org.virtuslab.bazelsteward.app.App",
     visibility = ["//visibility:public"],
     runtime_deps = [
+        "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
         "//core",
         "//maven",
-        "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
     ],
 )

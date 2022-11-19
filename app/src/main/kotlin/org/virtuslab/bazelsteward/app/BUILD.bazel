@@ -4,6 +4,6 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         "//core",
-        "//maven"
-    ]
+        "//maven",
+    ],
 )
