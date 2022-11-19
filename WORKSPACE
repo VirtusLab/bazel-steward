@@ -50,7 +50,7 @@ load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
 scala_repositories()
 
 # junit5
-load("//project:junit5.bzl", "junit_jupiter_java_repositories", "junit_platform_java_repositories")
+load("//tools/build_rules:junit5.bzl", "junit_jupiter_java_repositories", "junit_platform_java_repositories")
 JUNIT_JUPITER_VERSION = "5.8.2"
 JUNIT_PLATFORM_VERSION = "1.8.2"
 junit_jupiter_java_repositories( version = JUNIT_JUPITER_VERSION, )
