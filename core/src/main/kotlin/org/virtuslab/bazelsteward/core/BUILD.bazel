@@ -2,4 +2,9 @@ kt_jvm_library(
     name = "core",
     srcs = glob(["**/*.kt"]),
     visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:io_arrow_kt_arrow_core",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_jdk8",
+    ],
 )

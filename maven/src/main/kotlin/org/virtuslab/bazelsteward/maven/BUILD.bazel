@@ -6,5 +6,6 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         "//core",
+        "@maven//:io_get_coursier_interface",
     ],
 )
