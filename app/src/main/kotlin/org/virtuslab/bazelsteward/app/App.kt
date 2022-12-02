@@ -1,9 +1,12 @@
 package org.virtuslab.bazelsteward.app
 
-import org.virtuslab.bazelsteward.core.UpdateLogic
+import arrow.core.flattenOption
+import kotlinx.coroutines.runBlocking
+import org.virtuslab.bazelsteward.bazel.BuildFileSearch
+import org.virtuslab.bazelsteward.bazel.FileUpdateSearch
+import org.virtuslab.bazelsteward.bazel.UpdateLogic
 import org.virtuslab.bazelsteward.core.Workspace
 import org.virtuslab.bazelsteward.maven.MavenDependencyExtractor
-import org.virtuslab.bazelsteward.maven.MavenDependencyUpdater
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import kotlin.io.path.Path
 
@@ -11,12 +14,17 @@ class App {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val workspace = Workspace(Path("~/dev/bazel-steward"))
-            val currentDependencies = MavenDependencyExtractor().extract(workspace)
-            val availableVersions = MavenRepository().findVersions(currentDependencies.map { it.id })
-            val toUpdate = UpdateLogic().selectUpdates(currentDependencies, availableVersions)
-            MavenDependencyUpdater().applyUpdates(toUpdate)
-            println("Done")
+            val workspace = Workspace(Path("e2e/maven/trivial"))
+            val definitions = BuildFileSearch(workspace).buildDefinitions
+            val result: String = runBlocking {
+                val currentDependencies = MavenDependencyExtractor(workspace).extract()
+                val availableVersions = MavenRepository().findVersions(currentDependencies)
+                val updateSuggestions =
+                    availableVersions.map { UpdateLogic().selectUpdate(it.key, it.value) }.flattenOption()
+                val changeSuggestions = FileUpdateSearch(definitions).searchBuildFiles(updateSuggestions)
+                changeSuggestions.toString()
+            }
+            println(result)
         }
     }
 }

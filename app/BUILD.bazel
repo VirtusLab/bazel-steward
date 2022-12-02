@@ -6,6 +6,7 @@ java_binary(
     visibility = ["//visibility:public"],
     runtime_deps = [
         "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
+        "//bazel",
         "//core",
         "//maven",
     ],
