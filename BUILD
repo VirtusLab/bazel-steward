@@ -11,4 +11,6 @@ load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_config")
 
 ktlint_config(
     name = "lint_config",
+    editorconfig = ".editorconfig",
+    visibility = ["//visibility:public"],
 )
