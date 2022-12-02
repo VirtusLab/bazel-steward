@@ -8,3 +8,5 @@ kt_jvm_library(
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_jdk8",
     ],
 )
+
+lint(srcs = glob(["**/*.kt"]))

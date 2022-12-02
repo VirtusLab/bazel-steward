@@ -7,3 +7,5 @@ kt_junit5_test(
         "//maven/src/main/kotlin/org/virtuslab/bazelsteward/maven",
     ],
 )
+
+lint(srcs = glob(["**/*.kt"]))

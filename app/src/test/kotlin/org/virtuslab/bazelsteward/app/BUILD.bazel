@@ -7,3 +7,5 @@ kt_junit5_test(
         "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
     ],
 )
+
+lint(srcs = glob(["**/*.kt"]))
