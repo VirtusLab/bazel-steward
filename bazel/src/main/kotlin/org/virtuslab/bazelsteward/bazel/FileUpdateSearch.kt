@@ -4,7 +4,9 @@ import arrow.core.Option
 import arrow.core.continuations.ensureNotNull
 import arrow.core.continuations.option
 import arrow.core.flattenOption
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import java.nio.file.Path
 

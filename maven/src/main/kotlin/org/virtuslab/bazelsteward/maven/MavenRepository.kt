@@ -3,7 +3,11 @@ package org.virtuslab.bazelsteward.maven
 import coursierapi.Module
 import coursierapi.Repository
 import coursierapi.Versions
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
 
