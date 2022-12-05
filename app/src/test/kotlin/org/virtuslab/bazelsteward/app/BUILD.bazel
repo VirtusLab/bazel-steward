@@ -1,5 +1,5 @@
 kt_junit5_test(
-    name = "maven",
+    name = "app",
     size = "small",
     srcs = glob(["**/*.kt"]),
     test_package = "org.virtuslab.bazelsteward.app",
