@@ -85,6 +85,7 @@ maven_install(
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0",
         "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0",
         "io.get-coursier:interface:1.0.11",
+        "commons-io:commons-io:2.11.0",
     ],
     fetch_sources = True,
     repositories = [
