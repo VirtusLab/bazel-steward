@@ -11,20 +11,20 @@ import org.virtuslab.bazelsteward.maven.MavenRepository
 import kotlin.io.path.Path
 
 class App {
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val workspace = Workspace(Path("e2e/maven/trivial"))
-            val definitions = BuildFileSearch(workspace).buildDefinitions
-            val result: String = runBlocking {
-                val currentDependencies = MavenDependencyExtractor(workspace).extract()
-                val availableVersions = MavenRepository().findVersions(currentDependencies)
-                val updateSuggestions =
-                    availableVersions.map { UpdateLogic().selectUpdate(it.key, it.value) }.flattenOption()
-                val changeSuggestions = FileUpdateSearch(definitions).searchBuildFiles(updateSuggestions)
-                changeSuggestions.toString()
-            }
-            println(result)
-        }
+  companion object {
+    @JvmStatic
+    fun main(args: Array<String>) {
+      val workspace = Workspace(Path("e2e/maven/trivial"))
+      val definitions = BuildFileSearch(workspace).buildDefinitions
+      val result: String = runBlocking {
+        val currentDependencies = MavenDependencyExtractor(workspace).extract()
+        val availableVersions = MavenRepository().findVersions(currentDependencies)
+        val updateSuggestions =
+          availableVersions.map { UpdateLogic().selectUpdate(it.key, it.value) }.flattenOption()
+        val changeSuggestions = FileUpdateSearch(definitions).searchBuildFiles(updateSuggestions)
+        changeSuggestions.toString()
+      }
+      println(result)
     }
+  }
 }

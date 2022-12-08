@@ -9,3 +9,5 @@ kt_jvm_library(
         "@maven//:io_get_coursier_interface",
     ],
 )
+
+lint(srcs = glob(["**/*.kt"]))

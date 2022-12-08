@@ -8,3 +8,5 @@ kt_jvm_library(
         "//maven",
     ],
 )
+
+lint(srcs = glob(["**/*.kt"]))

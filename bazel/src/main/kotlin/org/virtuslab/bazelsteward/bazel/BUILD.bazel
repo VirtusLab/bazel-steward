@@ -6,3 +6,5 @@ kt_jvm_library(
         "//core",
     ],
 )
+
+lint(srcs = glob(["**/*.kt"]))
