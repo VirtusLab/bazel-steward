@@ -1,0 +1,11 @@
+name: "Bazel steward"
+description: "Automatically searches bazel repositories for dependencies and updates them"
+author: "Marcin Złakowski"
+inputs:
+  configuration-path:
+    description: "The path to bazel steward configuration"
+    default: ".github/bazel-steward.yaml"
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
