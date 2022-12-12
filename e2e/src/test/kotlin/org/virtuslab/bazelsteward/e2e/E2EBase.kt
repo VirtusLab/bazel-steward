@@ -11,14 +11,6 @@ open class E2EBase {
       val entries = jar.entries().asIterator().asSequence()
       entries.filterNot { it.isDirectory }.map { it.name }.filter { it.startsWith(testResourcePath) }.toList()
     }
-    names.forEach { FileUtils.copyURLToFile(javaClass.classLoader.getResource(it), File(tempDir, stripSuffix(it))) }
+    names.forEach { FileUtils.copyURLToFile(javaClass.classLoader.getResource(it), File(tempDir, it.removeSuffix(".bzlignore"))) }
   }
-
-  private fun stripSuffix(name: String): String =
-    if (name.endsWith(".blzx"))
-      if (name.startsWith("BUILD") || name.startsWith("WORKSPACE"))
-        name.dropLast(5)
-      else
-        name.dropLast(1)
-    else name
 }
