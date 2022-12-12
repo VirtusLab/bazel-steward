@@ -14,7 +14,7 @@ class App {
   companion object {
     @JvmStatic
     fun main(args: Array<String>) {
-      val workspace = Workspace(Path("e2e/maven/trivial"))
+      val workspace = Workspace(Path(args[1]))
       val definitions = BuildFileSearch(workspace).buildDefinitions
       val result: String = runBlocking {
         val currentDependencies = MavenDependencyExtractor(workspace).extract()
