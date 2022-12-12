@@ -1,11 +1,14 @@
 name: "Bazel steward"
 description: "Automatically searches bazel repositories for dependencies and updates them"
-author: "Marcin Złakowski"
+author: ""
 inputs:
   configuration-path:
     description: "The path to bazel steward configuration"
     default: ".github/bazel-steward.yaml"
 
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: "composite"
+  steps:
+      - uses: ./gh-action
+      - run: java -jar bazel-steward.jar
+        shell: bash

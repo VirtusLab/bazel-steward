@@ -14,7 +14,8 @@ class App {
   companion object {
     @JvmStatic
     fun main(args: Array<String>) {
-      val workspace = Workspace(Path(args[1]))
+      val path = if (args.size > 1) args[1] else "."
+      val workspace = Workspace(Path(path))
       val definitions = BuildFileSearch(workspace).buildDefinitions
       val result: String = runBlocking {
         val currentDependencies = MavenDependencyExtractor(workspace).extract()
