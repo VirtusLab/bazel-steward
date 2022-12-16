@@ -65,31 +65,23 @@ load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
 
 scala_repositories()
 
-# junit5
-load("//tools/build_rules:junit5.bzl", "junit_jupiter_java_repositories", "junit_platform_java_repositories")
-
-JUNIT_JUPITER_VERSION = "5.8.2"
-
-JUNIT_PLATFORM_VERSION = "1.8.2"
-
-junit_jupiter_java_repositories(version = JUNIT_JUPITER_VERSION)
-
-junit_platform_java_repositories(version = JUNIT_PLATFORM_VERSION)
-
-# maven deps
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        "io.arrow-kt:arrow-core:1.1.2",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0",
-        "io.get-coursier:interface:1.0.11",
-        "commons-io:commons-io:2.11.0",
-        "org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r",
+        "com.expedia:graphql-kotlin:1.0.0-RC5",
+        "com.expedia:graphql-kotlin-schema-generator:1.0.0-RC5",
+        "com.expedia:graphql-kotlin-federation:1.0.0-RC5",
+        "com.graphql-java:graphql-java:13.0",
+        "org.opentest4j:opentest4j:1.1.1",
+        "org.apiguardian:apiguardian-api:1.0.0",
+        "org.junit.platform:junit-platform-commons:1.4.2",
+        "org.junit.jupiter:junit-jupiter-api:5.4.2",
+        "org.junit.jupiter:junit-jupiter-params:5.4.2",
+        "org.apache.logging.log4j:log4j-core:2.16.0",
     ],
-    fetch_sources = True,
     repositories = [
-        "https://repo.maven.apache.org/maven2",
+        "https://maven-central.storage.googleapis.com/repos/central/data/",
+        "https://repo1.maven.org/maven2",
     ],
 )

@@ -1,0 +1,5 @@
+alias(
+    name = "maven",
+    actual = "//maven/src/main/kotlin/org/virtuslab/bazelsteward/maven",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,13 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "maven",
+    srcs = glob(["**/*.kt"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core",
+        "@maven//:io_get_coursier_interface",
+    ],
+)
+
+lint(srcs = glob(["**/*.kt"]))

@@ -1,0 +1,11 @@
+kt_jvm_library(
+    name = "common",
+    srcs = glob(["**/*.kt"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core",
+        "@maven//:org_eclipse_jgit_org_eclipse_jgit",
+    ],
+)
+
+lint(srcs = glob(["**/*.kt"]))
