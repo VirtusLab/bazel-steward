@@ -1,1 +1,2 @@
-/Users/mzlakowski/Projects/bazel/bazel-steward/.editorconfig
+[*.{kt,kts}]
+indent_size = 2
