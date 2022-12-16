@@ -1,0 +1,6 @@
+name: "Build project in docker file and copy it to workspace"
+description: ""
+author: ""
+runs:
+  using: "docker"
+  image: "../Dockerfile"
