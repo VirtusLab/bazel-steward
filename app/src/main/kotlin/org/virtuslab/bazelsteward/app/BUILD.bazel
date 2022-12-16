@@ -1,0 +1,12 @@
+kt_jvm_library(
+    name = "app",
+    srcs = glob(["**/*.kt"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common",
+        "//core",
+        "//maven",
+    ],
+)
+
+lint(srcs = glob(["**/*.kt"]))
