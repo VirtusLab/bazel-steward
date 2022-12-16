@@ -1,6 +1,0 @@
-name: "Get docker image with jar"
-description: ""
-author: ""
-runs:
-  using: "docker"
-  image: "../Dockerfile"
