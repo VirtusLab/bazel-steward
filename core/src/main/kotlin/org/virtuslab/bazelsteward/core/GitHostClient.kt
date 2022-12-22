@@ -1,6 +1,6 @@
 package org.virtuslab.bazelsteward.core
 
-interface GitHost {
+interface GitHostClient {
   fun checkRP(branch: GitBranch)
   fun openPR(branch: GitBranch)
 }
