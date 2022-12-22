@@ -1,6 +1,7 @@
 package org.virtuslab.bazelsteward.e2e
 
 import org.apache.commons.io.FileUtils
+import org.eclipse.jgit.api.Git
 import java.io.File
 import java.util.jar.JarFile
 
@@ -12,5 +13,6 @@ open class E2EBase {
       entries.filterNot { it.isDirectory }.map { it.name }.filter { it.startsWith(testResourcePath) }.toList()
     }
     names.forEach { FileUtils.copyURLToFile(javaClass.classLoader.getResource(it), File(tempDir, it.removeSuffix(".bzlignore"))) }
+    Git.init().setGitDir(tempDir).call()
   }
 }

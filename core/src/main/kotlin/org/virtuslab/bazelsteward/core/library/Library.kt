@@ -1,6 +1,6 @@
 package org.virtuslab.bazelsteward.core.library
 
-interface Library<Id : LibraryId> {
+interface Library<out Id : LibraryId> {
   val id: Id
   val version: Version
 }

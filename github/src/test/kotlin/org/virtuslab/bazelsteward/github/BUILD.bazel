@@ -1,0 +1,11 @@
+kt_junit5_test(
+    name = "github",
+    size = "small",
+    srcs = glob(["**/*.kt"]),
+    test_package = "org.virtuslab.bazelsteward.github",
+    deps = [
+        "//github/src/main/kotlin/org/virtuslab/bazelsteward/github",
+    ],
+)
+
+lint(srcs = glob(["**/*.kt"]))

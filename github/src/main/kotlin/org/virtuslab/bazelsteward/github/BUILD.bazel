@@ -1,13 +1,10 @@
 kt_jvm_library(
-    name = "app",
+    name = "github",
     srcs = glob(["**/*.kt"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//common",
         "//core",
-        "//github",
-        "//maven",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
+        "@maven//:org_kohsuke_github_api",
     ],
 )
 

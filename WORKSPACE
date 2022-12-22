@@ -87,6 +87,8 @@ maven_install(
         "io.get-coursier:interface:1.0.11",
         "commons-io:commons-io:2.11.0",
         "org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r",
+        "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
+        "org.kohsuke:github-api:1.313",
     ],
     fetch_sources = True,
     repositories = [

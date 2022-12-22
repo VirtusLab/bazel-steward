@@ -7,16 +7,17 @@ import arrow.core.flattenOption
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
+import org.virtuslab.bazelsteward.core.library.Version
 import java.nio.file.Path
 
 class FileUpdateSearch(private val buildDefinitions: List<Pair<Path, String>>) {
   data class FileChangeSuggestion(
-    val libraryId: LibraryId,
+    val library: Library<LibraryId>,
+    val newVersion: Version,
     val file: Path,
-    val position: Int,
-    val old: String,
-    val new: String
+    val position: Int
   )
 
   suspend fun <Lib : LibraryId> searchBuildFiles(updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib>>): List<FileChangeSuggestion> =
@@ -43,11 +44,10 @@ class FileUpdateSearch(private val buildDefinitions: List<Pair<Path, String>>) {
       val matchResult = ensureNotNull(files.firstNotNullOfOrNull { regex.find(it.second)?.to(it.first) })
       val versionGroup = ensureNotNull(matchResult.first.groups[3])
       FileChangeSuggestion(
-        updateSuggestion.currentLibrary.id,
+        updateSuggestion.currentLibrary,
+        updateSuggestion.suggestedVersion,
         matchResult.second,
-        versionGroup.range.first,
-        currentVersion,
-        updateSuggestion.suggestedVersion.value
+        versionGroup.range.first
       )
     }
 }

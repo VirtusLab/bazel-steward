@@ -4,8 +4,7 @@ import org.virtuslab.bazelsteward.core.Workspace
 import java.nio.file.Files
 import java.nio.file.Path
 
-class BuildFileSearch(workspace: Workspace) {
-
+class BazelFileSearch(workspace: Workspace) {
   private val fileNamesRegex =
     Regex(listOf("""BUILD\.bazel""", "BUILD", "WORKSPACE", """[0-9a-zA-Z]+\.bzl""").reduce { acc, s -> "$acc|$s" })
 
