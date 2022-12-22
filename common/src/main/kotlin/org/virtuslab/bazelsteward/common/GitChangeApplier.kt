@@ -1,4 +1,4 @@
-package common.src.main.kotlin.org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.common
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException

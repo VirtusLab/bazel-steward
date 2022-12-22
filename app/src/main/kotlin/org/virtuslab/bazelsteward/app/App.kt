@@ -2,10 +2,10 @@ package org.virtuslab.bazelsteward.app
 
 import arrow.core.flattenOption
 import kotlinx.coroutines.runBlocking
-import common.src.main.kotlin.org.virtuslab.bazelsteward.common.BuildFileSearch
-import common.src.main.kotlin.org.virtuslab.bazelsteward.common.FileUpdateSearch
-import common.src.main.kotlin.org.virtuslab.bazelsteward.common.GitChangeApplier
-import common.src.main.kotlin.org.virtuslab.bazelsteward.common.UpdateLogic
+import org.virtuslab.bazelsteward.common.BuildFileSearch
+import org.virtuslab.bazelsteward.common.FileUpdateSearch
+import org.virtuslab.bazelsteward.common.GitChangeApplier
+import org.virtuslab.bazelsteward.common.UpdateLogic
 import org.virtuslab.bazelsteward.maven.MavenDependencyExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
 

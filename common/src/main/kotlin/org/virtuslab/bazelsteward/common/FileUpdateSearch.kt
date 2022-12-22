@@ -1,4 +1,4 @@
-package common.src.main.kotlin.org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.common
 
 import arrow.core.Option
 import arrow.core.continuations.ensureNotNull

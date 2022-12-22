@@ -1,4 +1,4 @@
-package common.src.main.kotlin.org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.common
 
 import org.virtuslab.bazelsteward.core.Workspace
 import java.nio.file.Files
