@@ -5,12 +5,14 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class BazelFileSearch(workspace: Workspace) {
-  private val fileNamesRegex =
-    Regex(listOf("""BUILD\.bazel""", "BUILD", "WORKSPACE", """[0-9a-zA-Z]+\.bzl""").reduce { acc, s -> "$acc|$s" })
+  private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
+  private val fileSuffix = ".bzl"
 
   private val buildPaths: List<Path> by lazy {
     workspace.path.toFile().walkBottomUp()
-      .filter { it.isFile && fileNamesRegex.matches(it.name) }
+      .onEnter { !it.name.startsWith(".") }
+      .filter { it.isFile }
+      .filter { fileNames.contains(it.name) || it.name.endsWith(fileSuffix) }
       .map { it.toPath() }
       .toList()
   }

@@ -5,16 +5,14 @@ import arrow.core.Option
 import arrow.core.Some
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
-import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.transport.RefSpec
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.Workspace
 import java.io.IOException
 import kotlin.io.path.readText
 
 class GitService(workspace: Workspace) {
-  //private val ident: PersonIdent = PersonIdent("bazel-steward", "no-reply@github.com")
+  // private val ident: PersonIdent = PersonIdent("bazel-steward", "no-reply@github.com")
   private val git = Git.open(workspace.path.toFile())
 
   fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): Option<GitBranch> {
@@ -47,6 +45,5 @@ class GitService(workspace: Workspace) {
         else -> throw ex
       }
     }
-
   }
 }

@@ -9,7 +9,7 @@ class MavenE2E : E2EBase() {
 
   @Test
   fun `Maven basic test`(@TempDir tempDir: File) {
-    loadTest(tempDir, "maven/trivial")
-    App.main(args = arrayOf("main", tempDir.toString()))
+    val file = loadTest(tempDir, "maven/trivial")
+    App.main(args = arrayOf(file.toString()))
   }
 }
