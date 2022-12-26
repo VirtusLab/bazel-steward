@@ -28,7 +28,7 @@ class App {
 
       val workspace =
         if (github) createWorkspaceGithubActions()
-        else Workspace(Path(repository ?: "."), GitHostClient.stub)
+        else Workspace(Path(repository ?: "."), GitHostClient.stub, false)
 
       runBlocking {
         val definitions = BazelFileSearch(workspace).buildDefinitions
@@ -44,10 +44,12 @@ class App {
         val gitHost = workspace.gitHostClient
         changeSuggestions.forEach { change ->
           val branch = GitClient.Companion.fileChangeSuggestionToBranch(change)
-          if(!gitHost.checkIfPrExists(branch)){
+          if (!gitHost.checkIfPrExists(branch)) {
             git.createBranchWithChange(change)
-            git.pushBranchToOrigin(branch)
-            gitHost.openNewPR(branch)
+            if (workspace.pushToRemote) {
+              git.pushBranchToOrigin(branch)
+              gitHost.openNewPR(branch)
+            }
           }
         }
       }

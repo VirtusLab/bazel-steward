@@ -17,5 +17,5 @@ fun createWorkspaceGithubActions(): Workspace {
 
   val client = GithubClient(repository, token, url)
   val path = Path(workspace)
-  return Workspace(path, client)
+  return Workspace(path, client, true)
 }
