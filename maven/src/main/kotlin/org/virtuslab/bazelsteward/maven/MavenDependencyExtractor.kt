@@ -15,7 +15,7 @@ class MavenDependencyExtractor(private val workspace: Workspace) {
       ProcessBuilder(bazelQuery.split(' ')).directory(workspace.path.toFile()).start().onExit().await()
     val xml = process.inputStream.bufferedReader().use { it.readText() }
     val fileLocation =
-      xmlRegex.find(xml)?.let { it.groups[1]?.value } ?: throw RuntimeException("Failed to find file")
+      xmlRegex.find(xml)?.let { it.groups[1]?.value } ?: throw RuntimeException("Failed to find file in [$xml]")
 
     return Files.readAllLines(Path.of(fileLocation))
       .toList().map {

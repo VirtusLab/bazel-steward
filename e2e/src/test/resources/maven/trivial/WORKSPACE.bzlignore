@@ -1,4 +1,4 @@
-workspace(name = "bazel-steward")
+workspace(name = "maven-trivial")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -65,6 +65,7 @@ load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
 
 scala_repositories()
 
+# maven deps
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
@@ -80,8 +81,8 @@ maven_install(
         "org.junit.jupiter:junit-jupiter-params:5.4.2",
         "org.apache.logging.log4j:log4j-core:2.16.0",
     ],
+    fetch_sources = False,
     repositories = [
-        "https://maven-central.storage.googleapis.com/repos/central/data/",
         "https://repo1.maven.org/maven2",
     ],
 )
