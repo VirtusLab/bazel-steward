@@ -8,7 +8,7 @@ import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.common.FileUpdateSearch
-import org.virtuslab.bazelsteward.common.GitService
+import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.Workspace
@@ -40,8 +40,16 @@ class App {
               .selectUpdate(it.key, it.value)
           }.flattenOption()
         val changeSuggestions = FileUpdateSearch(definitions).searchBuildFiles(updateSuggestions)
-        val git = GitService(workspace)
-        changeSuggestions.forEach { git.createBranchWithChange(it) }
+        val git = GitClient(workspace)
+        val gitHost = workspace.gitHostClient
+        changeSuggestions.forEach { change ->
+          val branch = GitClient.Companion.fileChangeSuggestionToBranch(change)
+          if(!gitHost.checkIfPrExists(branch)){
+            git.createBranchWithChange(change)
+            git.pushBranchToOrigin(branch)
+            gitHost.openNewPR(branch)
+          }
+        }
       }
     }
   }

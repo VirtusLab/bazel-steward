@@ -11,13 +11,13 @@ import org.virtuslab.bazelsteward.core.Workspace
 import java.io.IOException
 import kotlin.io.path.readText
 
-class GitService(workspace: Workspace) {
+class GitClient(workspace: Workspace) {
   // private val ident: PersonIdent = PersonIdent("bazel-steward", "no-reply@github.com")
   private val git = Git.open(workspace.path.toFile())
 
   fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): Option<GitBranch> {
     try {
-      val branch = GitBranch(change.library.id, change.newVersion)
+      val branch = fileChangeSuggestionToBranch(change)
       git.checkout().setName(branch.name).setCreateBranch(true).call()
       val newContents =
         change.file.readText()
@@ -35,15 +35,21 @@ class GitService(workspace: Workspace) {
     }
   }
 
-  fun pushBranchToOrigin(branch: String) {
+  fun pushBranchToOrigin(branch: GitBranch) {
     try {
-      git.checkout().setName(branch).call()
-      git.push().setRemote("origin").setRefSpecs(RefSpec("$branch:$branch")).call()
+      val branchName = branch.name
+      git.checkout().setName(branchName).call()
+      git.push().setRemote("origin").setRefSpecs(RefSpec("$branchName:$branchName")).call()
     } catch (ex: Exception) {
       when (ex) {
         is GitAPIException, is IOException -> {}
         else -> throw ex
       }
     }
+  }
+
+  companion object {
+    fun fileChangeSuggestionToBranch(change: FileUpdateSearch.FileChangeSuggestion) =
+      GitBranch(change.library.id, change.newVersion)
   }
 }
