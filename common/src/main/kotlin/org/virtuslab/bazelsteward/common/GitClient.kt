@@ -11,12 +11,17 @@ import org.virtuslab.bazelsteward.core.Config
 import java.io.IOException
 import kotlin.io.path.readText
 
-class GitClient(workspace: Config) {
+class GitClient(private val config: Config) {
   // private val ident: PersonIdent = PersonIdent("bazel-steward", "no-reply@github.com")
-  private val git = Git.open(workspace.path.toFile())
+  private val git = Git.open(config.path.toFile())
+
+  fun checkoutBaseBranch() {
+    git.checkout().setName(config.baseBranch).call()
+  }
 
   fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): Option<GitBranch> {
     try {
+      checkoutBaseBranch()
       val branch = fileChangeSuggestionToBranch(change)
       git.checkout().setName(branch.name).setCreateBranch(true).call()
       val newContents =

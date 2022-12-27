@@ -5,6 +5,7 @@ import org.virtuslab.bazelsteward.common.GitClient
 
 class App(private val ctx: Context) {
   suspend fun run() {
+    ctx.gitClient.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
     val currentDependencies = ctx.mavenDependencyExtractor.extract()
     val availableVersions = ctx.mavenRepository.findVersions(currentDependencies)

@@ -16,7 +16,7 @@ import org.virtuslab.bazelsteward.maven.MavenDependencyExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import kotlin.io.path.Path
 
-class Context(
+data class Context(
   val config: Config,
   val bazelFileSearch: BazelFileSearch,
   val mavenDependencyExtractor: MavenDependencyExtractor,
@@ -35,10 +35,12 @@ class Context(
         .optional()
       val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
       val pushToRemote by parser.option(ArgType.Boolean, description = "Push to remote", shortName = "p").default(false)
+      val baseBranch by parser.option(ArgType.String, description = "Name of the base branch", shortName = "b")
+        .default("master")
       parser.parse(args)
 
       val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository ?: ".")
-      val config = Config(repoPath, pushToRemote)
+      val config = Config(repoPath, pushToRemote, baseBranch)
 
       val bfs = BazelFileSearch(config)
       val mde = MavenDependencyExtractor(config)
@@ -46,7 +48,7 @@ class Context(
       val ul = UpdateLogic()
       val fus = FileUpdateSearch()
       val gc = GitClient(config)
-      val ghc = if (github) GithubClient.getClient(env) else GitHostClient.stub
+      val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
 
       return Context(config, bfs, mde, mr, ul, fus, gc, ghc)
     }
