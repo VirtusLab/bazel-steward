@@ -38,7 +38,6 @@ class GithubClient private constructor(private val config: Config, repository: S
 
   companion object {
 
-
     fun getClient(env: Environment, config: Config): GitHostClient {
       val url = env.get("GITHUB_API_URL").getOrElse { throw RuntimeException() }
       val repository = env.get("GITHUB_REPOSITORY").getOrElse { throw RuntimeException() }

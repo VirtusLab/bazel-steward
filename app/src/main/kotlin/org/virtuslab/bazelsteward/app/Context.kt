@@ -8,9 +8,9 @@ import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
+import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.maven.MavenDependencyExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
@@ -26,7 +26,6 @@ data class Context(
   val gitClient: GitClient,
   val gitHostClient: GitHostClient
 ) {
-
 
   companion object {
     fun fromArgs(args: Array<String>, env: Environment): Context {

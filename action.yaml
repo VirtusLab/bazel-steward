@@ -22,4 +22,4 @@ runs:
       run: java -jar bazel-steward.jar --github
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ input.github-token }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}

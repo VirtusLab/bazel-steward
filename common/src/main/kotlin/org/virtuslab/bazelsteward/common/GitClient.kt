@@ -6,8 +6,8 @@ import arrow.core.Some
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.transport.RefSpec
-import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.Config
+import org.virtuslab.bazelsteward.core.GitBranch
 import java.io.IOException
 import kotlin.io.path.readText
 
