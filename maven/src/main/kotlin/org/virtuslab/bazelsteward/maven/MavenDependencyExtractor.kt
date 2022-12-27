@@ -1,11 +1,11 @@
 package org.virtuslab.bazelsteward.maven
 
 import kotlinx.coroutines.future.await
-import org.virtuslab.bazelsteward.core.Workspace
+import org.virtuslab.bazelsteward.core.Config
 import java.nio.file.Files
 import java.nio.file.Path
 
-class MavenDependencyExtractor(private val workspace: Workspace) {
+class MavenDependencyExtractor(private val workspace: Config) {
   private val bazelQuery = "bazel query @maven//:outdated.artifacts --output xml --noshow_progress"
   private val xmlRegex = Regex("""<source-file location="(.*):1:1" name="@maven//:outdated.artifacts">""")
 

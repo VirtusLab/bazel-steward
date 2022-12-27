@@ -1,12 +1,18 @@
 package org.virtuslab.bazelsteward.github
 
+import arrow.core.Option
+import arrow.core.getOrElse
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
+import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
+import java.lang.RuntimeException
+import java.nio.file.Path
+import kotlin.io.path.Path
 
-internal class GithubClient(repository: String, token: String, url: String) : GitHostClient {
+class GithubClient private constructor(repository: String, token: String, url: String) : GitHostClient {
   private val github: GitHub = GitHubBuilder().withOAuthToken(token).withEndpoint(url).build()
 
   private val ghRepository =
@@ -20,4 +26,20 @@ internal class GithubClient(repository: String, token: String, url: String) : Gi
   override fun checkIfPrExists(branch: GitBranch) = bazelPRs.contains(branch.name)
 
   override fun openNewPR(branch: GitBranch) = true
+
+  companion object {
+
+
+    fun getClient(env: Environment): GitHostClient {
+      val url = env.get("GITHUB_API_URL").getOrElse { throw RuntimeException() }
+      val repository = env.get("GITHUB_REPOSITORY").getOrElse { throw RuntimeException() }
+      val token = env.get("GITHUB_TOKEN").getOrElse { throw RuntimeException() }
+      return GithubClient(repository, token, url)
+    }
+
+    fun getRepoPath(env: Environment): Path {
+      val workspace = env.get("GITHUB_WORKSPACE").getOrElse { throw RuntimeException() }
+      return Path(workspace)
+    }
+  }
 }

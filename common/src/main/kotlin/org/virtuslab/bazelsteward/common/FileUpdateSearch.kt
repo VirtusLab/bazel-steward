@@ -9,7 +9,7 @@ import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
 import java.nio.file.Path
 
-class FileUpdateSearch(private val buildDefinitions: List<Pair<Path, String>>) {
+class FileUpdateSearch {
   data class FileChangeSuggestion(
     val library: Library<LibraryId>,
     val newVersion: Version,
@@ -17,7 +17,10 @@ class FileUpdateSearch(private val buildDefinitions: List<Pair<Path, String>>) {
     val position: Int
   )
 
-  suspend fun <Lib : LibraryId> searchBuildFiles(updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib>>): List<FileChangeSuggestion> =
+  suspend fun <Lib : LibraryId> searchBuildFiles(
+    buildDefinitions: List<Pair<Path, String>>,
+    updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib>>
+  ): List<FileChangeSuggestion> =
     updateSuggestions.map { suggestion ->
       findSuggestion(buildDefinitions, suggestion)
     }.flattenOption()

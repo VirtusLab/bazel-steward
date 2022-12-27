@@ -1,15 +1,15 @@
 package org.virtuslab.bazelsteward.common
 
-import org.virtuslab.bazelsteward.core.Workspace
+import org.virtuslab.bazelsteward.core.Config
 import java.nio.file.Files
 import java.nio.file.Path
 
-class BazelFileSearch(workspace: Workspace) {
+class BazelFileSearch(config: Config) {
   private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
   private val fileSuffix = ".bzl"
 
   private val buildPaths: List<Path> by lazy {
-    workspace.path.toFile().walkBottomUp()
+    config.path.toFile().walkBottomUp()
       .onEnter { !it.name.startsWith(".") }
       .filter { it.isFile }
       .filter { fileNames.contains(it.name) || it.name.endsWith(fileSuffix) }
