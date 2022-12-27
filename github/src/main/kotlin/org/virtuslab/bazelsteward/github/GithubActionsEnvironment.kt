@@ -13,7 +13,7 @@ fun createWorkspaceGithubActions(pushToRemote: Boolean): Workspace {
   val url = getEnv("GITHUB_API_URL").getOrElse { throw RuntimeException() }
   val repository = getEnv("GITHUB_REPOSITORY").getOrElse { throw RuntimeException() }
   val workspace = getEnv("GITHUB_WORKSPACE").getOrElse { throw RuntimeException() }
-  val token = getEnv("INPUT_GITHUB_TOKEN").getOrElse { throw RuntimeException() }
+  val token = getEnv("GITHUB_TOKEN").getOrElse { throw RuntimeException() }
 
   val client = GithubClient(repository, token, url)
   val path = Path(workspace)

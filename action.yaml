@@ -12,8 +12,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - run: printenv
+      - uses: ./tools
+      - run: java -jar bazel-steward.jar --github
         shell: bash
-#      - uses: ./tools
-#      - run: java -jar bazel-steward.jar --github
-#        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ input.github-token }}

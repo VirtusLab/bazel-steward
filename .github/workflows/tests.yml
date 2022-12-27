@@ -28,4 +28,4 @@ jobs:
       - name: Integration tests
         uses: ./
         with:
-          github-token: fsdafsadfs
+          github-token: ${{ secrets.GITHUB_TOKEN }}
