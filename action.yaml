@@ -8,6 +8,9 @@ inputs:
   github-token:
     description: "A token for the github repository"
     default: ${{ github.token }}
+  base-branch:
+    description: "Branch of the repository that will be scanned for dependencies"
+    required: true
 
 runs:
   using: "composite"
@@ -19,7 +22,7 @@ runs:
     - name: Build jar file
       uses: ./tools
     - name: Run bazel steward
-      run: java -jar bazel-steward.jar --github
+      run: java -jar bazel-steward.jar --github --baseBranch ${{ inputs.base-branch }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
