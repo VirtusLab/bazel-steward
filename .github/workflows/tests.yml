@@ -27,5 +27,5 @@ jobs:
           java-version: 11
       - name: Integration tests
         uses: ./
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
