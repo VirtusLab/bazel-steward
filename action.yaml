@@ -5,6 +5,9 @@ inputs:
   configuration-path:
     description: "The path to bazel steward configuration"
     default: ".github/bazel-steward.yaml"
+  github-token:
+    description: "A token for the github repository"
+    required: true
 
 runs:
   using: "composite"
