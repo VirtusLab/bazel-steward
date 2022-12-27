@@ -11,7 +11,7 @@ class MavenE2E : E2EBase() {
   fun `Maven trivial local test`(@TempDir tempDir: File) {
     val file = loadTest(tempDir, "maven/trivial")
     App.main(args = arrayOf(file.toString(), "-p"))
-    val expectedBranches = listOf("arrow-core", "arrow-fx-coroutines").map { "$branchPrefix/$it/1.1.3" } + masterBranch
+    val expectedBranches = listOf("arrow-core", "arrow-fx-coroutines").map { "$branchRef/$it/1.1.3" } + masterRef
     checkForBranches(file, expectedBranches)
     checkForBranches(File(tempDir, "remote"), expectedBranches)
   }

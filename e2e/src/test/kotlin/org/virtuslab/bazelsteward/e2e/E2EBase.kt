@@ -2,16 +2,17 @@ package org.virtuslab.bazelsteward.e2e
 
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.UriAssert
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.transport.RefSpec
 import org.eclipse.jgit.transport.URIish
 import org.virtuslab.bazelsteward.core.GitBranch
 import java.io.File
 import java.util.jar.JarFile
 
 open class E2EBase {
-  protected val branchPrefix = "refs/heads/${GitBranch.branchPrefix}"
-  protected val masterBranch = "refs/heads/master"
+  protected val branchRef = "refs/heads/${GitBranch.branchPrefix}"
+  private val master = "master"
+  protected val masterRef = "refs/heads/$master"
   protected fun loadTest(tempDir: File, testResourcePath: String): File {
     val localRepo = File(tempDir, "local")
     val finalFile = File(localRepo, testResourcePath)
@@ -28,12 +29,13 @@ open class E2EBase {
     }
 
     val remoteRepo = File(tempDir, "remote")
-    Git.init().setGitDir(File(remoteRepo, ".git")).setBare(true).call()
+    Git.init().setGitDir(remoteRepo).setBare(true).call()
 
-    val git = Git.init().setGitDir(File(finalFile, ".git")).call()
+    val git = Git.init().setGitDir(File(finalFile, ".git")).setInitialBranch(master).call()
     git.add().addFilepattern(".").call()
     git.commit().setMessage("Maven test $testResourcePath").setAuthor("Jan Pawel", "jp2@2137.pl").call()
-    git.remoteAdd().setName("origin").setUri(URIish(remoteRepo.toURI().toURL()))
+    git.remoteAdd().setName("origin").setUri(URIish(remoteRepo.toURI().toURL())).call()
+    git.push().setRemote("origin").setRefSpecs(RefSpec("$master:$master")).call()
     return finalFile
   }
 
