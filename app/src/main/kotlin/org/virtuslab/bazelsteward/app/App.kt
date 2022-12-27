@@ -22,14 +22,14 @@ class App {
     @JvmStatic
     fun main(args: Array<String>) {
       val parser = ArgParser("bazel-steward")
-      val repository by parser.argument(ArgType.String, description = "Location of repository to scan").optional()
-      val github by parser.option(ArgType.Boolean, description = "Create PRs at github").default(false)
+      val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan").optional()
+      val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
       val pushToRemote by parser.option(ArgType.Boolean, description = "Push to remote", shortName = "p").default(false)
 
       parser.parse(args)
 
       val workspace =
-        if (github) createWorkspaceGithubActions()
+        if (github) createWorkspaceGithubActions(pushToRemote)
         else Workspace(Path(repository ?: "."), GitHostClient.stub, pushToRemote)
 
       runBlocking {
