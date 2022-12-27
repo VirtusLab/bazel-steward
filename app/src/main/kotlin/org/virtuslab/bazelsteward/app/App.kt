@@ -2,7 +2,6 @@ package org.virtuslab.bazelsteward.app
 
 import arrow.core.flattenOption
 import org.virtuslab.bazelsteward.common.GitClient
-import org.virtuslab.bazelsteward.core.Config
 
 class App(private val ctx: Context) {
   suspend fun run() {
