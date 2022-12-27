@@ -14,6 +14,6 @@ runs:
   steps:
       - run: printenv
         shell: bash
-      - uses: ./tools
-      - run: java -jar bazel-steward.jar --github
-        shell: bash
+#      - uses: ./tools
+#      - run: java -jar bazel-steward.jar --github
+#        shell: bash
