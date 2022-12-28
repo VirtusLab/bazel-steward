@@ -25,7 +25,10 @@ runs:
       run: git switch ${{ inputs.base-branch }}
       shell: bash
     - name: Run bazel steward
-      run: java -jar bazel-steward.jar --github --baseBranch ${{ inputs.base-branch }}
+      run: java -jar bazel-steward.jar --github --baseBranch ${{ inputs.base-branch }} -p
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
+    - name: Switch back
+      run: git checkout $GITHUB_HEAD_REF
+      shell: bash
