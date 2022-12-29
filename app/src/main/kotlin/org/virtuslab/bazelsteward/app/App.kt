@@ -22,6 +22,7 @@ class App(private val ctx: Context) {
           ctx.gitClient.pushBranchToOrigin(branch)
           ctx.gitHostClient.openNewPR(branch)
         }
+        ctx.gitClient.checkoutBaseBranch()
       }
     }
   }
