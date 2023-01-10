@@ -10,7 +10,12 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VersionTest {
   private val notSemVerVersions = listOf(
-    "1.0a1-SNAPSHOT",
+    "1.0a1-SNAPSHOT+whatever",
+    "1.0+whatever",
+    "1.final",
+    "1.final-2a",
+    "1.0-0",
+    "1.final+whatever",
     "1.0-alpha1",
     "1.0beta1-SNAPSHOT",
     "1.0-b2",
@@ -27,8 +32,7 @@ class VersionTest {
     "1.0-RELEASE",
     "1.0-whatever",
     "1.0.z",
-    "1.0.1.0.0.0.0.0.0.0.0.0.0.0.1",
-    "1.final"
+    "1.0.1.0.0.0.0.0.0.0.0.0.0.0.1"
   )
 
   private fun singleArguments(): Stream<String> {
