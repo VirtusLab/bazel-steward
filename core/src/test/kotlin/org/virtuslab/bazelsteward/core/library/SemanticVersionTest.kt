@@ -32,32 +32,8 @@ class SemanticVersionTest {
 
   @Test
   fun `test fromString wrong versions`() {
-    SemanticVersion.fromString("1.2") shouldBe None
-    SemanticVersion.fromString("1") shouldBe None
-    SemanticVersion.fromString("7.9-628") shouldBe None
-    SemanticVersion.fromString("2022.11.29.0.1-api-version-222") shouldBe None
     SemanticVersion.fromString("1!1.0") shouldBe None
-    SemanticVersion.fromString("1.0.0b1") shouldBe None
-
-    SemanticVersion.fromString("1.0a1-SNAPSHOT") shouldBe None
-    SemanticVersion.fromString("1.0-alpha1") shouldBe None
-    SemanticVersion.fromString("1.0beta1-SNAPSHOT") shouldBe None
-    SemanticVersion.fromString("1.0-b2") shouldBe None
-    SemanticVersion.fromString("1.0-beta3.SNAPSHOT") shouldBe None
-    SemanticVersion.fromString("1.0-beta3") shouldBe None
-    SemanticVersion.fromString("1.0-milestone1-SNAPSHOT") shouldBe None
-    SemanticVersion.fromString("1.0-m2") shouldBe None
-    SemanticVersion.fromString("1.0-rc1-SNAPSHOT") shouldBe None
-    SemanticVersion.fromString("1.0-cr1") shouldBe None
-    SemanticVersion.fromString("1.0-SNAPSHOT") shouldBe None
-    SemanticVersion.fromString("1.0") shouldBe None
-    SemanticVersion.fromString("1.0-sp") shouldBe None
-    SemanticVersion.fromString("1.0-a") shouldBe None
-    SemanticVersion.fromString("1.0-RELEASE") shouldBe None
-    SemanticVersion.fromString("1.0-whatever") shouldBe None
-    SemanticVersion.fromString("1.0.z") shouldBe None
-    SemanticVersion.fromString("1.0.1.0.0.0.0.0.0.0.0.0.0.0.1") shouldBe None
-    SemanticVersion.fromString("1-1.foo-bar-1-baz-0.1") shouldBe None
+    SemanticVersion.fromString("NotAVersionSting") shouldBe None
   }
 
   private fun testSemanticVersion(

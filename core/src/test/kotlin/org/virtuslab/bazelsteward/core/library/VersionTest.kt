@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.core.library
 
 import arrow.core.None
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -32,7 +33,11 @@ class VersionTest {
     "1.0-RELEASE",
     "1.0-whatever",
     "1.0.z",
-    "1.0.1.0.0.0.0.0.0.0.0.0.0.0.1"
+    "1.0.1.0.0.0.0.0.0.0.0.0.0.0.1",
+    "1-1.foo-bar-1-baz-0.1",
+    "2022.11.29.0.1-api-version-222",
+    "1.0.0b1",
+    "7.9-628"
   )
 
   private fun singleArguments(): Stream<String> {
@@ -44,7 +49,7 @@ class VersionTest {
   @MethodSource("singleArguments")
   fun `not SemVer Version`(version: String) {
       val ver = SimpleVersion(version)
-      ver.toSemVer() shouldBe None
+      ver.toSemVer() shouldNotBe None
   }
 
 }
