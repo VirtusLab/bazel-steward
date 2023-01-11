@@ -4,7 +4,6 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         "//core",
-        "@maven//:org_eclipse_jgit_org_eclipse_jgit",
     ],
 )
 

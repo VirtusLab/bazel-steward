@@ -6,7 +6,7 @@ import kotlinx.cli.default
 import kotlinx.cli.optional
 import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.common.FileUpdateSearch
-import org.virtuslab.bazelsteward.common.GitClient
+import org.virtuslab.bazelsteward.common.GitOperations
 import org.virtuslab.bazelsteward.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
@@ -23,7 +23,7 @@ data class Context(
   val mavenRepository: MavenRepository,
   val updateLogic: UpdateLogic,
   val fileUpdateSearch: FileUpdateSearch,
-  val gitClient: GitClient,
+  val gitOperations: GitOperations,
   val gitHostClient: GitHostClient
 ) {
 
@@ -46,7 +46,7 @@ data class Context(
       val mr = MavenRepository()
       val ul = UpdateLogic()
       val fus = FileUpdateSearch()
-      val gc = GitClient(config)
+      val gc = GitOperations(config)
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
 
       return Context(config, bfs, mde, mr, ul, fus, gc, ghc)

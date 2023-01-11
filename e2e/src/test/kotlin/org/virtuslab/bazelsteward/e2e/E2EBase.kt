@@ -1,18 +1,19 @@
 package org.virtuslab.bazelsteward.e2e
 
+import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.transport.RefSpec
-import org.eclipse.jgit.transport.URIish
+import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.core.GitBranch
 import java.io.File
+import java.lang.RuntimeException
 import java.util.jar.JarFile
 
 open class E2EBase {
-  protected val branchRef = "refs/heads/${GitBranch.branchPrefix}"
+  private val heads = "refs/heads/"
+  protected val branchRef = "$heads${GitBranch.branchPrefix}"
   private val master = "master"
-  protected val masterRef = "refs/heads/$master"
+  protected val masterRef = "$heads$master"
   protected fun loadTest(tempDir: File, testResourcePath: String): File {
     val localRepo = File(tempDir, "local")
     val finalFile = File(localRepo, testResourcePath)
@@ -28,20 +29,45 @@ open class E2EBase {
       )
     }
 
-    val remoteRepo = File(tempDir, "remote")
-    Git.init().setGitDir(remoteRepo).setBare(true).call()
+    runBlocking {
+      val remoteRepo = File(tempDir, "remote")
+      if (!remoteRepo.mkdir())
+        throw RuntimeException("Failed to create directory")
+      GitClient(remoteRepo).init(bare = true)
 
-    val git = Git.init().setGitDir(File(finalFile, ".git")).setInitialBranch(master).call()
-    git.add().addFilepattern(".").call()
-    git.commit().setMessage("Maven test $testResourcePath").setAuthor("Jan Pawel", "jp2@2137.pl").call()
-    git.remoteAdd().setName("origin").setUri(URIish(remoteRepo.toURI().toURL())).call()
-    git.push().setRemote("origin").setRefSpecs(RefSpec("$master:$master")).call()
+      val git = GitClient(finalFile)
+      git.init(initialBranch = master)
+      git.add(File(".").toPath())
+      git.commit("Maven test $testResourcePath")
+      git.remoteAdd("origin", remoteRepo.path)
+      git.push(master)
+    }
     return finalFile
   }
 
-  protected fun checkForBranches(tempDir: File, branches: List<String>) {
-    val git = Git.open(tempDir)
-    val gitBranches = git.branchList().call().toList().map { it.name }
+  protected fun checkBranches(tempDir: File, testResourcePath: String, branches: List<String>) {
+    val localRepo = File(File(tempDir, "local"), testResourcePath)
+    val remoteRepo = File(tempDir, "remote")
+
+    checkForBranches(localRepo, branches)
+    checkForBranches(remoteRepo, branches)
+
+    val git = GitClient(localRepo)
+    runBlocking {
+      branches.forEach { branchRef ->
+        val branch = branchRef.removePrefix(heads)
+        git.checkout(branch)
+        val status = git.runGitCommand("git status")
+        Assertions.assertThat(status)
+          .contains("Your branch is up to date with")
+          .contains("nothing to commit, working tree clean")
+      }
+    }
+  }
+
+  private fun checkForBranches(tempDir: File, branches: List<String>) {
+    val git = GitClient(tempDir)
+    val gitBranches = runBlocking { git.showRef(heads = true) }
     Assertions.assertThat(gitBranches).containsExactlyInAnyOrderElementsOf(branches)
   }
 }

@@ -5,6 +5,5 @@ import org.junit.jupiter.api.Test
 class GithubTest {
   @Test
   fun `should have equals`() {
-    true
   }
 }
