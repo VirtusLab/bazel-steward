@@ -7,8 +7,8 @@ class App(private val ctx: Context) {
   suspend fun run() {
     ctx.gitOperations.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
-    val currentDependencies = ctx.mavenDependencyExtractor.extract()
-    val availableVersions = ctx.mavenRepository.findVersions(currentDependencies)
+    val mavenData = ctx.mavenDataExtractor.extract()
+    val availableVersions = ctx.mavenRepository.findVersions(mavenData)
     val updateSuggestions =
       availableVersions.map {
         ctx.updateLogic.selectUpdate(it.key, it.value)
