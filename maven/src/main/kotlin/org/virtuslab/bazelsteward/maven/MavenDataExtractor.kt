@@ -15,9 +15,9 @@ class MavenDataExtractor(private val workspace: Workspace) {
   suspend fun extract(): MavenData {
     val repositories = extractFromFile("outdated.repositories")
     val dependencies = extractFromFile("outdated.artifacts").map {
-        val split = it.split(':', limit = 3)
-        MavenCoordinates.of(split[0], split[1], split[2])
-      }
+      val split = it.split(':', limit = 3)
+      MavenCoordinates.of(split[0], split[1], split[2])
+    }
     return MavenData(repositories, dependencies)
   }
 
