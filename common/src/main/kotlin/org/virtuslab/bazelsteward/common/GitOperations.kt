@@ -1,7 +1,5 @@
 package org.virtuslab.bazelsteward.common
 
-import arrow.core.Option
-import arrow.core.Some
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.GitBranch
 import kotlin.io.path.readText
@@ -13,7 +11,7 @@ class GitOperations(private val config: Config) {
     git.checkout(config.baseBranch)
   }
 
-  suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): Option<GitBranch> {
+  suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {
     val branch = fileChangeSuggestionToBranch(change)
     git.checkout(branch.name, true)
     val newContents = change.file.readText()
@@ -21,7 +19,7 @@ class GitOperations(private val config: Config) {
     change.file.toFile().writeText(newContents)
     git.add(change.file)
     git.commit("Updated ${change.library.id.name} to ${change.newVersion.value}")
-    return Some(branch)
+    return branch
   }
 
   suspend fun pushBranchToOrigin(branch: GitBranch) {

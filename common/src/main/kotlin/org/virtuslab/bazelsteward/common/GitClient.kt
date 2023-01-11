@@ -9,9 +9,9 @@ import java.nio.file.Path
 class GitClient(private val repositoryFile: File) {
   private val quiet = "--quiet"
 
-  suspend fun checkout(target: String, branch: Boolean = false) {
-    val newBranch = if (branch) "-b" else ""
-    runGitCommand("git checkout $quiet $newBranch $target")
+  suspend fun checkout(target: String, newBranch: Boolean = false) {
+    val b = if (newBranch) "-b" else ""
+    runGitCommand("git checkout $quiet $b $target")
   }
 
   suspend fun add(vararg paths: Path) {
@@ -20,7 +20,7 @@ class GitClient(private val repositoryFile: File) {
   }
 
   suspend fun commit(message: String) {
-    runGitCommand("""git commit $quiet -m "$message" """)
+    runGitCommand("""git commit $quiet -m '$message' """)
   }
 
   suspend fun push(upstream: String? = null) {
