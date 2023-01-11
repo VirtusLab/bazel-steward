@@ -1,7 +1,6 @@
 package org.virtuslab.bazelsteward.maven
 
 import coursierapi.Module
-import coursierapi.Repository
 import coursierapi.Versions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -12,13 +11,14 @@ import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
 
 class MavenRepository {
-  suspend fun findVersions(libraries: List<MavenCoordinates>): Map<MavenCoordinates, List<Version>> =
+  suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> =
     withContext(Dispatchers.IO) {
       coroutineScope {
-        libraries.map { coordinates ->
+        val mavenRepositories = mavenData.repositories.map { coursierapi.MavenRepository.of(it) }
+        mavenData.dependencies.map { coordinates ->
           async {
             val versionResult =
-              Versions.create().withRepositories(Repository.central())
+              Versions.create().withRepositories(*mavenRepositories.toTypedArray())
                 .withModule(Module.of(coordinates.id.group, coordinates.id.artifact))
                 .versions()
             if (versionResult.errors.isNotEmpty())
