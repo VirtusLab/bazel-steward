@@ -88,7 +88,6 @@ maven_install(
         "commons-io:commons-io:2.11.0",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
         "org.kohsuke:github-api:1.313",
-        "com.github.tomakehurst:wiremock-jre8:2.35.0",
     ],
     fetch_sources = True,
     repositories = [

@@ -8,7 +8,6 @@ kt_junit5_test(
     test_package = "org.virtuslab.bazelsteward.e2e",
     deps = [
         "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
-        "@maven//:com_github_tomakehurst_wiremock_jre8",
         "@maven//:commons_io_commons_io",
     ],
 )
