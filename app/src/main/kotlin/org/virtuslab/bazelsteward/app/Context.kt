@@ -4,8 +4,10 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.optional
+import kotlinx.coroutines.runBlocking
 import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.common.FileUpdateSearch
+import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.common.GitOperations
 import org.virtuslab.bazelsteward.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.Config
@@ -34,11 +36,10 @@ data class Context(
         .optional()
       val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
       val pushToRemote by parser.option(ArgType.Boolean, description = "Push to remote", shortName = "p").default(false)
-      val baseBranch by parser.option(ArgType.String, description = "Name of the base branch", shortName = "b")
-        .default("master")
       parser.parse(args)
 
       val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository ?: ".")
+      val baseBranch = runBlocking { GitClient(repoPath.toFile()).runGitCommand("git rev-parse --abbrev-ref HEAD") }
       val config = Config(repoPath, pushToRemote, baseBranch)
 
       val bfs = BazelFileSearch(config)

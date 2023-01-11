@@ -25,5 +25,3 @@ jobs:
           fetch-depth: 0
       - name: Integration tests
         uses: ./
-        with:
-          base-branch: "main"
