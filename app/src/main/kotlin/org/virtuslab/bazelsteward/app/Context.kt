@@ -12,14 +12,14 @@ import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.github.GithubClient
-import org.virtuslab.bazelsteward.maven.MavenDependencyExtractor
+import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import kotlin.io.path.Path
 
 data class Context(
   val config: Config,
   val bazelFileSearch: BazelFileSearch,
-  val mavenDependencyExtractor: MavenDependencyExtractor,
+  val mavenDataExtractor: MavenDataExtractor,
   val mavenRepository: MavenRepository,
   val updateLogic: UpdateLogic,
   val fileUpdateSearch: FileUpdateSearch,
@@ -42,7 +42,7 @@ data class Context(
       val config = Config(repoPath, pushToRemote, baseBranch)
 
       val bfs = BazelFileSearch(config)
-      val mde = MavenDependencyExtractor(config)
+      val mde = MavenDataExtractor(config)
       val mr = MavenRepository()
       val ul = UpdateLogic()
       val fus = FileUpdateSearch()
