@@ -9,9 +9,10 @@ class MavenE2E : E2EBase() {
 
   @Test
   fun `Maven trivial local test`(@TempDir tempDir: File) {
-    val file = loadTest(tempDir, "maven/trivial")
+    val testResourcePath = "maven/trivial"
+    val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "-p"))
     val expectedBranches = listOf("arrow-core", "arrow-fx-coroutines").map { "$branchRef/$it/1.1.3" } + masterRef
-    checkBranches(tempDir, "maven/trivial", expectedBranches)
+    checkBranches(tempDir, testResourcePath, expectedBranches)
   }
 }
