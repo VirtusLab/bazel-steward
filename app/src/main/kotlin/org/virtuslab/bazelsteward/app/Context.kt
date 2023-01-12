@@ -39,7 +39,9 @@ data class Context(
       parser.parse(args)
 
       val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository ?: ".")
-      val baseBranch = runBlocking { GitClient(repoPath.toFile()).runGitCommand("git rev-parse --abbrev-ref HEAD") }
+      val baseBranch = runBlocking {
+        GitClient(repoPath.toFile()).runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
+      }
       val config = Config(repoPath, pushToRemote, baseBranch)
 
       val bfs = BazelFileSearch(config)

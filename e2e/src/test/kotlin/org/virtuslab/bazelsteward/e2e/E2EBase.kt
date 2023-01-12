@@ -57,7 +57,7 @@ open class E2EBase {
       branches.forEach { branchRef ->
         val branch = branchRef.removePrefix(heads)
         git.checkout(branch)
-        val status = git.runGitCommand("git status")
+        val status = git.status()
         Assertions.assertThat(status)
           .contains("Your branch is up to date with")
           .contains("nothing to commit, working tree clean")

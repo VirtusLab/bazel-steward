@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.github
 
-import arrow.core.getOrElse
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
@@ -39,14 +38,14 @@ class GithubClient private constructor(private val config: Config, repository: S
   companion object {
 
     fun getClient(env: Environment, config: Config): GitHostClient {
-      val url = env.get("GITHUB_API_URL").getOrElse { throw RuntimeException() }
-      val repository = env.get("GITHUB_REPOSITORY").getOrElse { throw RuntimeException() }
-      val token = env.get("GITHUB_TOKEN").getOrElse { throw RuntimeException() }
+      val url = env.getOrThrow("GITHUB_API_URL")
+      val repository = env.getOrThrow("GITHUB_REPOSITORY")
+      val token = env.getOrThrow("GITHUB_TOKEN")
       return GithubClient(config, repository, token, url)
     }
 
     fun getRepoPath(env: Environment): Path {
-      val workspace = env.get("GITHUB_WORKSPACE").getOrElse { throw RuntimeException() }
+      val workspace = env.getOrThrow("GITHUB_WORKSPACE")
       return Path(workspace)
     }
   }
