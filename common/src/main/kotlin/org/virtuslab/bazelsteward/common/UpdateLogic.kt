@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.bazel
+package org.virtuslab.bazelsteward.common
 
 import arrow.core.Option
 import arrow.core.continuations.ensureNotNull

@@ -1,0 +1,26 @@
+name: "Bazel steward"
+description: "Automatically searches bazel repositories for dependencies and updates them"
+author: ""
+inputs:
+  configuration-path:
+    description: "The path to bazel steward configuration"
+    default: ".github/bazel-steward.yaml"
+  github-token:
+    description: "A token for the github repository"
+    default: ${{ github.token }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Build jar file
+      uses: ./tools
+    - uses: fregante/setup-git-user@v1
+    - name: Run bazel steward
+      run: java -jar bazel-steward.jar --github
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}

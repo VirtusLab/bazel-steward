@@ -1,5 +1,5 @@
 kt_jvm_library(
-    name = "bazel",
+    name = "common",
     srcs = glob(["**/*.kt"]),
     visibility = ["//visibility:public"],
     deps = [

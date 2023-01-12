@@ -1,0 +1,5 @@
+alias(
+    name = "github",
+    actual = "//github/src/main/kotlin/org/virtuslab/bazelsteward/github",
+    visibility = ["//visibility:public"],
+)
