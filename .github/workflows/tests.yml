@@ -31,4 +31,4 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: echo ${{ github.ref_type }} ${{ github.ref_type != 'tag' }} ${{ github.ref_type != 'tag' && 'Development Build' || "nain" }}
+      - run: echo ${{ github.ref_type }} ${{ github.ref_type != 'tag' }} ${{ github.ref_type != 'tag' && 'Development Build' || 'nain' }}
