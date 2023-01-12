@@ -16,7 +16,7 @@ jobs:
       steps:
         - uses: actions/checkout@v2
         - name: Build
-          uses: bazel build //app:app_deploy.jar
+          run: bazel build //app:app_deploy.jar
         - name: Publish
           uses: "marvinpinto/action-automatic-releases@v1.2.1"
           with:
