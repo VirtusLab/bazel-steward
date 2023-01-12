@@ -17,7 +17,7 @@ runs:
       with:
         java-version: 11
     - name: Build jar file
-      uses: ./tools
+      uses: ./.github
     - uses: fregante/setup-git-user@v1
     - name: Run bazel steward
       run: java -jar bazel-steward.jar --github

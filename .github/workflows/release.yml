@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches: [ main ]
+
+jobs:
+  tagged-release:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: bazel build //app:app_deploy.jar
+        name: Build project and jar
+      - run: mv bazel-bin/app/app_deploy.jar bazel-steward.jar
+        name: Rename jar
+      - uses: marvinpinto/action-automatic-releases@v1.2.1
+        name: Publish
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ github.ref_type != 'tag' }}
+          title: ${{ github.ref_type != 'tag' && 'Development Build' || null }}
+          automatic_release_tag: ${{ github.ref_type != 'tag' && 'latest' || null }}
+          files: bazel-steward.jar
