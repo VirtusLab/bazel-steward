@@ -20,9 +20,8 @@ jobs:
         - name: Publish
           uses: "marvinpinto/action-automatic-releases@v1.2.1"
           with:
-            repo_token: "${{ secrets.GITHUB_TOKEN }}"
-            prerelease: false #make cond
-            title: #make cond
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            prerelease: ${{ github.ref_type != "tag" }}
+            title: ${{ github.ref_type != "tag" && "Development Build" || null }}
             automatic_release_tag: "latest"
-            files: |
-              bazel-bin/app/app_deploy.jar
+            files: bazel-bin/app/app_deploy.jar
