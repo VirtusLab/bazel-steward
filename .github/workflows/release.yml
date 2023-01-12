@@ -1,0 +1,28 @@
+name: Tagged Release
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - "main"
+
+jobs:
+  tagged-release:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Build
+          uses: bazel build //app:app_deploy.jar
+        - name: Publish
+          uses: "marvinpinto/action-automatic-releases@v1.2.1"
+          with:
+            repo_token: "${{ secrets.GITHUB_TOKEN }}"
+            prerelease: false #make cond
+            title: #make cond
+            automatic_release_tag: "latest"
+            files: |
+              bazel-bin/app/app_deploy.jar
