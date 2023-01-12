@@ -25,3 +25,10 @@ jobs:
           fetch-depth: 0
       - name: Integration tests
         uses: ./
+
+  tagged-release:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo ${{ github.ref_type }} ${{ github.ref_type != 'tag' }} ${{ github.ref_type != 'tag' && 'Development Build' || "nain" }}
