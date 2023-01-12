@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.app
 
+import config.src.main.kotlin.org.virtuslab.bazelsteward.config.BazelStewardConfiguration
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -44,6 +45,7 @@ data class Context(
       }
       val config = Config(repoPath, pushToRemote, baseBranch)
 
+      val bsc = runBlocking { BazelStewardConfiguration(repoPath).get() } // will be used later
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
       val mr = MavenRepository()

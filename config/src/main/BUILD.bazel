@@ -1,0 +1,20 @@
+kt_jvm_library(
+    name = "main",
+    srcs = glob(["kotlin/**/*.kt"]),
+    resources = glob(
+        ["resources/**"],
+    ),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//maven",
+        "@maven//:com_fasterxml_jackson_dataformat_jackson_dataformat_yaml",
+        "@maven//:com_fasterxml_jackson_module_jackson_module_kotlin",
+        "@maven//:com_networknt_json_schema_validator",
+        "@maven//:io_arrow_kt_arrow_core",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_jdk8",
+        "@maven//:org_slf4j_slf4j_nop",
+    ],
+)
+
+lint(srcs = glob(["kotlin/**/*.kt"]))
