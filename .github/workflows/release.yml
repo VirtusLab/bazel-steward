@@ -14,7 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: bazel build //app:app_deploy.jar
-        name: Build
+        name: Build project and jar
+      - run: mv bazel-bin/app/app_deploy.jar bazel-steward.jar
+        name: Rename jar
       - uses: marvinpinto/action-automatic-releases@v1.2.1
         name: Publish
         with:
@@ -22,4 +24,4 @@ jobs:
           prerelease: ${{ github.ref_type != 'tag' }}
           title: ${{ github.ref_type != 'tag' && 'Development Build' || null }}
           automatic_release_tag: ${{ github.ref_type != 'tag' && 'latest' || null }}
-          files: bazel-bin/app/app_deploy.jar
+          files: bazel-steward.jar
