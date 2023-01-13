@@ -8,6 +8,9 @@ inputs:
   github-token:
     description: "A token for the github repository"
     default: ${{ github.token }}
+  use-release:
+    description: "Weather to use prebuild jar from release, instead of compiling code"
+    default: "true"
 
 runs:
   using: "composite"
@@ -16,7 +19,12 @@ runs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Download release
+      if: ${{ inputs.use-release }}
+      run: gh release download ${{ github.action_ref }} --pattern bazel-steward.jar
+      shell: bash
     - name: Build jar file
+      if: ${{ !inputs.use-release }}
       uses: ./.github
     - uses: fregante/setup-git-user@v1
     - name: Run bazel steward
@@ -24,3 +32,7 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
+
+branding:
+  icon: 'umbrella'
+  color: 'green'
