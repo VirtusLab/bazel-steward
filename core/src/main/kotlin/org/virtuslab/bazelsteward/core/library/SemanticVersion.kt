@@ -83,8 +83,6 @@ data class SemanticVersion(
   }
 
   companion object {
-    private val canonicalSemVerRegex =
-      Regex("""^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?${'$'}""")
     private val semVerRegex =
       Regex("""^(?<majorRegex>0|[1-9]\d*)(?:[.-](?<minorRegex>(0|[1-9]\d*)))?(?:[.-]?(?<patchRegex>(0|[1-9]\d*)?))(?:[-.]?(?<preReleaseRegex>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaDataRegex>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
 
