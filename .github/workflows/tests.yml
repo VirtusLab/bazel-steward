@@ -25,6 +25,8 @@ jobs:
           fetch-depth: 0
       - name: Integration tests
         uses: ./
+        with:
+          use-release: "false"
   buildifier:
     runs-on: ubuntu-latest
     steps:
