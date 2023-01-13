@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 
 class SemanticVersionTest {
 
-
   @Test
   fun `test fromString`() {
     testSemanticVersion("1.2.3", 1, 2, 3, "", "")
@@ -16,16 +15,16 @@ class SemanticVersionTest {
     testSemanticVersion("1.0.0-alpha", 1, 0, 0, "alpha", "")
     testSemanticVersion("1.0.0-alpha.1", 1, 0, 0, "alpha.1", "")
     testSemanticVersion("1.0.0-0.3.7", 1, 0, 0, "0.3.7", "")
-    testSemanticVersion("1.0.0-x.7.z.92", 1, 0, 0, "x.7.z.92","")
+    testSemanticVersion("1.0.0-x.7.z.92", 1, 0, 0, "x.7.z.92", "")
     testSemanticVersion("1.0.0-alpha+001", 1, 0, 0, "alpha", "001")
     testSemanticVersion("1.0.0+20130313144700", 1, 0, 0, "", "20130313144700")
     testSemanticVersion("1.0.0-beta+exp.sha.5114f85", 1, 0, 0, "beta", "exp.sha.5114f85")
     testSemanticVersion("1.0.0-alpha", 1, 0, 0, "alpha", "")
     testSemanticVersion("1.0.0-alpha.1", 1, 0, 0, "alpha.1", "")
-    testSemanticVersion( "1.0.0-alpha.beta", 1, 0, 0, "alpha.beta", "")
+    testSemanticVersion("1.0.0-alpha.beta", 1, 0, 0, "alpha.beta", "")
     testSemanticVersion("1.0.0-beta", 1, 0, 0, "beta", "")
     testSemanticVersion("1.0.0-beta.2", 1, 0, 0, "beta.2", "")
-    testSemanticVersion("1.0.0-beta.11",1, 0, 0, "beta.11", "")
+    testSemanticVersion("1.0.0-beta.11", 1, 0, 0, "beta.11", "")
     testSemanticVersion("1.0.0-rc.1", 1, 0, 0, "rc.1", "")
     testSemanticVersion("1.0.0", 1, 0, 0, "", "")
   }

@@ -3,7 +3,6 @@ package org.virtuslab.bazelsteward.core.library
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.toOption
-import java.util.*
 
 data class SemanticVersion(
   val major: Int,
@@ -33,9 +32,9 @@ data class SemanticVersion(
     this.comparePreReleases(this.prerelease, other.prerelease)
   else 0
 
-  private fun comparePreReleases(preRelease: String, other: String): Int{
+  private fun comparePreReleases(preRelease: String, other: String): Int {
     val qualifiers: Map<String, Int> = mapOf(
-      Pair("alpha",1),
+      Pair("alpha", 1),
       Pair("beta", 2),
       Pair("milestone", 3),
       Pair("rc", 4),
@@ -51,12 +50,12 @@ data class SemanticVersion(
     val firstQualifier: String? = getQualifierForPreRelease(qualifiers, preRelease)
     val otherQualifier: String? = getQualifierForPreRelease(qualifiers, other)
 
-    val compareQualifiers = when{
-      qualifiers[firstQualifier] == null -> if(qualifiers[otherQualifier] == null) preRelease.compareTo(other) else -1
+    val compareQualifiers = when {
+      qualifiers[firstQualifier] == null -> if (qualifiers[otherQualifier] == null) preRelease.compareTo(other) else -1
       qualifiers[otherQualifier] == null -> 1
       else -> qualifiers[firstQualifier]!!.compareTo(qualifiers[otherQualifier]!!)
     }.let {
-      if(it == 0){
+      if (it == 0) {
         val preReleaseNoQualifier = getPreReleaseNoQualifier(firstQualifier!!, preRelease)
         val otherNoQualifier = getPreReleaseNoQualifier(otherQualifier!!, other)
         preReleaseNoQualifier.compareTo(otherNoQualifier)
@@ -66,20 +65,20 @@ data class SemanticVersion(
     return compareQualifiers
   }
 
-  private fun getQualifierForPreRelease(qualifiers: Map<String, Int>, preRelease: String): String?{
-    return when{
+  private fun getQualifierForPreRelease(qualifiers: Map<String, Int>, preRelease: String): String? {
+    return when {
       preRelease.startsWith('a') -> "alpha"
       preRelease.startsWith('b') -> "beta"
       preRelease.startsWith('m') -> "milestone"
-      else -> qualifiers.keys.firstOrNull{ preRelease.contains(it) }
+      else -> qualifiers.keys.firstOrNull { preRelease.contains(it) }
     }
   }
 
-  private fun getPreReleaseNoQualifier(qualifier: String, preRelease: String): String{
-    return if(preRelease.contains(qualifier)){
-      preRelease.replaceFirst(qualifier,"")
+  private fun getPreReleaseNoQualifier(qualifier: String, preRelease: String): String {
+    return if (preRelease.contains(qualifier)) {
+      preRelease.replaceFirst(qualifier, "")
     } else {
-      preRelease.replaceFirst(qualifier.first().toString(),"")
+      preRelease.replaceFirst(qualifier.first().toString(), "")
     }
   }
 
@@ -87,7 +86,7 @@ data class SemanticVersion(
     private val canonicalSemVerRegex =
       Regex("""^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?${'$'}""")
     private val semVerRegex =
-        Regex("""^(?<majorRegex>0|[1-9]\d*)(?:[.-](?<minorRegex>(0|[1-9]\d*)))?(?:[.-]?(?<patchRegex>(0|[1-9]\d*)?))(?:[-.]?(?<preReleaseRegex>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaDataRegex>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
+      Regex("""^(?<majorRegex>0|[1-9]\d*)(?:[.-](?<minorRegex>(0|[1-9]\d*)))?(?:[.-]?(?<patchRegex>(0|[1-9]\d*)?))(?:[-.]?(?<preReleaseRegex>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaDataRegex>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
 
     fun fromString(value: String): Option<SemanticVersion> {
       return semVerRegex.matchEntire(value).toOption().map { matchResult ->

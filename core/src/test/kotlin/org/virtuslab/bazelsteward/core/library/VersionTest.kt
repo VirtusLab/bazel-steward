@@ -4,7 +4,6 @@ import arrow.core.None
 import arrow.core.compareTo
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldNotBe
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -51,14 +50,14 @@ class VersionTest {
   @ParameterizedTest
   @MethodSource("argumentsForCheckVersion")
   fun `check version`(version: String) {
-      val ver = SimpleVersion(version)
-      ver.toSemVer() shouldNotBe None
+    val ver = SimpleVersion(version)
+    ver.toSemVer() shouldNotBe None
   }
 
   private fun argumentsForCompareVersions(): Stream<Arguments> {
     val listWithArguments: MutableList<Arguments> = mutableListOf()
-    for(i in mavenVersions.indices step 2){
-      listWithArguments.add(Arguments.of(mavenVersions[i], mavenVersions[i+1]))
+    for (i in mavenVersions.indices step 2) {
+      listWithArguments.add(Arguments.of(mavenVersions[i], mavenVersions[i + 1]))
     }
     return listWithArguments.stream()
   }
