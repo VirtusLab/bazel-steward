@@ -20,11 +20,13 @@ runs:
       with:
         java-version: 11
     - name: Download release
-      if: ${{ inputs.use-release }}
+      if: ${{ inputs.use-release == 'true' }}
       run: gh release download ${{ github.action_ref }} --pattern bazel-steward.jar
+      env:
+        GH_TOKEN: ${{ github.token }}
       shell: bash
     - name: Build jar file
-      if: ${{ !inputs.use-release }}
+      if: ${{ inputs.use-release != 'true' }}
       uses: ./.github
     - uses: fregante/setup-git-user@v1
     - name: Run bazel steward
