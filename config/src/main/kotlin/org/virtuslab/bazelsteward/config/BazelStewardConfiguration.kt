@@ -35,7 +35,8 @@ class BazelStewardConfiguration(repoRoot: Path) {
   suspend fun get(): Configuration {
 
     return withContext(Dispatchers.IO) {
-      val schemaContent = javaClass.classLoader.getResource("bazel-steward-schema.json")?.readText() ?: return@withContext Configuration()
+      val schemaContent = javaClass.classLoader.getResource("bazel-steward-schema.json")?.readText()
+        ?: throw Exception("Could not find schema to validate configuration file")
       val schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaContent)
 
       runCatching {

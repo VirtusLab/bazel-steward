@@ -11,7 +11,7 @@ import java.io.File
 class BazelStewardConfigurationTest {
 
   @Test
-  fun `should throw exception when maven object in config file is not correct`(@TempDir tempDir: File) {
+  fun `should throw an exception when maven object in config file is not correct`(@TempDir tempDir: File) {
     copyConfigFileToTempLocation(tempDir, ".bazel-steward-fail.yaml")
     Assertions.assertThatThrownBy { runBlocking { BazelStewardConfiguration(tempDir.toPath()).get() } }
       .hasMessage(
