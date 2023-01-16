@@ -1,5 +1,7 @@
-package config.src.main.kotlin.org.virtuslab.bazelsteward.config
+package org.virtuslab.bazelsteward.config
 
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -8,15 +10,17 @@ import com.networknt.schema.SpecVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
 
 data class Configuration(
-  val maven: MavenConfig?
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  val maven: MavenConfig = MavenConfig()
 )
 
 data class MavenConfig(
-  val ruledDependencies: List<MavenDependency>?
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  val ruledDependencies: List<MavenDependency> = emptyList()
 )
 
 data class MavenDependency(
@@ -26,32 +30,33 @@ data class MavenDependency(
 
 class BazelStewardConfiguration(repoRoot: Path) {
 
-  private val configFilePath = repoRoot.resolve(".bazel-steward.conf")
+  private val configFilePath = repoRoot.resolve(".bazel-steward.yaml")
 
-  suspend fun get(): Configuration? {
+  suspend fun get(): Configuration {
 
     return withContext(Dispatchers.IO) {
-      val schemaContent = this::class.java.classLoader.getResource("bazel-steward-schema.json")?.readText() ?: return@withContext null
+      val schemaContent = this::class.java.classLoader.getResource("bazel-steward-schema.json")?.readText() ?: return@withContext Configuration()
       val schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaContent)
 
       runCatching {
-        Files.newBufferedReader(configFilePath).use { bufferedReader ->
-          val configContent =
-            bufferedReader.use { br -> br.readLines().filterNot { it.startsWith("#") }.joinToString("\n") }
-
-          val yamlReader = ObjectMapper(YAMLFactory())
-          yamlReader.registerModule(KotlinModule())
-          val validationResult = schema.validate(yamlReader.readTree(configContent))
-          if (validationResult.isNotEmpty()) {
-            throw Exception(validationResult.joinToString(System.lineSeparator()) { it.message.removePrefix("$.") })
-          } else {
-            yamlReader.readValue(configContent, Configuration::class.java)
-          }
+        if (!configFilePath.exists()) return@withContext Configuration()
+        val configContent = configFilePath.toFile()
+          .readLines()
+          .filterNot { it.startsWith("#") }
+          .joinToString("\n")
+          .ifEmpty { return@withContext Configuration() }
+        val yamlReader = ObjectMapper(YAMLFactory())
+        yamlReader.registerModule(KotlinModule())
+        val validationResult = schema.validate(yamlReader.readTree(configContent))
+        if (validationResult.isNotEmpty()) {
+          throw Exception(validationResult.joinToString(System.lineSeparator()) { it.message.removePrefix("$.") })
+        } else {
+          yamlReader.readValue(configContent, Configuration::class.java)
         }
-      }.onFailure {
+      }.getOrElse {
         println("Could not parse $configFilePath file!")
-        println(it.message)
-      }.getOrNull()
+        throw it
+      }
     }
   }
 }

@@ -1,16 +1,17 @@
 maven:
   ruledDependencies:
     -
-      group: "commons-io"
-      artifact: "commons-io"
+      id:
+        group: "commons-io"
+        artifact: "commons-io"
       versioning: "loose"
     -
       id:
         group: "io.get-coursier"
         artifact: "interface"
-      versioning: "semverr"
+      versioning: "semver"
     -
       id:
         group: "org.jetbrains.kotlinx"
         artifact: "kotlinx-coroutines-jdk8"
-      versioning: "regex:(?<major>\\d+)(?<minor>\\.\\d+)?(?<patch>\\.\\d+)?$"
+      versioning: "regex:(?<major>\\d+)"

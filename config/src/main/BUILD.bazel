@@ -1,5 +1,5 @@
 kt_jvm_library(
-    name = "main",
+    name = "config",
     srcs = glob(["kotlin/**/*.kt"]),
     resources = glob(
         ["resources/**"],
@@ -17,4 +17,4 @@ kt_jvm_library(
     ],
 )
 
-lint(srcs = glob(["kotlin/**/*.kt"]))
+lint(srcs = glob(["**/*.kt"]))

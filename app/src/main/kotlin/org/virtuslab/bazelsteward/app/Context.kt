@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.app
 
-import config.src.main.kotlin.org.virtuslab.bazelsteward.config.BazelStewardConfiguration
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -11,6 +10,7 @@ import org.virtuslab.bazelsteward.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.common.GitOperations
 import org.virtuslab.bazelsteward.common.UpdateLogic
+import org.virtuslab.bazelsteward.config.BazelStewardConfiguration
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient

@@ -1,0 +1,15 @@
+kt_junit5_test(
+    name = "config",
+    size = "small",
+    srcs = glob(["kotlin/**/*.kt"]),
+    resources = glob(
+        ["resources/**"],
+    ),
+    test_package = "org.virtuslab.bazelsteward.config",
+    deps = [
+        "//config/src/main:config",
+        "@maven//:commons_io_commons_io",
+    ],
+)
+
+lint(srcs = glob(["**/*.kt"]))
