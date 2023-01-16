@@ -17,7 +17,7 @@ class VersionTest {
     "1.0a1-SNAPSHOT+whatever",
     "1.final-2a",
     "1.final",
-    "1.final+whatever",
+    "1.final1+whatever",
     "1.0-0",
     "1.0beta1-SNAPSHOT",
     "1.0-alpha1",
@@ -40,7 +40,9 @@ class VersionTest {
     "2022.11.29.0.1-api-version-222",
     "1.0.0b1",
     "7.10-final",
-    "7.9-628"
+    "7.9-628",
+    "7.9-sp",
+    "7.9",
   )
 
   private fun argumentsForCheckVersion(): Stream<String> {

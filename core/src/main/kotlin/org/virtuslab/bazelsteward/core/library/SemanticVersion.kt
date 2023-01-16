@@ -32,37 +32,36 @@ data class SemanticVersion(
     this.comparePreReleases(this.prerelease, other.prerelease)
   else 0
 
-  private fun comparePreReleases(preRelease: String, other: String): Int {
+  private fun comparePreReleases(first: String, second: String): Int {
+    //"alpha" < "beta" < "milestone" < "rc" = "cr" < "snapshot" < "" = "final" = "ga" < "sp"
     val qualifiers: Map<String, Int> = mapOf(
-      Pair("alpha", 1),
-      Pair("beta", 2),
-      Pair("milestone", 3),
-      Pair("rc", 4),
-      Pair("cr", 4),
-      Pair("snapshot", 5),
-      Pair("", 6),
-      Pair("ga", 6),
-      Pair("final", 6),
-      Pair("release", 6),
-      Pair("sp", 7)
+      "alpha" to 1,
+      "beta" to 2,
+      "milestone" to 3,
+      "rc" to 4,
+      "cr" to 4,
+      "snapshot" to 5,
+      "ga" to 6,
+      "final" to 6,
+      "release" to 6,
+      "sp" to 7,
+      "" to 6,
     )
 
-    val firstQualifier: String? = getQualifierForPreRelease(qualifiers, preRelease)
-    val otherQualifier: String? = getQualifierForPreRelease(qualifiers, other)
+    val firstQualifier: String? = getQualifierForPreRelease(qualifiers, first)
+    val otherQualifier: String? = getQualifierForPreRelease(qualifiers, second)
 
-    val compareQualifiers = when {
-      qualifiers[firstQualifier] == null -> if (qualifiers[otherQualifier] == null) preRelease.compareTo(other) else -1
+    return when {
+      qualifiers[firstQualifier] == null -> if (qualifiers[otherQualifier] == null) first.compareTo(second) else -1
       qualifiers[otherQualifier] == null -> 1
       else -> qualifiers[firstQualifier]!!.compareTo(qualifiers[otherQualifier]!!)
     }.let {
       if (it == 0) {
-        val preReleaseNoQualifier = getPreReleaseNoQualifier(firstQualifier!!, preRelease)
-        val otherNoQualifier = getPreReleaseNoQualifier(otherQualifier!!, other)
-        preReleaseNoQualifier.compareTo(otherNoQualifier)
+        val firstWithoutQualifier = getPreReleaseWithoutQualifier(firstQualifier, first)
+        val secondWithoutQualifier = getPreReleaseWithoutQualifier(otherQualifier, second)
+        firstWithoutQualifier.compareTo(secondWithoutQualifier)
       } else it
     }
-
-    return compareQualifiers
   }
 
   private fun getQualifierForPreRelease(qualifiers: Map<String, Int>, preRelease: String): String? {
@@ -74,27 +73,31 @@ data class SemanticVersion(
     }
   }
 
-  private fun getPreReleaseNoQualifier(qualifier: String, preRelease: String): String {
-    return if (preRelease.contains(qualifier)) {
-      preRelease.replaceFirst(qualifier, "")
-    } else {
-      preRelease.replaceFirst(qualifier.first().toString(), "")
-    }
+  private fun getPreReleaseWithoutQualifier(qualifier: String?, preRelease: String): String {
+    return qualifier?.let {
+      if (preRelease.contains(it)) {
+        preRelease.replaceFirst(it, "")
+      } else {
+        preRelease.replaceFirst(it.first().toString(), "")
+      }
+    } ?: preRelease
   }
 
   companion object {
+    private val canonicalSemVerRegex =
+      Regex("""^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<preRelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildMetaData>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?${'$'}""")
     private val semVerRegex =
-      Regex("""^(?<majorRegex>0|[1-9]\d*)(?:[.-](?<minorRegex>(0|[1-9]\d*)))?(?:[.-]?(?<patchRegex>(0|[1-9]\d*)?))(?:[-.]?(?<preReleaseRegex>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaDataRegex>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
+      Regex("""^(?<major>0|[1-9]\d*)(?:[.-](?<minor>(0|[1-9]\d*)))?(?:[.-]?(?<patch>(0|[1-9]\d*)))?(?:[-.]?(?<preRelease>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaData>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
 
     fun fromString(value: String): Option<SemanticVersion> {
       return semVerRegex.matchEntire(value).toOption().map { matchResult ->
         val values = matchResult.groups as MatchNamedGroupCollection
         SemanticVersion(
-          values["majorRegex"]?.value?.toIntOrNull() ?: 0,
-          values["minorRegex"]?.value?.toIntOrNull() ?: 0,
-          values["patchRegex"]?.value?.toIntOrNull() ?: 0,
-          values["preReleaseRegex"]?.value ?: "",
-          values["buildMetaDataRegex"]?.value ?: "",
+          values["major"]?.value?.toIntOrNull() ?: 0,
+          values["minor"]?.value?.toIntOrNull() ?: 0,
+          values["patch"]?.value?.toIntOrNull() ?: 0,
+          values["preRelease"]?.value ?: "",
+          values["buildMetaData"]?.value ?: "",
         )
       }
     }
