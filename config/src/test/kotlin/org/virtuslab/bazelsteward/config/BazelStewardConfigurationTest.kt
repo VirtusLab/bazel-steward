@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.io.File
-import java.util.jar.JarFile
 
 class BazelStewardConfigurationTest {
 
@@ -48,12 +47,7 @@ class BazelStewardConfigurationTest {
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)
   }
 
-  private fun copyConfigFileToTempLocation(tempDir: File, configFilename: String) {
-    val jarFile = File(javaClass.protectionDomain.codeSource.location.toURI())
-    val configFileName = JarFile(jarFile).use { jar ->
-      val entries = jar.entries().asIterator().asSequence()
-      entries.filterNot { it.isDirectory }.map { it.name }.filter { it.startsWith(configFilename) }.first()
-    }
+  private fun copyConfigFileToTempLocation(tempDir: File, configFileName: String) {
     FileUtils.copyURLToFile(
       javaClass.classLoader.getResource(configFileName),
       File(tempDir, ".bazel-steward.yaml")

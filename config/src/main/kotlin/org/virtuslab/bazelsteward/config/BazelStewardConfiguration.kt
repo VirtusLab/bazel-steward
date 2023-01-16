@@ -35,7 +35,7 @@ class BazelStewardConfiguration(repoRoot: Path) {
   suspend fun get(): Configuration {
 
     return withContext(Dispatchers.IO) {
-      val schemaContent = this::class.java.classLoader.getResource("bazel-steward-schema.json")?.readText() ?: return@withContext Configuration()
+      val schemaContent = javaClass.classLoader.getResource("bazel-steward-schema.json")?.readText() ?: return@withContext Configuration()
       val schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaContent)
 
       runCatching {
