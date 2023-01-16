@@ -33,7 +33,7 @@ data class SemanticVersion(
   else 0
 
   private fun comparePreReleases(first: String, second: String): Int {
-    //"alpha" < "beta" < "milestone" < "rc" = "cr" < "snapshot" < "" = "final" = "ga" < "sp"
+    // "alpha" < "beta" < "milestone" < "rc" = "cr" < "snapshot" < "" = "final" = "ga" < "sp"
     val qualifiers: Map<String, Int> = mapOf(
       "alpha" to 1,
       "beta" to 2,
