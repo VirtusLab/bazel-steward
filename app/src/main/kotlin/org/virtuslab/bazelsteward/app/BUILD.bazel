@@ -4,6 +4,7 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common",
+        "//config",
         "//core",
         "//github",
         "//maven",

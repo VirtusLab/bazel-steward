@@ -1,0 +1,5 @@
+alias(
+    name = "config",
+    actual = "//config/src/main:config",
+    visibility = ["//visibility:public"],
+)
