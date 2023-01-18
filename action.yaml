@@ -11,6 +11,9 @@ inputs:
   use-release:
     description: "Weather to use prebuild jar from release, instead of compiling code"
     default: "true"
+  additional-args:
+    description: "Additional arguments to bazel steward jar"
+    default: "--pushToRemote"
 
 runs:
   using: "composite"
@@ -67,7 +70,7 @@ runs:
       uses: ./.github
     - uses: fregante/setup-git-user@v1
     - name: Run bazel steward
-      run: java -jar bazel-steward.jar --github
+      run: java -jar bazel-steward.jar --github ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}

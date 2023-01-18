@@ -27,6 +27,7 @@ jobs:
         uses: ./
         with:
           use-release: "false"
+          additional-args: ""
   buildifier:
     runs-on: ubuntu-latest
     steps:
