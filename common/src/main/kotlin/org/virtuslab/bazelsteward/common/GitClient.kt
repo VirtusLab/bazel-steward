@@ -60,7 +60,10 @@ class GitClient(private val repositoryFile: File) {
         .onExit().await()
       val stdout = process.inputStream.bufferedReader().use { it.readText() }
       val stderr = process.errorStream.bufferedReader().use { it.readText() }
-      if (stderr.isBlank()) stdout else throw RuntimeException(stderr)
+
+      if (process.exitValue() == 0) stdout else throw RuntimeException(
+        "${command.joinToString(" ")}\n$stdout\n$stderr"
+      )
     }
   }
 }
