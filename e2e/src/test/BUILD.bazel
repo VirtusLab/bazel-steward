@@ -1,6 +1,4 @@
-kt_junit5_test(
-    name = "e2e",
-    size = "medium",
+integration_tests(
     srcs = glob(["kotlin/**/*.kt"]),
     resources = glob(
         ["resources/**"],
@@ -11,5 +9,3 @@ kt_junit5_test(
         "@maven//:commons_io_commons_io",
     ],
 )
-
-lint(srcs = glob(["kotlin/**/*.kt"]))
