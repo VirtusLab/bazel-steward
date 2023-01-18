@@ -56,7 +56,7 @@ runs:
         java-version: 11
     - name: Download release
       if: ${{ inputs.use-release == 'true' }}
-      run: gh release download ${{ github.action_ref }} --pattern bazel-steward.jar
+      run: gh release download `echo ${{ github.action_path }} | grep -Po "(?<=\/)[^\/]*$` --pattern bazel-steward.jar
       env:
         GH_TOKEN: ${{ github.token }}
       shell: bash
