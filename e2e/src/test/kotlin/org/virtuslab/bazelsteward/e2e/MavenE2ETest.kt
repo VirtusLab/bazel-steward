@@ -5,14 +5,14 @@ import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.app.Main
 import java.io.File
 
-class MavenE2E : E2EBase() {
+class MavenE2ETest : E2EBase() {
 
   @Test
   fun `Maven trivial local test`(@TempDir tempDir: File) {
     val testResourcePath = "maven/trivial"
     val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "--pushToRemote"))
-    val expectedBranches = listOf("arrow-core", "arrow-fx-coroutines").map { "$branchRef/$it/1.1.3" } + masterRef
+    val expectedBranches = listOf("arrow-core", "arrow-fx-coroutines").map { "$branchRef/$it/1.1.5" } + masterRef
     checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
   }
 

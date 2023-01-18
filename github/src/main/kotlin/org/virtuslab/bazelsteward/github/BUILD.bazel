@@ -1,11 +1,7 @@
-kt_jvm_library(
-    name = "github",
+library(
     srcs = glob(["**/*.kt"]),
-    visibility = ["//visibility:public"],
     deps = [
         "//core",
         "@maven//:org_kohsuke_github_api",
     ],
 )
-
-lint(srcs = glob(["**/*.kt"]))

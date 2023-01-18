@@ -1,5 +1,5 @@
 alias(
     name = "config",
-    actual = "//config/src/main:config",
+    actual = "//config/src/main",
     visibility = ["//visibility:public"],
 )

@@ -1,11 +1,7 @@
-kt_junit5_test(
-    name = "app",
-    size = "small",
+unit_tests(
     srcs = glob(["**/*.kt"]),
     test_package = "org.virtuslab.bazelsteward.app",
     deps = [
         "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
     ],
 )
-
-lint(srcs = glob(["**/*.kt"]))

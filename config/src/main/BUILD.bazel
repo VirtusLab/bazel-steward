@@ -1,10 +1,8 @@
-kt_jvm_library(
-    name = "config",
+library(
     srcs = glob(["kotlin/**/*.kt"]),
     resources = glob(
         ["resources/**"],
     ),
-    visibility = ["//visibility:public"],
     deps = [
         "//maven",
         "@maven//:com_fasterxml_jackson_dataformat_jackson_dataformat_yaml",
@@ -16,5 +14,3 @@ kt_jvm_library(
         "@maven//:org_slf4j_slf4j_nop",
     ],
 )
-
-lint(srcs = glob(["**/*.kt"]))
