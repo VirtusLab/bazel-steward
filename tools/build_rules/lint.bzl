@@ -5,6 +5,7 @@ def lint(srcs):
         name = "lint_test",
         srcs = srcs,
         config = "//:lint_config",
+        tags = ["lint"],
     )
 
     ktlint_fix(

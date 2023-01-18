@@ -18,11 +18,19 @@ def library(**kwargs):
 def unit_tests(**kwargs):
     if "name" not in kwargs:
         kwargs["name"] = default_target_name()
+    if "tags" not in kwargs:
+        kwargs["tags"] = []
+    kwargs["tags"].append("unit")
+
     kt_junit5_test(size = "small", **kwargs)
     lint(kwargs["srcs"])
 
 def integration_tests(**kwargs):
     if "name" not in kwargs:
         kwargs["name"] = default_target_name()
+    if "tags" not in kwargs:
+        kwargs["tags"] = []
+    kwargs["tags"].append("integration")
+
     kt_junit5_test(size = "medium", **kwargs)
     lint(kwargs["srcs"])

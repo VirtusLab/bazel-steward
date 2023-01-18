@@ -16,8 +16,28 @@ jobs:
         with:
           java-version: 11
       - name: Run tests
-        run: bazel test //...
+        run: bazel test //... --keep_going --test_output=errors --test_tag_filters=unit
   integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Run tests
+        run: bazel test //... --keep_going --test_output=errors --test_tag_filters=integration
+  klint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Run tests
+        run: bazel test //... --keep_going --test_output=errors --test_tag_filters=lint
+  docker-build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
