@@ -14,6 +14,7 @@ open class E2EBase {
   protected val branchRef = "$heads${GitBranch.branchPrefix}"
   private val master = "master"
   protected val masterRef = "$heads$master"
+
   protected fun loadTest(tempDir: File, testResourcePath: String): File {
     val localRepo = File(tempDir, "local")
     val finalFile = File(localRepo, testResourcePath)
@@ -37,6 +38,7 @@ open class E2EBase {
 
       val git = GitClient(finalFile)
       git.init(initialBranch = master)
+      git.configureAuthor("bazel-steward@virtuslab.org", "Bazel Steward")
       git.add(File(".").toPath())
       git.commit("Maven test $testResourcePath")
       git.remoteAdd("origin", remoteRepo.path)
@@ -62,7 +64,7 @@ open class E2EBase {
     checkForBranchesWithoutVersions(localRepo, branchesPattern)
     checkForBranchesWithoutVersions(remoteRepo, branchesPattern)
 
-    val git = GitClient(tempDir)
+    val git = GitClient(localRepo)
     val gitBranches = runBlocking { git.showRef(heads = true) }
     checkStatusOfBranches(localRepo, gitBranches)
   }
