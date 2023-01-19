@@ -1,26 +1,20 @@
 package org.virtuslab.bazelsteward.core.library
 
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.toOption
-
 data class SemanticVersion(
   val major: Int,
   val minor: Int,
   val patch: Int,
   val prerelease: String,
   val buildmetadata: String,
-) : Version,
-  Comparable<SemanticVersion> {
+) : Version, Comparable<SemanticVersion> {
 
-  override val value: String = run {
-    val builder = StringBuilder("$major.$minor.$patch")
-    if (prerelease.isNotBlank())
-      builder.append("-$prerelease")
-    if (buildmetadata.isNotBlank())
-      builder.append("+$buildmetadata")
-    builder.toString()
-  }
+  override val value: String =
+    StringBuilder("$major.$minor.$patch").apply {
+      if (prerelease.isNotBlank())
+        append("-$prerelease")
+      if (buildmetadata.isNotBlank())
+        append("+$buildmetadata")
+    }.toString()
 
   override fun compareTo(other: SemanticVersion): Int = if (this.major != other.major)
     this.major.compareTo(other.major)
@@ -64,24 +58,22 @@ data class SemanticVersion(
     }
   }
 
-  private fun getQualifierForPreRelease(qualifiers: Map<String, Int>, preRelease: String): String? {
-    return when {
+  private fun getQualifierForPreRelease(qualifiers: Map<String, Int>, preRelease: String): String? =
+    when {
       preRelease.startsWith('a') -> "alpha"
       preRelease.startsWith('b') -> "beta"
       preRelease.startsWith('m') -> "milestone"
       else -> qualifiers.keys.firstOrNull { preRelease.contains(it) }
     }
-  }
 
-  private fun getPreReleaseWithoutQualifier(qualifier: String?, preRelease: String): String {
-    return qualifier?.let {
+  private fun getPreReleaseWithoutQualifier(qualifier: String?, preRelease: String): String =
+    qualifier?.let {
       if (preRelease.contains(it)) {
         preRelease.replaceFirst(it, "")
       } else {
         preRelease.replaceFirst(it.first().toString(), "")
       }
     } ?: preRelease
-  }
 
   companion object {
     private val canonicalSemVerRegex =
@@ -89,19 +81,18 @@ data class SemanticVersion(
     private val semVerRegex =
       Regex("""^(?<major>0|[1-9]\d*)(?:[.-](?<minor>(0|[1-9]\d*)))?(?:[.-]?(?<patch>(0|[1-9]\d*)))?(?:[-.]?(?<preRelease>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaData>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
 
-    fun fromString(value: String): Option<SemanticVersion> {
-      return semVerRegex.matchEntire(value).toOption().map { matchResult ->
-        val values = matchResult.groups as MatchNamedGroupCollection
+    fun fromString(value: String): SemanticVersion? =
+      semVerRegex.matchEntire(value)?.let { matchResult ->
+        val values = matchResult.groups
         SemanticVersion(
           values["major"]?.value?.toIntOrNull() ?: 0,
           values["minor"]?.value?.toIntOrNull() ?: 0,
           values["patch"]?.value?.toIntOrNull() ?: 0,
-          values["preRelease"]?.value ?: "",
-          values["buildMetaData"]?.value ?: "",
+          values["preRelease"]?.value.orEmpty(),
+          values["buildMetaData"]?.value.orEmpty(),
         )
       }
-    }
   }
 
-  override fun toSemVer(): Option<SemanticVersion> = Some(this)
+  override fun toSemVer(): SemanticVersion = this
 }

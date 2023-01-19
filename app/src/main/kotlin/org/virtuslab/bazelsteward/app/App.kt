@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.app
 
-import arrow.core.flattenOption
 import org.virtuslab.bazelsteward.common.GitOperations
 
 class App(private val ctx: Context) {
@@ -9,11 +8,11 @@ class App(private val ctx: Context) {
     val definitions = ctx.bazelFileSearch.buildDefinitions
     val mavenData = ctx.mavenDataExtractor.extract()
     val availableVersions = ctx.mavenRepository.findVersions(mavenData)
-    val updateSuggestions =
-      availableVersions.map {
-        ctx.updateLogic.selectUpdate(it.key, it.value)
-      }.flattenOption()
+    val updateSuggestions = availableVersions.mapNotNull {
+      ctx.updateLogic.selectUpdate(it.key, it.value)
+    }
     val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions, updateSuggestions)
+
     changeSuggestions.forEach { change ->
       val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
       if (!ctx.gitHostClient.checkIfPrExists(branch)) {
