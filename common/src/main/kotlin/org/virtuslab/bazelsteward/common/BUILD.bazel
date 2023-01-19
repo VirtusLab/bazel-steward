@@ -1,10 +1,6 @@
-kt_jvm_library(
-    name = "common",
+library(
     srcs = glob(["**/*.kt"]),
-    visibility = ["//visibility:public"],
     deps = [
         "//core",
     ],
 )
-
-lint(srcs = glob(["**/*.kt"]))

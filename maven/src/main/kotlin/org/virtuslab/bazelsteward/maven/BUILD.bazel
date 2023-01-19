@@ -1,11 +1,7 @@
-kt_jvm_library(
-    name = "maven",
+library(
     srcs = glob(["**/*.kt"]),
-    visibility = ["//visibility:public"],
     deps = [
         "//core",
         "@maven//:io_get_coursier_interface",
     ],
 )
-
-lint(srcs = glob(["**/*.kt"]))

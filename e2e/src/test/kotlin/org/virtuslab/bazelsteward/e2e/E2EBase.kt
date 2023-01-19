@@ -45,14 +45,44 @@ open class E2EBase {
     return finalFile
   }
 
-  protected fun checkBranches(tempDir: File, testResourcePath: String, branches: List<String>) {
+  protected fun checkBranchesWithVersions(tempDir: File, testResourcePath: String, branches: List<String>) {
     val localRepo = File(File(tempDir, "local"), testResourcePath)
     val remoteRepo = File(tempDir, "remote")
 
-    checkForBranches(localRepo, branches)
-    checkForBranches(remoteRepo, branches)
+    checkForBranchesWithVersions(localRepo, branches)
+    checkForBranchesWithVersions(remoteRepo, branches)
 
-    val git = GitClient(localRepo)
+    checkStatusOfBranches(localRepo, branches)
+  }
+
+  protected fun checkBranchesWithoutVersions(tempDir: File, testResourcePath: String, branchesPattern: List<String>) {
+    val localRepo = File(File(tempDir, "local"), testResourcePath)
+    val remoteRepo = File(tempDir, "remote")
+
+    checkForBranchesWithoutVersions(localRepo, branchesPattern)
+    checkForBranchesWithoutVersions(remoteRepo, branchesPattern)
+
+    val git = GitClient(tempDir)
+    val gitBranches = runBlocking { git.showRef(heads = true) }
+    checkStatusOfBranches(localRepo, gitBranches)
+  }
+
+  private fun checkForBranchesWithoutVersions(tempDir: File, requiredBranches: List<String>) {
+    val git = GitClient(tempDir)
+    val gitBranches = runBlocking { git.showRef(heads = true) }
+
+    Assertions.assertThat(gitBranches).hasSameSizeAs(requiredBranches)
+    Assertions.assertThat(requiredBranches.all { branch -> gitBranches.any { it.contains(branch) } }).isTrue
+  }
+
+  private fun checkForBranchesWithVersions(tempDir: File, branches: List<String>) {
+    val git = GitClient(tempDir)
+    val gitBranches = runBlocking { git.showRef(heads = true) }
+    Assertions.assertThat(gitBranches).containsExactlyInAnyOrderElementsOf(branches)
+  }
+
+  private fun checkStatusOfBranches(tempDir: File, branches: List<String>) {
+    val git = GitClient(tempDir)
     runBlocking {
       branches.forEach { branchRef ->
         val branch = branchRef.removePrefix(heads)
@@ -63,11 +93,5 @@ open class E2EBase {
           .contains("nothing to commit, working tree clean")
       }
     }
-  }
-
-  private fun checkForBranches(tempDir: File, branches: List<String>) {
-    val git = GitClient(tempDir)
-    val gitBranches = runBlocking { git.showRef(heads = true) }
-    Assertions.assertThat(gitBranches).containsExactlyInAnyOrderElementsOf(branches)
   }
 }

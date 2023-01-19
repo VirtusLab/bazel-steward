@@ -1,14 +1,11 @@
-kt_jvm_library(
-    name = "app",
+library(
     srcs = glob(["**/*.kt"]),
-    visibility = ["//visibility:public"],
     deps = [
         "//common",
+        "//config",
         "//core",
         "//github",
         "//maven",
         "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
     ],
 )
-
-lint(srcs = glob(["**/*.kt"]))

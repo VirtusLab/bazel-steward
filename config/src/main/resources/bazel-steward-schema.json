@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "properties": {
+    "maven": {
+      "properties": {
+        "ruledDependencies": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "object",
+                "properties": {
+                  "group": {
+                    "type": "string"
+                  },
+                  "artifact": {
+                    "type": "string"
+                  }
+                },
+                "required": ["group", "artifact"]
+              },
+              "versioning": {
+                "type": "string",
+                "anyOf": [{"enum": ["loose", "semver"]}, {"pattern": "^regex:"}]
+              }
+            },
+            "required": ["id", "versioning"]
+          }
+        }
+      },
+      "required": ["ruledDependencies"]
+    }
+  }
+}

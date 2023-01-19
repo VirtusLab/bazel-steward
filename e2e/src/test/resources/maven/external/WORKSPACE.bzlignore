@@ -1,4 +1,4 @@
-workspace(name = "bazel-steward")
+workspace(name = "maven-external")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -65,36 +65,15 @@ load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
 
 scala_repositories()
 
-# junit5
-load("//tools/build_rules:junit5.bzl", "junit_jupiter_java_repositories", "junit_platform_java_repositories")
-
-JUNIT_JUPITER_VERSION = "5.8.2"
-
-JUNIT_PLATFORM_VERSION = "1.8.2"
-
-junit_jupiter_java_repositories(version = JUNIT_JUPITER_VERSION)
-
-junit_platform_java_repositories(version = JUNIT_PLATFORM_VERSION)
-
 # maven deps
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        "io.arrow-kt:arrow-core:1.1.2",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0",
-        "io.get-coursier:interface:1.0.11",
-        "commons-io:commons-io:2.11.0",
-        "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.2",
-        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1",
-        "com.networknt:json-schema-validator:1.0.76",
-        "org.slf4j:slf4j-nop:2.0.6",
-        "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
-        "org.kohsuke:github-api:1.313",
+        "com.7theta:utilis:2.3.5"
     ],
-    fetch_sources = True,
+    fetch_sources = False,
     repositories = [
-        "https://repo.maven.apache.org/maven2",
+        "https://clojars.org/repo",
     ],
 )

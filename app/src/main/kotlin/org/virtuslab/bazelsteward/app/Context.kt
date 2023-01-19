@@ -10,6 +10,7 @@ import org.virtuslab.bazelsteward.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.common.GitOperations
 import org.virtuslab.bazelsteward.common.UpdateLogic
+import org.virtuslab.bazelsteward.config.BazelStewardConfiguration
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -49,6 +50,7 @@ data class Context(
 
       val config = Config(repoPath, pushToRemote, baseBranchName)
 
+      val bsc = runBlocking { BazelStewardConfiguration(repoPath).get() } // will be used later
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
       val mr = MavenRepository()
