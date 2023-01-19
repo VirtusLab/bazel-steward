@@ -1,7 +1,6 @@
 library(
     srcs = glob(["**/*.kt"]),
     deps = [
-        "@maven//:io_arrow_kt_arrow_core",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_jdk8",
     ],
