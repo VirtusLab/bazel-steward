@@ -11,6 +11,5 @@ library(
         "@maven//:io_arrow_kt_arrow_core",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_jdk8",
-        "@maven//:org_slf4j_slf4j_nop",
     ],
 )

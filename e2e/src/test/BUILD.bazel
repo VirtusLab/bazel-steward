@@ -5,7 +5,7 @@ integration_tests(
     ),
     test_package = "org.virtuslab.bazelsteward.e2e",
     deps = [
-        "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
+        "//app/src/main",
         "@maven//:commons_io_commons_io",
     ],
 )

@@ -1,12 +1,15 @@
 package org.virtuslab.bazelsteward.app
 
 import arrow.core.flattenOption
+import mu.KotlinLogging
 import org.virtuslab.bazelsteward.common.GitOperations
 
+private val logger = KotlinLogging.logger {}
 class App(private val ctx: Context) {
   suspend fun run() {
     ctx.gitOperations.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
+    logger.debug { definitions.map { it.first } }
     val mavenData = ctx.mavenDataExtractor.extract()
     val availableVersions = ctx.mavenRepository.findVersions(mavenData)
     val updateSuggestions =

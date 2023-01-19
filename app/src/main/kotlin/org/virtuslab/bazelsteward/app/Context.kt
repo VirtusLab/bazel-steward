@@ -5,6 +5,7 @@ import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.common.GitClient
@@ -19,6 +20,7 @@ import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import kotlin.io.path.Path
 
+private val logger = KotlinLogging.logger {}
 data class Context(
   val config: Config,
   val bazelFileSearch: BazelFileSearch,
@@ -44,6 +46,7 @@ data class Context(
         GitClient(repoPath.toFile()).runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
       }
       val config = Config(repoPath, pushToRemote, baseBranch)
+      logger.info { config }
 
       val bsc = runBlocking { BazelStewardConfiguration(repoPath).get() } // will be used later
       val bfs = BazelFileSearch(config)
