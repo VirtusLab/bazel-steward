@@ -37,12 +37,17 @@ data class Context(
       val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
       val pushToRemote by parser.option(ArgType.Boolean, description = "Push to remote", shortName = "p").default(false)
       parser.parse(args)
+      val baseBranch by parser.argument(
+        ArgType.String,
+        description = "Branch that will be set as a base in pull request"
+      ).optional()
 
       val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository ?: ".")
-      val baseBranch = runBlocking {
+      val baseBranchName = baseBranch ?: runBlocking {
         GitClient(repoPath.toFile()).runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
       }
-      val config = Config(repoPath, pushToRemote, baseBranch)
+
+      val config = Config(repoPath, pushToRemote, baseBranchName)
 
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
