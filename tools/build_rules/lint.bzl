@@ -5,11 +5,12 @@ def lint(srcs):
         name = "lint_test",
         srcs = srcs,
         config = "//:lint_config",
-        tags = ["lint"],
+        tags = ["lint", "no-ide"],
     )
 
     ktlint_fix(
         name = "lint_fix",
         srcs = srcs,
         config = "//:lint_config",
+        tags = ["no-ide"],
     )
