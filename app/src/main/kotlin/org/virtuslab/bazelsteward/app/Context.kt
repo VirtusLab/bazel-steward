@@ -37,11 +37,12 @@ data class Context(
         .optional()
       val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
       val pushToRemote by parser.option(ArgType.Boolean, description = "Push to remote", shortName = "p").default(false)
-      parser.parse(args)
-      val baseBranch by parser.argument(
+      val baseBranch by parser.option(
         ArgType.String,
         description = "Branch that will be set as a base in pull request"
-      ).optional()
+      )
+
+      parser.parse(args)
 
       val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository ?: ".")
       val baseBranchName = baseBranch ?: runBlocking {
