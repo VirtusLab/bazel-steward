@@ -21,6 +21,7 @@ import org.virtuslab.bazelsteward.maven.MavenRepository
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
+
 data class Context(
   val config: Config,
   val bazelFileSearch: BazelFileSearch,
@@ -48,6 +49,7 @@ data class Context(
       val config = Config(repoPath, pushToRemote, baseBranch)
       logger.info { config }
 
+      @Suppress("UNUSED_VARIABLE")
       val bsc = runBlocking { BazelStewardConfiguration(repoPath).get() } // will be used later
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
