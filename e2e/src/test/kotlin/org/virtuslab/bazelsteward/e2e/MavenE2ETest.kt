@@ -11,7 +11,7 @@ class MavenE2ETest : E2EBase() {
   fun `Maven trivial local test`(@TempDir tempDir: File) {
     val testResourcePath = "maven/trivial"
     val file = loadTest(tempDir, testResourcePath)
-    Main.main(args = arrayOf(file.toString(), "--pushToRemote"))
+    Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
     val expectedBranches = listOf("arrow-core", "arrow-fx-coroutines").map { "$branchRef/$it/1.1.5" } + masterRef
     checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
   }
@@ -20,7 +20,7 @@ class MavenE2ETest : E2EBase() {
   fun `Check dependency update not in maven central repository`(@TempDir tempDir: File) {
     val testResourcePath = "maven/external"
     val file = loadTest(tempDir, testResourcePath)
-    Main.main(args = arrayOf(file.toString(), "--pushToRemote"))
+    Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
     val expectedBranches = listOf("$branchRef/utilis", masterRef)
     checkBranchesWithoutVersions(tempDir, testResourcePath, expectedBranches)
   }
