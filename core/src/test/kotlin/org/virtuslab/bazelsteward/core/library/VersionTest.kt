@@ -10,6 +10,8 @@ import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VersionTest {
+
+  private val looseVersioningType = VersioningSchema(VersioningType.LOOSE.name)
   private val mavenVersions = listOf(
     "1.0+whatever",
     "1.0a1-SNAPSHOT+whatever",
@@ -51,7 +53,7 @@ class VersionTest {
   @MethodSource("argumentsForCheckVersion")
   fun `check version`(version: String) {
     val ver = SimpleVersion(version)
-    ver.toSemVer() shouldNotBe null
+    ver.toSemVer(looseVersioningType) shouldNotBe null
   }
 
   private fun argumentsForCompareVersions(): Stream<Arguments> {
@@ -65,8 +67,8 @@ class VersionTest {
   @ParameterizedTest
   @MethodSource("argumentsForCompareVersions")
   fun `compare Versions`(first: String, second: String) {
-    val firstVer = SimpleVersion(first).toSemVer()!!
-    val secondVer = SimpleVersion(second).toSemVer()!!
+    val firstVer = SimpleVersion(first).toSemVer(looseVersioningType)!!
+    val secondVer = SimpleVersion(second).toSemVer(looseVersioningType)!!
     firstVer.compareTo(secondVer) shouldBeGreaterThan 0
   }
 }

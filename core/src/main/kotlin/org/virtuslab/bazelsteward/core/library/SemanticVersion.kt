@@ -1,5 +1,7 @@
 package org.virtuslab.bazelsteward.core.library
 
+import arrow.core.Option
+
 data class SemanticVersion(
   val major: Int,
   val minor: Int,
@@ -76,23 +78,31 @@ data class SemanticVersion(
     } ?: preRelease
 
   companion object {
-    private val canonicalSemVerRegex =
+    private val strictSemVerRegex =
       Regex("""^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<preRelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildMetaData>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?${'$'}""")
-    private val semVerRegex =
+    private val looseSemVerRegex =
       Regex("""^(?<major>0|[1-9]\d*)(?:[.-](?<minor>(0|[1-9]\d*)))?(?:[.-]?(?<patch>(0|[1-9]\d*)))?(?:[-.]?(?<preRelease>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaData>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
 
-    fun fromString(value: String): SemanticVersion? =
-      semVerRegex.matchEntire(value)?.let { matchResult ->
-        val values = matchResult.groups
-        SemanticVersion(
-          values["major"]?.value?.toIntOrNull() ?: 0,
-          values["minor"]?.value?.toIntOrNull() ?: 0,
-          values["patch"]?.value?.toIntOrNull() ?: 0,
-          values["preRelease"]?.value.orEmpty(),
-          values["buildMetaData"]?.value.orEmpty(),
-        )
+    fun fromString(value: String, versioningScheme: VersioningSchema): SemanticVersion? {
+      fun matchToSemanticVersion(regex: Regex): SemanticVersion? {
+        return regex.matchEntire(value)?.let { matchResult ->
+          val values = matchResult.groups as MatchNamedGroupCollection
+          SemanticVersion(
+            values["major"]?.value?.toIntOrNull() ?: 0,
+            values["minor"]?.value?.toIntOrNull() ?: 0,
+            values["patch"]?.value?.toIntOrNull() ?: 0,
+            values["preRelease"]?.value.orEmpty(),
+            values["buildMetaData"]?.value.orEmpty(),
+          )
+        }
       }
+      return when (versioningScheme.type) {
+        VersioningType.SEMVER -> matchToSemanticVersion(strictSemVerRegex)
+        VersioningType.LOOSE -> matchToSemanticVersion(looseSemVerRegex)
+        else -> matchToSemanticVersion(Regex(versioningScheme.regex!!))
+      }
+    }
   }
 
-  override fun toSemVer(): SemanticVersion = this
+  override fun toSemVer(versioning: VersioningSchema): SemanticVersion = this
 }
