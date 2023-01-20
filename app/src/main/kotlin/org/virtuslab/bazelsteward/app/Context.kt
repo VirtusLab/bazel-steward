@@ -34,12 +34,12 @@ data class Context(
     fun fromArgs(args: Array<String>, env: Environment): Context {
       val parser = ArgParser("bazel-steward")
       val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan")
-        .optional()
+        .optional().default(".")
       val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
-      val pushToRemote by parser.option(ArgType.Boolean, description = "Push to remote", shortName = "p").default(false)
+      val pushToRemote by parser.option(ArgType.Boolean, fullName = "push-to-remote", description = "Push to remote", shortName = "p").default(false)
       parser.parse(args)
 
-      val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository ?: ".")
+      val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository)
       val baseBranch = runBlocking {
         GitClient(repoPath.toFile()).runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
       }
