@@ -36,15 +36,28 @@ data class Context(
       val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan")
         .optional().default(".")
       val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
-      val pushToRemote by parser.option(ArgType.Boolean, fullName = "push-to-remote", description = "Push to remote", shortName = "p").default(false)
+      val pushToRemote by parser.option(
+        ArgType.Boolean,
+        description = "Push to remote",
+        fullName = "push-to-remote",
+        shortName = "p"
+      ).default(false)
+      val baseBranch by parser.option(
+        ArgType.String,
+        fullName = "base-branch",
+        description = "Branch that will be set as a base in pull request"
+      )
+
       parser.parse(args)
 
       val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository)
-      val baseBranch = runBlocking {
+      val baseBranchName = baseBranch ?: runBlocking {
         GitClient(repoPath.toFile()).runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
       }
-      val config = Config(repoPath, pushToRemote, baseBranch)
 
+      val config = Config(repoPath, pushToRemote, baseBranchName)
+
+      @Suppress("UNUSED_VARIABLE")
       val bsc = runBlocking { BazelStewardConfiguration(repoPath).get() } // will be used later
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)

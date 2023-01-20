@@ -8,6 +8,15 @@ inputs:
   github-token:
     description: "A token for the github repository"
     default: ${{ github.token }}
+  use-release:
+    description: "Whether to use prebuild jar from release, instead of compiling code"
+    default: "true"
+  push-to-remote:
+    description: "Whether to push changes to remote and open pull requests"
+    default: "true"
+  additional-args:
+    description: "Additional arguments to bazel steward jar"
+    required: false
 
 runs:
   using: "composite"
@@ -16,11 +25,25 @@ runs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Download release
+      if: ${{ inputs.use-release == 'true' }}
+      run: |
+        TAG_NAME=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
+        gh release download $TAG_NAME --pattern bazel-steward.jar --repo VirtusLab/bazel-steward
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
     - name: Build jar file
+      if: ${{ inputs.use-release != 'true' }}
       uses: ./.github
-    - uses: fregante/setup-git-user@v1
+    - name: Setup git user
+      uses: fregante/setup-git-user@v1
     - name: Run bazel steward
-      run: java -jar bazel-steward.jar --github
+      run: java -jar bazel-steward.jar --github ${{ inputs.push-to-remote == 'true' && '--pushToRemote' || '' }}  ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
+
+branding:
+  icon: 'umbrella'
+  color: 'green'
