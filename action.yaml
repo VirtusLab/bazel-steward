@@ -9,10 +9,10 @@ inputs:
     description: "A token for the github repository"
     default: ${{ github.token }}
   use-release:
-    description: "Weather to use prebuild jar from release, instead of compiling code"
+    description: "Whether to use prebuild jar from release, instead of compiling code"
     default: "true"
   push-to-remote:
-    description: "Weather to push changes to remote and open pull requests"
+    description: "Whether to push changes to remote and open pull requests"
     default: "true"
   additional-args:
     description: "Additional arguments to bazel steward jar"
