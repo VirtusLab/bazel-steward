@@ -1,7 +1,5 @@
 package org.virtuslab.bazelsteward.core.library
 
-import arrow.core.None
-import arrow.core.Some
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
@@ -31,8 +29,8 @@ class SemanticVersionTest {
 
   @Test
   fun `test fromString wrong versions`() {
-    SemanticVersion.fromString("1!1.0") shouldBe None
-    SemanticVersion.fromString("NotAVersionSting") shouldBe None
+    SemanticVersion.fromString("1!1.0") shouldBe null
+    SemanticVersion.fromString("NotAVersionSting") shouldBe null
   }
 
   private fun testSemanticVersion(
@@ -44,15 +42,7 @@ class SemanticVersionTest {
     buildMetadata: String
   ) {
     val sevVer = SemanticVersion.fromString(value)
-    sevVer shouldBe Some(
-      SemanticVersion(
-        major,
-        minor,
-        patch,
-        prerelease,
-        buildMetadata
-      )
-    )
-    sevVer.tap { it.value shouldBe value }
+    sevVer shouldBe SemanticVersion(major, minor, patch, prerelease, buildMetadata)
+    sevVer!!.value shouldBe value
   }
 }

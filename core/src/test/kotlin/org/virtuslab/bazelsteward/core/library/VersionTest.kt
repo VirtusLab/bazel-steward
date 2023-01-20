@@ -1,7 +1,5 @@
 package org.virtuslab.bazelsteward.core.library
 
-import arrow.core.None
-import arrow.core.compareTo
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.TestInstance
@@ -53,7 +51,7 @@ class VersionTest {
   @MethodSource("argumentsForCheckVersion")
   fun `check version`(version: String) {
     val ver = SimpleVersion(version)
-    ver.toSemVer() shouldNotBe None
+    ver.toSemVer() shouldNotBe null
   }
 
   private fun argumentsForCompareVersions(): Stream<Arguments> {
@@ -67,8 +65,8 @@ class VersionTest {
   @ParameterizedTest
   @MethodSource("argumentsForCompareVersions")
   fun `compare Versions`(first: String, second: String) {
-    val firstVer = SimpleVersion(first).toSemVer()
-    val secondVer = SimpleVersion(second).toSemVer()
+    val firstVer = SimpleVersion(first).toSemVer()!!
+    val secondVer = SimpleVersion(second).toSemVer()!!
     firstVer.compareTo(secondVer) shouldBeGreaterThan 0
   }
 }

@@ -1,10 +1,12 @@
 package org.virtuslab.bazelsteward.common
 
 import org.virtuslab.bazelsteward.core.Config
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.readText
 
 class BazelFileSearch(config: Config) {
+  data class BazelFile(val path: Path, val content: String)
+
   private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
   private val fileSuffix = ".bzl"
 
@@ -17,7 +19,5 @@ class BazelFileSearch(config: Config) {
       .toList()
   }
 
-  val buildDefinitions: List<Pair<Path, String>> by lazy {
-    buildPaths.map { it to String(Files.readAllBytes(it)) }
-  }
+  val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { BazelFile(it, it.readText()) } }
 }
