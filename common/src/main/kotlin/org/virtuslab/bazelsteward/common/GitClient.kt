@@ -28,8 +28,8 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("commit", quiet, "-m", message)
   }
 
-  suspend fun push(setUpstream: String? = null) {
-    val upCmd = setUpstream?.let { Triple("--set-upstream", "origin", it) }
+  suspend fun push(branch: String? = null, remote: String = "origin") {
+    val upCmd = branch?.let { Triple("--set-upstream", remote, it) }
     runGitCommand(listOf("push", quiet) + (upCmd?.toList() ?: emptyList()))
   }
 
@@ -51,6 +51,11 @@ class GitClient(private val repositoryFile: File) {
 
   suspend fun status() = runGitCommand("status")
 
+  suspend fun configureAuthor(email: String, name: String) {
+    runGitCommand("config", "user.email", email)
+    runGitCommand("config", "user.name", name)
+  }
+
   suspend fun runGitCommand(vararg gitArgs: String?): String = runGitCommand(gitArgs.toList())
 
   suspend fun runGitCommand(gitArgs: List<String?>): String {
@@ -64,7 +69,10 @@ class GitClient(private val repositoryFile: File) {
         .onExit().await()
       val stdout = process.inputStream.bufferedReader().use { it.readText() }
       val stderr = process.errorStream.bufferedReader().use { it.readText() }
-      if (stderr.isBlank()) stdout else throw RuntimeException(stderr)
+
+      if (process.exitValue() == 0) stdout else throw RuntimeException(
+        "${command.joinToString(" ")}\n$stdout\n$stderr"
+      )
     }
   }
 }
