@@ -28,9 +28,13 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("commit", quiet, "-m", message)
   }
 
-  suspend fun push(branch: String? = null, remote: String = "origin") {
-    val upCmd = branch?.let { Triple("--set-upstream", remote, it) }
-    runGitCommand(listOf("push", quiet) + (upCmd?.toList() ?: emptyList()))
+  suspend fun push(branch: String? = null, remote: String = "origin", force: Boolean = false) {
+    val args = mutableListOf("push", quiet)
+    if (branch != null)
+      args.addAll(listOf("--set-upstream", remote, branch))
+    if (force)
+      args.add("--force")
+    runGitCommand(args)
   }
 
   suspend fun init(initialBranch: String? = null, bare: Boolean = false) {

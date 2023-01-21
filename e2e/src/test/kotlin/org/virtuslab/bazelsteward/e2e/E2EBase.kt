@@ -11,7 +11,7 @@ import java.util.jar.JarFile
 
 open class E2EBase {
   private val heads = "refs/heads/"
-  protected val branchRef = "$heads${GitBranch.branchPrefix}"
+  protected val branchRef = "$heads${GitBranch.bazelPrefix}"
   private val master = "master"
   protected val masterRef = "$heads$master"
 

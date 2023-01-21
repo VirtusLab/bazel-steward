@@ -11,7 +11,11 @@ class Main {
     @JvmStatic
     fun main(args: Array<String>) {
       logger.info { args }
-      val ctx = Context.fromArgs(args, Environment.system)
+      mainMapContext(args)
+    }
+
+    fun mainMapContext(args: Array<String>, f: (Context) -> Context = { x -> x }) {
+      val ctx = f(Context.fromArgs(args, Environment.system))
       runBlocking {
         App(ctx).run()
       }

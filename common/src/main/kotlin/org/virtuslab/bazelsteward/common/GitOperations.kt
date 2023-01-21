@@ -22,10 +22,10 @@ class GitOperations(private val config: Config) {
     return branch
   }
 
-  suspend fun pushBranchToOrigin(branch: GitBranch) {
+  suspend fun pushBranchToOrigin(branch: GitBranch, force: Boolean) {
     val branchName = branch.name
     git.checkout(branchName)
-    git.push(branchName)
+    git.push(branchName, force = force)
   }
 
   companion object {
