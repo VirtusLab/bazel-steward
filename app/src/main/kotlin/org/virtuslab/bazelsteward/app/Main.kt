@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.Environment
 
 private val logger = KotlinLogging.logger {}
+
 class Main {
   companion object {
     @JvmStatic

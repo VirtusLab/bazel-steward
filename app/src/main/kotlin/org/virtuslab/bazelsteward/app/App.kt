@@ -9,14 +9,15 @@ class App(private val ctx: Context) {
   suspend fun run() {
     ctx.gitOperations.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
-    logger.debug { definitions.map { it.first } }
+    logger.debug { definitions.map { it.path } }
     val mavenData = ctx.mavenDataExtractor.extract()
-    logger.debug { mavenData.repositories }
-    logger.debug { mavenData.dependencies.map { it.id.name + " " + it.version.value } }
+    logger.debug { "Repositories " + mavenData.repositories.toString() }
+    logger.debug { "Dependencies: " + mavenData.dependencies.map { it.id.name + " " + it.version.value }.toString() }
     val availableVersions = ctx.mavenRepository.findVersions(mavenData)
     val updateSuggestions = availableVersions.mapNotNull {
       ctx.updateLogic.selectUpdate(it.key, it.value)
     }
+    logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
     val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions, updateSuggestions)
 
     changeSuggestions.forEach { change ->

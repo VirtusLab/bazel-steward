@@ -9,6 +9,7 @@ import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -27,6 +28,8 @@ data class MavenDependency(
   val id: MavenLibraryId,
   val versioning: String
 )
+
+private val logger = KotlinLogging.logger {  }
 
 class BazelStewardConfiguration(repoRoot: Path) {
 
@@ -55,7 +58,7 @@ class BazelStewardConfiguration(repoRoot: Path) {
           yamlReader.readValue(configContent, Configuration::class.java)
         }
       }.getOrElse {
-        println("Could not parse $configFilePath file!")
+        logger.error { "Could not parse $configFilePath file!" }
         throw it
       }
     }

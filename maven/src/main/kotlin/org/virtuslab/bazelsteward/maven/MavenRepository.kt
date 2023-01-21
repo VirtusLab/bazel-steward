@@ -8,6 +8,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import java.io.File
@@ -40,6 +41,8 @@ object CoursierCache {
   }
 }
 
+private val logger = KotlinLogging.logger {}
+
 class MavenRepository {
   suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> =
     withContext(Dispatchers.IO) {
@@ -55,7 +58,7 @@ class MavenRepository {
                 .withCache(cache)
                 .versions()
             if (versionResult.errors.isNotEmpty())
-              println(versionResult.errors)
+              logger.error { versionResult.errors }
             coordinates to versionResult.mergedListings.available.map { SimpleVersion(it) }
           }
         }.awaitAll().toMap()
