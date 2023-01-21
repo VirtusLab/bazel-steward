@@ -29,7 +29,7 @@ data class MavenDependency(
   val versioning: String
 )
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger { }
 
 class BazelStewardConfiguration(repoRoot: Path) {
 
