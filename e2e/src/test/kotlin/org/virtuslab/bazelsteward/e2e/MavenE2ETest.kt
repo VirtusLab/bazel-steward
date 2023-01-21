@@ -17,7 +17,7 @@ import java.io.File
 
 class MavenE2ETest : E2EBase() {
 
-    @Test
+  @Test
   fun `Maven trivial local test`(@TempDir tempDir: File) {
     val testResourcePath = "maven/trivial"
     val file = loadTest(tempDir, testResourcePath)
@@ -28,7 +28,7 @@ class MavenE2ETest : E2EBase() {
     checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
   }
 
-    @Test
+  @Test
   fun `Check dependency update not in maven central repository`(@TempDir tempDir: File) {
     val testResourcePath = "maven/external"
     val file = loadTest(tempDir, testResourcePath)

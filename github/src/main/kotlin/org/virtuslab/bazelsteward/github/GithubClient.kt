@@ -27,7 +27,6 @@ class GithubClient private constructor(private val config: Config, repository: S
       .filter { it.head.ref.startsWith(GitBranch.bazelPrefix) }
   private val branchToGHPR: Map<String, GHPullRequest> = bazelPRs.associateBy { it.head.ref }
 
-
   override fun checkPrStatus(branch: GitBranch): PrStatus {
     val pr = branchToGHPR[branch.name] ?: return PrStatus.NONE
     return if (pr.isMerged)

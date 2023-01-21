@@ -9,8 +9,8 @@ import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.CLOSED
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.MERGED
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.NONE
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MERGEABLE
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MODIFIED
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE
 
 private val logger = KotlinLogging.logger {}
 
@@ -62,8 +62,6 @@ class App(private val ctx: Context) {
 
         CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${branch.name}" }
       }
-
-
     }
   }
 }
