@@ -27,6 +27,13 @@ class BazelStewardConfigurationTest {
   }
 
   @Test
+  fun `should throw an exception when versioning regex does not contain all required named groups`(@TempDir tempDir: File) {
+    copyConfigFileToTempLocation(tempDir, ".bazel-steward-fail2.yaml")
+    Assertions.assertThatThrownBy { runBlocking { BazelStewardConfigExtractor(tempDir.toPath()).get() } }
+      .hasMessageContaining("does not contain all required groups: <major>, <minor>, <patch>, <preRelease>, <buildMetaData>")
+  }
+
+  @Test
   fun `should create default configuration when config file is not declared`(@TempDir tempDir: File) {
     val configuration = runBlocking { BazelStewardConfigExtractor(tempDir.toPath()).get() }
     Assertions.assertThat(configuration).usingRecursiveComparison().isEqualTo(BazelStewardConfig())

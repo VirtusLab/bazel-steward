@@ -1,7 +1,7 @@
 library(
     srcs = glob(["**/*.kt"]),
     deps = [
+        "//config",
         "//core",
-        "//config"
     ],
 )

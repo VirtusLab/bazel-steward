@@ -14,14 +14,14 @@ class SemanticVersionTest {
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
   inner class StrictSemVerVersioningTypeTest {
 
-    private val looseVersioningType = VersioningSchema(VersioningType.SEMVER.name)
+    private val strictVersioningType = VersioningSchema(VersioningType.SEMVER.name)
     @ParameterizedTest
-    @MethodSource("looseVersioningArguments")
+    @MethodSource("strictVersioningArguments")
     fun `test fromString`(value: String, major: Int, minor: Int, patch: Int, prerelease: String, buildMetadata: String) {
-      testSemanticVersion(value, major, minor, patch, prerelease, buildMetadata, looseVersioningType)
+      testSemanticVersion(value, major, minor, patch, prerelease, buildMetadata, strictVersioningType)
     }
 
-    private fun looseVersioningArguments(): List<Arguments> = listOf(
+    private fun strictVersioningArguments(): List<Arguments> = listOf(
       Arguments.of("1.2.3", 1, 2, 3, "", ""),
       Arguments.of("2.0.0-alpha+beta", 2, 0, 0, "alpha", "beta"),
       Arguments.of("1.0.1", 1, 0, 1, "", ""),
@@ -44,8 +44,8 @@ class SemanticVersionTest {
 
     @Test
     fun `test fromString wrong versions`() {
-      SemanticVersion.fromString("1!1.0", looseVersioningType) shouldBe null
-      SemanticVersion.fromString("NotAVersionSting", looseVersioningType) shouldBe null
+      SemanticVersion.fromString("1!1.0", strictVersioningType) shouldBe null
+      SemanticVersion.fromString("NotAVersionSting", strictVersioningType) shouldBe null
     }
   }
 

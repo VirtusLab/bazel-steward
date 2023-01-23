@@ -31,7 +31,7 @@ data class MavenConfig(
 
 data class MavenDependency(
   val id: MavenLibraryId,
-  var versioning: VersioningSchema
+  val versioning: VersioningSchema
 )
 
 class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema>(VersioningSchema::class.java) {
