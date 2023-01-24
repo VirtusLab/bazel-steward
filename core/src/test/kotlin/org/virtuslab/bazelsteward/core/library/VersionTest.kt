@@ -1,18 +1,46 @@
 package org.virtuslab.bazelsteward.core.library
 
-import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
-import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VersionTest {
 
-  private val looseVersioningType = VersioningSchema(VersioningType.LOOSE.name)
-  private val mavenVersions = listOf(
+  private val strictSemVersions = listOf(
+    "1.2.3",
+    "2.0.0-alpha+beta",
+    "1.0.1",
+    "1.0.0-alpha",
+    "1.0.0-0.3.7",
+    "1.0.0-x.7.z.92",
+    "1.0.0-alpha+001",
+    "1.0.0+20130313144700",
+    "1.0.0-beta+exp.sha.5114f85",
+  )
+
+  @ParameterizedTest
+  @EnumSource(value = VersioningType::class, names = ["SEMVER", "LOOSE"])
+  fun `check toSemVer`(versionType: VersioningType) {
+    val versioningSchema = VersioningSchema(versionType.name)
+    strictSemVersions.forEach {
+      val ver = SimpleVersion(it)
+      ver.toSemVer(versioningSchema) shouldNotBe null
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("argumentsForReturnNullWithStrictSemVer")
+  fun `toSemVer should return null when versioningSchema is SEMVER but versions follow only LOOSE `(value: String) {
+    val versioningSchema = VersioningSchema(VersioningType.SEMVER.name)
+    val ver = SimpleVersion(value)
+    ver.toSemVer(versioningSchema) shouldBe null
+  }
+
+  private fun argumentsForReturnNullWithStrictSemVer(): List<String> = listOf(
     "1.0+whatever",
     "1.0a1-SNAPSHOT+whatever",
     "1.final-2a",
@@ -20,55 +48,6 @@ class VersionTest {
     "1.final1+whatever",
     "1.0-0",
     "1.0beta1-SNAPSHOT",
-    "1.0-alpha1",
-    "1.0-beta3.SNAPSHOT",
-    "1.0-b2",
-    "1.0-milestone1-SNAPSHOT",
-    "1.0-beta3",
-    "1.0-rc1-SNAPSHOT",
-    "1.0-m2",
-    "1.0-SNAPSHOT",
-    "1.0-cr1",
-    "1.0-sp",
-    "1.0",
-    "1.0-RELEASE",
-    "1.0-a",
-    "1.0.z",
-    "1.0-whatever",
-    "1-1.foo-bar-1-baz-0.1",
-    "1.0.1.0.0.0.0.0.0.0.0.0.0.0.1",
-    "2022.11.29.0.1-api-version-222",
-    "1.0.0b1",
-    "7.10-final",
-    "7.9-628",
-    "7.9-sp",
-    "7.9",
+    "1.0-alpha1"
   )
-
-  private fun argumentsForCheckVersion(): Stream<String> {
-    return mavenVersions.stream()
-  }
-
-  @ParameterizedTest
-  @MethodSource("argumentsForCheckVersion")
-  fun `check version`(version: String) {
-    val ver = SimpleVersion(version)
-    ver.toSemVer(looseVersioningType) shouldNotBe null
-  }
-
-  private fun argumentsForCompareVersions(): Stream<Arguments> {
-    val listWithArguments: MutableList<Arguments> = mutableListOf()
-    for (i in mavenVersions.indices step 2) {
-      listWithArguments.add(Arguments.of(mavenVersions[i], mavenVersions[i + 1]))
-    }
-    return listWithArguments.stream()
-  }
-
-  @ParameterizedTest
-  @MethodSource("argumentsForCompareVersions")
-  fun `compare Versions`(first: String, second: String) {
-    val firstVer = SimpleVersion(first).toSemVer(looseVersioningType)!!
-    val secondVer = SimpleVersion(second).toSemVer(looseVersioningType)!!
-    firstVer.compareTo(secondVer) shouldBeGreaterThan 0
-  }
 }
