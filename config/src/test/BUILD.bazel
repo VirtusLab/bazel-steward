@@ -6,6 +6,7 @@ unit_tests(
     test_package = "org.virtuslab.bazelsteward.config",
     deps = [
         "//config/src/main",
+        "//core",
         "@maven//:commons_io_commons_io",
     ],
 )
