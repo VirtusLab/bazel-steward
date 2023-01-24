@@ -3,6 +3,7 @@ package org.virtuslab.bazelsteward.common
 import org.virtuslab.bazelsteward.config.BazelStewardConfig
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
+import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.core.library.VersioningType
@@ -16,16 +17,24 @@ class UpdateLogic(private val bazelStewardConfig: BazelStewardConfig) {
     availableVersions: List<Version>
   ): UpdateSuggestion<Lib>? {
     val versioningSchemaForLibrary = getVersioningForLibrary(library)
+
+    fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): SemanticVersion? =
+      availableVersions
+        .mapNotNull { it.toSemVer(versioningSchemaForLibrary) }
+        .filter { it.prerelease.isBlank() && filterVersionComponent(it) }
+        .sorted()
+        .maxOrNull()
+
     return library.version.toSemVer(versioningSchemaForLibrary)
-      ?.takeIf { version -> version.prerelease.isBlank() && version.buildmetadata.isBlank() }
+      ?.takeIf { version -> version.prerelease.isBlank() }
       ?.let { version ->
-        availableVersions
-          .asSequence()
-          .mapNotNull { it.toSemVer(versioningSchemaForLibrary) }
-          .filter { it.major == version.major }
-          .filter { it.buildmetadata.isBlank() && it.prerelease.isBlank() }
-          .filter { version < it }
-          .maxOrNull()?.let { nextVersion -> UpdateSuggestion(library, nextVersion) }
+        val maxPatchVersion = maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor }
+        val maxMinorVersion = maxAvailableVersion { a -> a.major == version.major }
+        val maxMajorVersion = maxAvailableVersion { _ -> true }
+        val nextLibrary = maxPatchVersion?.takeIf { it.patch > version.patch }
+          ?: maxMinorVersion?.takeIf { it.minor > version.minor }
+          ?: maxMajorVersion?.takeIf { it.major > version.major }
+        nextLibrary?.let { UpdateSuggestion(library, it) }
       }
   }
 
