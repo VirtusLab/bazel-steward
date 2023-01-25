@@ -3,33 +3,32 @@
   "properties": {
     "maven": {
       "properties": {
-        "ruledDependencies": {
+        "configs": {
           "type": ["array", "null"],
           "items": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "object",
-                "properties": {
-                  "group": {
-                    "type": "string"
-                  },
-                  "artifact": {
-                    "type": "string"
-                  }
-                },
-                "required": ["group", "artifact"]
+              "group": {
+                "type": "string"
+              },
+              "artifact": {
+                "type": "string"
               },
               "versioning": {
                 "type": "string",
-                "anyOf": [{"enum": ["loose", "semver"]}, {"pattern": "^regex:"}]
+                "anyOf": [{ "enum": ["loose", "semver"] }, { "pattern": "^regex:" }]
+              },
+              "bumping": {
+                "type": ["string", "null"],
+                "enum": ["default", "latest"]
               }
             },
-            "required": ["id", "versioning"]
+            "anyOf": ["versioning", "bumping", "group", "artifact"],
+            "additionalProperties": false
           }
         }
       },
-      "required": ["ruledDependencies"]
+      "required": ["configs"]
     }
   }
 }

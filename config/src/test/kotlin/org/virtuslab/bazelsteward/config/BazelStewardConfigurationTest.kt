@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import org.virtuslab.bazelsteward.maven.MavenLibraryId
+import org.virtuslab.bazelsteward.core.library.VersioningType
 import java.io.File
 
 class BazelStewardConfigurationTest {
@@ -17,11 +17,12 @@ class BazelStewardConfigurationTest {
     Assertions.assertThatThrownBy { runBlocking { BazelStewardConfigExtractor(tempDir.toPath()).get() } }
       .hasMessage(
         listOf(
-          "maven.ruledDependencies[0].id.group: is missing but it is required",
-          "maven.ruledDependencies[0].id.artifact: is missing but it is required",
-          "maven.ruledDependencies[1].versioning: does not have a value in the enumeration [loose, semver]",
-          "maven.ruledDependencies[1].versioning: does not match the regex pattern ^regex:",
-          "maven.ruledDependencies[2].id.group: integer found, string expected"
+          "maven.configs[0].grouop: is not defined in the schema and the schema does not allow additional properties",
+          "maven.configs[0].artifactt: is not defined in the schema and the schema does not allow additional properties",
+          "maven.configs[1].versioning: does not have a value in the enumeration [loose, semver]",
+          "maven.configs[1].versioning: does not match the regex pattern ^regex:",
+          "maven.configs[1].bumping: does not have a value in the enumeration [default, latest]",
+          "maven.configs[2].group: integer found, string expected",
         ).joinToString(System.lineSeparator())
       )
   }
@@ -46,10 +47,12 @@ class BazelStewardConfigurationTest {
     val expectedConfiguration = BazelStewardConfig(
       MavenConfig(
         listOf(
-          MavenDependency(MavenLibraryId("commons-io", "commons-io"), VersioningSchema("loose")),
-          MavenDependency(MavenLibraryId("io.get-coursier", "interface"), VersioningSchema("semver")),
-          MavenDependency(MavenLibraryId("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8"), VersioningSchema("regex:^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?"))
-        )
+          ConfigEntry("commons-io", "commons-io", VersioningSchema(VersioningType.LOOSE.name), BumpingStrategy.DEFAULT),
+          ConfigEntry("io.get-coursier", "interface", VersioningSchema(VersioningType.SEMVER.name), BumpingStrategy.LATEST),
+          ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", VersioningSchema("regex:^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?"), null),
+          ConfigEntry("org.jetbrains.kotlinx", null, VersioningSchema("loose"), null),
+          ConfigEntry(null, null, VersioningSchema(VersioningType.LOOSE.name), null),
+        ),
       )
     )
     Assertions.assertThat(configuration).usingRecursiveComparison().isEqualTo(expectedConfiguration)

@@ -1,17 +1,15 @@
 maven:
-  ruledDependencies:
+  configs:
     -
-      id:
-        grouop: commons-io
-        artifactt: commons-io
+      grouop: commons-io
+      artifactt: commons-io
       versioning: loose
     -
-      id:
-        group: io.get-coursier
-        artifact: interface
+      group: io.get-coursier
+      artifact: interface
       versioning: semverr
+      bumping: lates
     -
-      id:
-        group: 2
-        artifact: kotlinx-coroutines-jdk8
+      group: 2
+      artifact: kotlinx-coroutines-jdk8
       versioning: regex:(?<major>\\d+)(?<minor>\\.\\d+)?(?<patch>\\.\\d+)?$

@@ -1,6 +1,7 @@
 package org.virtuslab.bazelsteward.config
 
 import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.annotation.Nulls
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
@@ -16,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.nio.file.Path
 import kotlin.io.path.exists
 
@@ -27,13 +27,22 @@ data class BazelStewardConfig(
 
 data class MavenConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
-  val ruledDependencies: List<MavenDependency> = emptyList()
+  val configs: List<ConfigEntry> = emptyList(),
 )
 
-data class MavenDependency(
-  val id: MavenLibraryId,
-  val versioning: VersioningSchema
+data class ConfigEntry(
+  val group: String?,
+  val artifact: String?,
+  val versioning: VersioningSchema?,
+  val bumping: BumpingStrategy?,
 )
+
+enum class BumpingStrategy {
+  DEFAULT, LATEST;
+
+  @JsonValue
+  val lowercaseName = this.toString().lowercase()
+}
 
 private val logger = KotlinLogging.logger { }
 
