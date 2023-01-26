@@ -24,7 +24,7 @@ class App(private val ctx: Context) {
     val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions, updateSuggestions)
 
     val bazelVersion = runCatching { BazelVersion.extractBazelVersion(ctx.config.path) }
-      .onFailure { println("Can't extract Bazel version") }.getOrNull()
+      .onFailure { logger.error { "Can't extract Bazel version"} }.getOrNull()
 
     val bazelChangeSuggestions = bazelVersion?.let {
       val availableBazelVersions = ctx.bazelUpdater.availableVersions(bazelVersion)
