@@ -13,7 +13,7 @@ class MavenE2ETest : E2EBase() {
     val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
     val expectedBranches =
-      listOf("arrow-core" to "1.1.5", "arrow-fx-coroutines" to "1.1.5", "bazel" to "5.4.0")
+      listOf("arrow-core" to "1.1.5", "arrow-fx-coroutines" to "1.1.5", "bazel" to "5.3.2")
         .map { "$branchRef/${it.first}/${it.second}" } + masterRef
     checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
   }
@@ -23,7 +23,7 @@ class MavenE2ETest : E2EBase() {
     val testResourcePath = "maven/external"
     val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
-    val expectedBranches = listOf("$branchRef/utilis", "$branchRef/bazel/5.4.0", masterRef)
+    val expectedBranches = listOf("$branchRef/utilis", "$branchRef/bazel/5.3.2", masterRef)
     checkBranchesWithoutVersions(tempDir, testResourcePath, expectedBranches)
   }
 }
