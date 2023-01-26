@@ -14,6 +14,7 @@ import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.nio.file.Path
@@ -33,6 +34,8 @@ data class MavenDependency(
   val id: MavenLibraryId,
   val versioning: VersioningSchema
 )
+
+private val logger = KotlinLogging.logger { }
 
 class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema>(VersioningSchema::class.java) {
   override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): VersioningSchema {
@@ -70,7 +73,7 @@ class BazelStewardConfigExtractor(repoRoot: Path) {
           yamlReader.readValue(configContent, BazelStewardConfig::class.java)
         }
       }.getOrElse {
-        println("Could not parse $configFilePath file!")
+        logger.error { "Could not parse $configFilePath file!" }
         throw it
       }
     }

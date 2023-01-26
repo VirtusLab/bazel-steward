@@ -39,7 +39,10 @@ runs:
     - name: Setup git user
       uses: fregante/setup-git-user@v1
     - name: Run bazel steward
-      run: java -jar bazel-steward.jar --github ${{ inputs.push-to-remote == 'true' && '--pushToRemote' || '' }}  ${{ inputs.additional-args }}
+      run: |
+        DEBUG_FLAG="-Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG"
+        PUSH_TO_REMOTE_FLAG=${{ inputs.push-to-remote == 'true' && '--push-to-remote' || '' }}
+        java "$DEBUG_FLAG" -jar bazel-steward.jar --github "$PUSH_TO_REMOTE_FLAG" ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}

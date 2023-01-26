@@ -4,8 +4,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import java.io.File
 import java.nio.file.Path
+
+private val logger = KotlinLogging.logger {}
 
 class GitClient(private val repositoryFile: File) {
   private val quiet = "--quiet"
@@ -60,6 +63,7 @@ class GitClient(private val repositoryFile: File) {
   }
 
   private suspend fun runCommand(command: List<String>): String {
+    logger.debug { command }
     return withContext(Dispatchers.IO) {
       val process = ProcessBuilder(command).directory(repositoryFile).start()
         .onExit().await()

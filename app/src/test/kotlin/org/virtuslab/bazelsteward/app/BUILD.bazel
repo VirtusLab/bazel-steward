@@ -2,6 +2,6 @@ unit_tests(
     srcs = glob(["**/*.kt"]),
     test_package = "org.virtuslab.bazelsteward.app",
     deps = [
-        "//app/src/main/kotlin/org/virtuslab/bazelsteward/app",
+        "//app/src/main",
     ],
 )

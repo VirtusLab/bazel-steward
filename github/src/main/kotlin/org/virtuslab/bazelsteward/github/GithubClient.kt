@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.github
 
+import mu.KotlinLogging
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
@@ -9,6 +10,8 @@ import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
 import java.nio.file.Path
 import kotlin.io.path.Path
+
+private val logger = KotlinLogging.logger {}
 
 class GithubClient private constructor(private val config: Config, repository: String, token: String, url: String) :
   GitHostClient {
@@ -25,6 +28,7 @@ class GithubClient private constructor(private val config: Config, repository: S
   override fun checkIfPrExists(branch: GitBranch) = bazelPRs.contains(branch.name)
 
   override fun openNewPR(branch: GitBranch): Boolean {
+    logger.info { "Creating pull request for ${branch.name}" }
     ghRepository.createPullRequest(
       "Updated ${branch.libraryId.name} to ${branch.version.value}",
       branch.name,

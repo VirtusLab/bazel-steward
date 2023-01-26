@@ -1,5 +1,8 @@
 library(
-    srcs = glob(["**/*.kt"]),
+    srcs = glob(["kotlin/**/*.kt"]),
+    resources = glob(
+        ["resources/**"],
+    ),
     deps = [
         "//common",
         "//config",
@@ -7,5 +10,6 @@ library(
         "//github",
         "//maven",
         "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
+        "@maven//:org_slf4j_slf4j_simple",
     ],
 )
