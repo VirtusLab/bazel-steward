@@ -11,7 +11,7 @@ import org.virtuslab.bazelsteward.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.common.GitOperations
 import org.virtuslab.bazelsteward.common.UpdateLogic
-import org.virtuslab.bazelsteward.config.BazelStewardConfiguration
+import org.virtuslab.bazelsteward.config.BazelStewardConfigExtractor
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -62,11 +62,11 @@ data class Context(
       logger.info { config }
 
       @Suppress("UNUSED_VARIABLE")
-      val bsc = runBlocking { BazelStewardConfiguration(repoPath).get() } // will be used later
+      val bsc = runBlocking { BazelStewardConfigExtractor(repoPath).get() }
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
       val mr = MavenRepository()
-      val ul = UpdateLogic()
+      val ul = UpdateLogic(bsc)
       val fus = FileUpdateSearch()
       val gc = GitOperations(config)
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
