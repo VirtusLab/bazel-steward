@@ -5,9 +5,6 @@ java_binary(
     main_class = "org.virtuslab.bazelsteward.app.Main",
     visibility = ["//visibility:public"],
     runtime_deps = [
-        "//app/src/main",
-        "//common",
-        "//core",
-        "//maven",
+        "//app/src/main:main",
     ],
 )

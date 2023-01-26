@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.app
 
+import bazel.src.BazelUpdater
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -30,7 +31,8 @@ data class Context(
   val updateLogic: UpdateLogic,
   val fileUpdateSearch: FileUpdateSearch,
   val gitOperations: GitOperations,
-  val gitHostClient: GitHostClient
+  val gitHostClient: GitHostClient,
+  val bazelUpdater: BazelUpdater,
 ) {
 
   companion object {
@@ -70,8 +72,9 @@ data class Context(
       val fus = FileUpdateSearch()
       val gc = GitOperations(config)
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
+      val bu = BazelUpdater()
 
-      return Context(config, bfs, mde, mr, ul, fus, gc, ghc)
+      return Context(config, bfs, mde, mr, ul, fus, gc, ghc, bu)
     }
   }
 }

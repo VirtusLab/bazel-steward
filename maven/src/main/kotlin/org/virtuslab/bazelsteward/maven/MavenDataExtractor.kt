@@ -4,8 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
 import org.virtuslab.bazelsteward.core.Config
-import java.lang.RuntimeException
-import java.nio.file.Files
 import java.nio.file.Path
 
 class MavenDataExtractor(private val config: Config) {
@@ -21,17 +19,13 @@ class MavenDataExtractor(private val config: Config) {
     return MavenData(repositories, dependencies)
   }
 
-  private suspend fun extractFromFile(fileName: String): List<String> {
-    return withContext(Dispatchers.IO) {
-      val process =
-        ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(config.path.toFile()).start().onExit().await()
-      val xml = process.inputStream.bufferedReader().use { it.readText() }
-      val fileLocation =
-        Regex(regexPattern.format(fileName)).find(xml)?.let { it.groups[1]?.value }
-          ?: throw RuntimeException("Failed to find file")
+  private suspend fun extractFromFile(fileName: String): List<String> = withContext(Dispatchers.IO) {
+    val process =
+      ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(config.path.toFile()).start().onExit().await()
+    val xml = process.inputStream.bufferedReader().use { it.readText() }
+    val fileLocation = Regex(regexPattern.format(fileName)).find(xml)?.let { it.groups[1]?.value }
+      ?: throw RuntimeException("Failed to find file")
 
-      Files.readAllLines(Path.of(fileLocation))
-        .toList()
-    }
+    Path.of(fileLocation).toFile().readLines()
   }
 }

@@ -11,5 +11,6 @@ library(
         "//maven",
         "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
         "@maven//:org_slf4j_slf4j_simple",
+        "//bazel",
     ],
 )

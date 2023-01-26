@@ -1,0 +1,5 @@
+alias(
+    name = "bazel",
+    actual = "//bazel/src",
+    visibility = ["//visibility:public"],
+)

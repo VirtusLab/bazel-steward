@@ -1,5 +1,8 @@
 package org.virtuslab.bazelsteward.app
 
+import bazel.src.BazelUpdater
+import bazel.src.BazelVersion
+import bazel.src.BazelVersionFileSearch
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.common.GitOperations
 
@@ -20,7 +23,19 @@ class App(private val ctx: Context) {
     logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
     val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions, updateSuggestions)
 
-    changeSuggestions.forEach { change ->
+    val bazelVersion = runCatching { BazelVersion.extractBazelVersion(ctx.config.path) }
+      .onFailure { println("Can't extract Bazel version") }.getOrNull()
+
+    val bazelChangeSuggestions = bazelVersion?.let {
+      val availableBazelVersions = ctx.bazelUpdater.availableVersions(bazelVersion)
+      val bazelUpdateSuggestions =
+        ctx.updateLogic.selectUpdate(BazelUpdater.Companion.BazelLibrary(bazelVersion), availableBazelVersions)
+
+      val bazelVersionFiles = BazelVersionFileSearch(ctx.config).bazelVersionFiles
+      ctx.fileUpdateSearch.searchBazelVersionFiles(bazelVersionFiles, listOfNotNull(bazelUpdateSuggestions))
+    }.orEmpty()
+
+    (changeSuggestions + bazelChangeSuggestions).forEach { change ->
       val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
       if (!ctx.gitHostClient.checkIfPrExists(branch)) {
         logger.info { "Creating branch ${branch.name}" }
