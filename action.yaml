@@ -41,7 +41,7 @@ runs:
     - name: Run bazel steward
       run: |
         DEBUG_FLAG="-Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG"
-        PUSH_TO_REMOTE_FLAG=${{ inputs.push-to-remote == 'true' && '--pushToRemote' || '' }}
+        PUSH_TO_REMOTE_FLAG=${{ inputs.push-to-remote == 'true' && '--push-to-remote' || '' }}
         java "$DEBUG_FLAG" -jar bazel-steward.jar --github "$PUSH_TO_REMOTE_FLAG" ${{ inputs.additional-args }}
       shell: bash
       env:
