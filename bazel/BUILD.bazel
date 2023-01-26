@@ -1,5 +1,5 @@
 alias(
     name = "bazel",
-    actual = "//bazel/src",
+    actual = "//bazel/src/main/kotlin/org/virtuslab/bazelsteward/bazel",
     visibility = ["//visibility:public"],
 )

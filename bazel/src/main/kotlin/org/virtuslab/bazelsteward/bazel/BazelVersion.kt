@@ -1,4 +1,4 @@
-package bazel.src
+package org.virtuslab.bazelsteward.bazel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

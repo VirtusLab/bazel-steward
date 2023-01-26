@@ -1,4 +1,4 @@
-package bazel.src
+package org.virtuslab.bazelsteward.bazel
 
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.library.Library

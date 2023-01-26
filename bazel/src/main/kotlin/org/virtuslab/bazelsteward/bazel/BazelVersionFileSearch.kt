@@ -1,4 +1,4 @@
-package bazel.src
+package org.virtuslab.bazelsteward.bazel
 
 import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.core.Config

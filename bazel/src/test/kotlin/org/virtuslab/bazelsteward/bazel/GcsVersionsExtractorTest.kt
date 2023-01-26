@@ -1,6 +1,5 @@
-package bazel.test
+package org.virtuslab.bazelsteward.bazel
 
-import bazel.src.GcsVersionsExtractor
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 

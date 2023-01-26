@@ -1,9 +1,9 @@
 package org.virtuslab.bazelsteward.app
 
-import bazel.src.BazelUpdater
-import bazel.src.BazelVersion
-import bazel.src.BazelVersionFileSearch
 import mu.KotlinLogging
+import org.virtuslab.bazelsteward.bazel.BazelUpdater
+import org.virtuslab.bazelsteward.bazel.BazelVersion
+import org.virtuslab.bazelsteward.bazel.BazelVersionFileSearch
 import org.virtuslab.bazelsteward.common.GitOperations
 
 private val logger = KotlinLogging.logger {}

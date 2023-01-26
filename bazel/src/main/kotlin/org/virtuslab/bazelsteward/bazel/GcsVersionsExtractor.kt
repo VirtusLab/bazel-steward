@@ -1,4 +1,4 @@
-package bazel.src
+package org.virtuslab.bazelsteward.bazel
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

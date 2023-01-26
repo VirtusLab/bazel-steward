@@ -1,12 +1,12 @@
 package org.virtuslab.bazelsteward.app
 
-import bazel.src.BazelUpdater
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.common.GitClient
