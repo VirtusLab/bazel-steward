@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import org.virtuslab.bazelsteward.core.library.VersioningType
 import java.io.File
 
 class BazelStewardConfigurationTest {
@@ -47,15 +46,15 @@ class BazelStewardConfigurationTest {
     val expectedConfiguration = BazelStewardConfig(
       MavenConfig(
         listOf(
-          ConfigEntry("commons-io", "commons-io", VersioningSchema(VersioningType.LOOSE.name), BumpingStrategy.DEFAULT),
-          ConfigEntry("io.get-coursier", "interface", VersioningSchema(VersioningType.SEMVER.name), BumpingStrategy.LATEST),
-          ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", VersioningSchema("regex:^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?"), null),
-          ConfigEntry("org.jetbrains.kotlinx", null, VersioningSchema("loose"), null),
-          ConfigEntry(null, null, VersioningSchema(VersioningType.LOOSE.name), null),
+          ConfigEntry("commons-io", "commons-io", VersioningSchema.Loose, BumpingStrategy.DEFAULT),
+          ConfigEntry("io.get-coursier", "interface", VersioningSchema.SemVer, BumpingStrategy.LATEST),
+          ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", VersioningSchema.Regex("^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?".toRegex()), null),
+          ConfigEntry("org.jetbrains.kotlinx", null, VersioningSchema.Loose, null),
+          ConfigEntry(null, null, VersioningSchema.Loose, null),
         ),
       )
     )
-    Assertions.assertThat(configuration).usingRecursiveComparison().isEqualTo(expectedConfiguration)
+    Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)
   }
 
   private fun copyConfigFileToTempLocation(tempDir: File, configFileName: String) {
