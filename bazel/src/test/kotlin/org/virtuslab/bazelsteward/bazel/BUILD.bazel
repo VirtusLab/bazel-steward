@@ -1,0 +1,7 @@
+unit_tests(
+    srcs = glob(["**/*.kt"]),
+    test_package = "org.virtuslab.bazelsteward.bazel",
+    deps = [
+        "//bazel",
+    ],
+)

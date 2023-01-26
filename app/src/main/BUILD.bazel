@@ -4,6 +4,7 @@ library(
         ["resources/**"],
     ),
     deps = [
+        "//bazel",
         "//common",
         "//config",
         "//core",

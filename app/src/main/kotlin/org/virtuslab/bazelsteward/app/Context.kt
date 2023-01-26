@@ -6,6 +6,7 @@ import kotlinx.cli.default
 import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.common.GitClient
@@ -30,7 +31,8 @@ data class Context(
   val updateLogic: UpdateLogic,
   val fileUpdateSearch: FileUpdateSearch,
   val gitOperations: GitOperations,
-  val gitHostClient: GitHostClient
+  val gitHostClient: GitHostClient,
+  val bazelUpdater: BazelUpdater,
 ) {
 
   companion object {
@@ -70,8 +72,9 @@ data class Context(
       val fus = FileUpdateSearch()
       val gc = GitOperations(config)
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
+      val bu = BazelUpdater()
 
-      return Context(config, bfs, mde, mr, ul, fus, gc, ghc)
+      return Context(config, bfs, mde, mr, ul, fus, gc, ghc, bu)
     }
   }
 }
