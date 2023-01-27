@@ -34,6 +34,7 @@ class UpdateLogic(private val bazelStewardConfig: BazelStewardConfig) {
         val nextLibrary = when (bumpingStrategy) {
           BumpingStrategy.DEFAULT -> maxPatch ?: maxMinor ?: maxMajor
           BumpingStrategy.LATEST -> maxMajor ?: maxMinor ?: maxPatch
+          BumpingStrategy.MINOR -> maxMinor ?: maxPatch
         }
         nextLibrary?.let { UpdateSuggestion(library, it) }
       }
@@ -51,7 +52,7 @@ class UpdateLogic(private val bazelStewardConfig: BazelStewardConfig) {
         val bumpingForDependency = getConfigEntryFromConfigs(libraryId, bazelStewardConfig.maven.configs.filter { it.bumping != null })
         Pair(versioningForDependency?.versioning ?: VersioningSchema.Loose, bumpingForDependency?.bumping ?: BumpingStrategy.DEFAULT)
       }
-      else -> Pair(VersioningSchema.Loose, BumpingStrategy.DEFAULT)
+      else -> Pair(VersioningSchema.Loose, BumpingStrategy.MINOR)
     }
   }
 }

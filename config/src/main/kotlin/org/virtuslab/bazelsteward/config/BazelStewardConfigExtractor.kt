@@ -38,7 +38,7 @@ data class ConfigEntry(
 )
 
 enum class BumpingStrategy {
-  DEFAULT, LATEST;
+  DEFAULT, LATEST, MINOR;
 
   @JsonValue
   val lowercaseName = this.toString().lowercase()
