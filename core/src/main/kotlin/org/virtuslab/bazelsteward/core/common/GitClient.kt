@@ -1,18 +1,12 @@
 package org.virtuslab.bazelsteward.core.common
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import mu.KotlinLogging
 import java.io.File
 import java.nio.file.Path
 
-private val logger = KotlinLogging.logger {}
-
 class GitClient(private val repositoryFile: File) {
   private val quiet = "--quiet"
-  private val git = runBlocking { runCommand(listOf("sh", "-c", "which git")).trim() }
+  private val git = runBlocking { CommandRunner.run(listOf("sh", "-c", "which git"), repositoryFile).trim() }
 
   suspend fun checkout(target: String, newBranch: Boolean = false) {
     val b = if (newBranch) "-b" else null
@@ -67,20 +61,6 @@ class GitClient(private val repositoryFile: File) {
   suspend fun runGitCommand(vararg gitArgs: String?): String = runGitCommand(gitArgs.toList())
 
   suspend fun runGitCommand(gitArgs: List<String?>): String {
-    return runCommand(listOf(git) + gitArgs.filterNotNull())
-  }
-
-  private suspend fun runCommand(command: List<String>): String {
-    logger.debug { command }
-    return withContext(Dispatchers.IO) {
-      val process = ProcessBuilder(command).directory(repositoryFile).start()
-        .onExit().await()
-      val stdout = process.inputStream.bufferedReader().use { it.readText() }
-      val stderr = process.errorStream.bufferedReader().use { it.readText() }
-
-      if (process.exitValue() == 0) stdout else throw RuntimeException(
-        "${command.joinToString(" ")}\n$stdout\n$stderr"
-      )
-    }
+    return CommandRunner.run(listOf(git) + gitArgs.filterNotNull(), repositoryFile)
   }
 }

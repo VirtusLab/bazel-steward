@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.core.common
 
 import org.virtuslab.bazelsteward.core.Config
 import java.nio.file.Path
+import kotlin.io.path.isSymbolicLink
 import kotlin.io.path.readText
 
 class BazelFileSearch(config: Config) {
@@ -10,17 +11,32 @@ class BazelFileSearch(config: Config) {
       get() = path.readText()
   }
 
-  private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
-  private val fileSuffix = ".bzl"
-
-  private val buildPaths: List<Path> by lazy {
-    config.path.toFile().walkBottomUp()
-      .onEnter { !it.name.startsWith(".") }
-      .filter { it.isFile }
-      .filter { fileNames.contains(it.name) || it.name.endsWith(fileSuffix) }
-      .map { it.toPath() }
-      .toList()
+  enum class BazelFileType {
+    BUILD, WORKSPACE, BZL
   }
 
-  val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { BazelFile(it) } }
+  private val buildFileNames = listOf("BUILD.bazel", "BUILD")
+  private val workspaceFileNames = listOf("WORKSPACE", "WORKSPACE.bazel").map { config.path.resolve(it) }
+  private val fileSuffix = ".bzl"
+
+  private val buildPaths: Map<Path, BazelFileType> by lazy {
+    val paths = config.path.toFile().walkBottomUp()
+      .onEnter { !(it.name.startsWith(".") || it.toPath().isSymbolicLink()) }
+      .filter { it.isFile }
+      .filter { buildFileNames.contains(it.name) || it.name.endsWith(fileSuffix) || workspaceFileNames.contains(it.toPath()) }
+      .map { it.toPath() }
+      .toMutableList()
+    if (paths.toList().containsAll(workspaceFileNames)) {
+      paths.remove(workspaceFileNames[0])
+    }
+    paths.associateWith {
+      when (it.fileName.toString()) {
+        "BUILD.bazel", "BUILD" -> BazelFileType.BUILD
+        "WORKSPACE", "WORKSPACE.bazel" -> BazelFileType.WORKSPACE
+        else -> BazelFileType.BZL
+      }
+    }
+  }
+
+  val buildDefinitions: Map<BazelFile, BazelFileType> by lazy { buildPaths.mapKeys { BazelFile(it.key) } }
 }

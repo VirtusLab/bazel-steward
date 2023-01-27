@@ -20,6 +20,7 @@ class MavenDataExtractor(private val config: Config) {
   }
 
   private suspend fun extractFromFile(fileName: String): List<String> = withContext(Dispatchers.IO) {
+    // TODO use ProcessBuilder
     val process =
       ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(config.path.toFile()).start().onExit().await()
     val xml = process.inputStream.bufferedReader().use { it.readText() }

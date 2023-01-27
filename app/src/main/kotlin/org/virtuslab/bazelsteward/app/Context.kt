@@ -20,6 +20,7 @@ import org.virtuslab.bazelsteward.core.config.BazelStewardConfigExtractor
 import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
+import org.virtuslab.bazelsteward.rules.BazelRulesExtractor
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
@@ -29,6 +30,7 @@ data class Context(
   val bazelStewardConfig: BazelStewardConfig,
   val bazelFileSearch: BazelFileSearch,
   val mavenDataExtractor: MavenDataExtractor,
+  val bazelRulesExtractor: BazelRulesExtractor,
   val mavenRepository: MavenRepository,
   val updateLogic: UpdateLogic,
   val fileUpdateSearch: FileUpdateSearch,
@@ -74,6 +76,7 @@ data class Context(
       val bsc = runBlocking { BazelStewardConfigExtractor(config.configPath).get() }
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
+      val bre = BazelRulesExtractor(config)
       val mr = MavenRepository()
       val ul = UpdateLogic()
       val fus = FileUpdateSearch()
@@ -81,7 +84,7 @@ data class Context(
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
       val bu = BazelUpdater()
 
-      return Context(config, bsc, bfs, mde, mr, ul, fus, gc, ghc, bu)
+      return Context(config, bfs, mde, bre, mr, ul, fus, gc, ghc, bu)
     }
   }
 }
