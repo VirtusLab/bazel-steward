@@ -2,9 +2,9 @@ package org.virtuslab.bazelsteward.core.library
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -22,20 +22,24 @@ class VersionTest {
     "1.0.0-beta+exp.sha.5114f85",
   )
 
-  @ParameterizedTest
-  @EnumSource(value = VersioningType::class, names = ["SEMVER", "LOOSE"])
-  fun `check toSemVer`(versionType: VersioningType) {
-    val versioningSchema = VersioningSchema(versionType.name)
+  @Test
+  fun `check toSemVer with SemVer`() {
     strictSemVersions.forEach {
-      val ver = SimpleVersion(it)
-      ver.toSemVer(versioningSchema) shouldNotBe null
+      SimpleVersion(it).toSemVer(VersioningSchema.SemVer) shouldNotBe null
+    }
+  }
+
+  @Test
+  fun `check toSemVer with Loose`() {
+    strictSemVersions.forEach {
+      SimpleVersion(it).toSemVer(VersioningSchema.Loose) shouldNotBe null
     }
   }
 
   @ParameterizedTest
   @MethodSource("argumentsForReturnNullWithStrictSemVer")
   fun `toSemVer should return null when versioningSchema is SEMVER but versions follow only LOOSE `(value: String) {
-    val versioningSchema = VersioningSchema(VersioningType.SEMVER.name)
+    val versioningSchema = VersioningSchema.SemVer
     val ver = SimpleVersion(value)
     ver.toSemVer(versioningSchema) shouldBe null
   }

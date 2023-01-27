@@ -14,7 +14,7 @@ class SemanticVersionTest {
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
   inner class StrictSemVerVersioningTypeTest {
 
-    private val strictVersioningType = VersioningSchema(VersioningType.SEMVER.name)
+    private val strictVersioningType = VersioningSchema.SemVer
     @ParameterizedTest
     @MethodSource("argumentsForStrictVersioning")
     fun `test fromString`(value: String, major: Int, minor: Int, patch: Int, prerelease: String, buildMetadata: String) {
@@ -64,7 +64,7 @@ class SemanticVersionTest {
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
   inner class LooseVersioningTypeTest {
 
-    private val looseVersioningType = VersioningSchema(VersioningType.LOOSE.name)
+    private val looseVersioningType = VersioningSchema.Loose
     @ParameterizedTest
     @MethodSource("argumentsForLooseVersioning")
     fun `test fromString`(value: String, expectedValue: String, major: Int, minor: Int, patch: Int, prerelease: String, buildMetadata: String) {

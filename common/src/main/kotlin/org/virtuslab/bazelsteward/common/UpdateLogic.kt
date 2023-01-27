@@ -8,7 +8,6 @@ import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import org.virtuslab.bazelsteward.core.library.VersioningType
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 class UpdateLogic(private val bazelStewardConfig: BazelStewardConfig) {
@@ -50,9 +49,9 @@ class UpdateLogic(private val bazelStewardConfig: BazelStewardConfig) {
       is MavenLibraryId -> {
         val versioningForDependency = getConfigEntryFromConfigs(libraryId, bazelStewardConfig.maven.configs.filter { it.versioning != null })
         val bumpingForDependency = getConfigEntryFromConfigs(libraryId, bazelStewardConfig.maven.configs.filter { it.bumping != null })
-        Pair(versioningForDependency?.versioning ?: VersioningSchema(VersioningType.LOOSE.name), bumpingForDependency?.bumping ?: BumpingStrategy.DEFAULT)
+        Pair(versioningForDependency?.versioning ?: VersioningSchema.Loose, bumpingForDependency?.bumping ?: BumpingStrategy.DEFAULT)
       }
-      else -> Pair(VersioningSchema(VersioningType.LOOSE.name), BumpingStrategy.DEFAULT)
+      else -> Pair(VersioningSchema.Loose, BumpingStrategy.DEFAULT)
     }
   }
 }

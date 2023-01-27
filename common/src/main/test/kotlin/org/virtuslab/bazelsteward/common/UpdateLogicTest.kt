@@ -12,7 +12,6 @@ import org.virtuslab.bazelsteward.config.ConfigEntry
 import org.virtuslab.bazelsteward.config.MavenConfig
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import org.virtuslab.bazelsteward.core.library.VersioningType
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -96,8 +95,8 @@ class UpdateLogicTest {
     val bazelStewardConfig = BazelStewardConfig(
       MavenConfig(
         listOf(
-          ConfigEntry("g2", "a1", VersioningSchema(VersioningType.LOOSE.name), BumpingStrategy.DEFAULT),
-          ConfigEntry("g3", "a3", VersioningSchema(VersioningType.LOOSE.name), BumpingStrategy.DEFAULT),
+          ConfigEntry("g2", "a1", VersioningSchema.Loose, BumpingStrategy.DEFAULT),
+          ConfigEntry("g3", "a3", VersioningSchema.Loose, BumpingStrategy.DEFAULT),
           ConfigEntry("g1", null, null, BumpingStrategy.DEFAULT),
           ConfigEntry("g2", null, null, BumpingStrategy.LATEST),
           ConfigEntry(null, null, null, BumpingStrategy.LATEST),

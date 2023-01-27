@@ -94,10 +94,10 @@ data class SemanticVersion(
           )
         }
       }
-      return when (versioningScheme.type) {
-        VersioningType.SEMVER -> matchToSemanticVersion(strictSemVerRegex)
-        VersioningType.LOOSE -> matchToSemanticVersion(looseSemVerRegex)
-        else -> matchToSemanticVersion(Regex(versioningScheme.regex!!))
+      return when (versioningScheme) {
+        is VersioningSchema.SemVer -> matchToSemanticVersion(strictSemVerRegex)
+        is VersioningSchema.Loose -> matchToSemanticVersion(looseSemVerRegex)
+        is VersioningSchema.Regex -> matchToSemanticVersion(versioningScheme.regex)
       }
     }
   }
