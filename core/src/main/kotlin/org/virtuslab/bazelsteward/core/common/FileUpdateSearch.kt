@@ -18,15 +18,15 @@ class FileUpdateSearch {
     val branch = GitBranch(library.id, newVersion)
   }
 
-  fun <Lib : LibraryId> searchBuildFiles(
+  fun <Lib : LibraryId, V : Version> searchBuildFiles(
     buildDefinitions: List<BazelFileSearch.BazelFile>,
-    updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib>>
+    updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib, V>>
   ): List<FileChangeSuggestion> =
     updateSuggestions.mapNotNull { suggestion -> findSuggestion(buildDefinitions, suggestion) }
 
-  private fun <Lib : LibraryId> findSuggestion(
+  private fun <Lib : LibraryId, V : Version> findSuggestion(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>
+    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
   ): FileChangeSuggestion? {
     val allHeuristics = listOf(
       WholeLibraryHeuristic(),
@@ -38,21 +38,20 @@ class FileUpdateSearch {
     return null
   }
 
-  fun <Lib : LibraryId> searchBazelVersionFiles(
+  fun <Lib : LibraryId, V : Version> searchBazelVersionFiles(
     buildDefinitions: List<BazelFileSearch.BazelFile>,
-    updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib>>
+    updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib, V>>
   ): List<FileChangeSuggestion> =
     updateSuggestions.mapNotNull { suggestion -> findBazelSuggestion(buildDefinitions, suggestion) }
 
-  private fun <Lib : LibraryId> findBazelSuggestion(
+  private fun <Lib : LibraryId, V : Version> findBazelSuggestion(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>
+    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
   ): FileChangeSuggestion? {
     val markers = updateSuggestion.currentLibrary.id.associatedStrings()
     val currentVersion = updateSuggestion.currentLibrary.version.value
     val regex =
-      (markers.map { """(?:${Regex.escape(it)})""" } + "(${Regex.escape(currentVersion)})").reduce { acc, s -> "$acc*.*$s" }
-        .let(::Regex)
+      (markers.map { """(?:${Regex.escape(it)})""" } + "(${Regex.escape(currentVersion)})").reduce { acc, s -> "$acc*.*$s" }.toRegex()
     val matchResult = files.firstNotNullOfOrNull { regex.find(it.content)?.to(it.path) } ?: return null
     val versionGroup = matchResult.first.groups[1] ?: return null
     return FileChangeSuggestion(

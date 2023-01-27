@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.core.common
 
 import org.virtuslab.bazelsteward.core.Config
 import java.nio.file.Path
+import kotlin.io.path.isSymbolicLink
 import kotlin.io.path.readText
 
 class BazelFileSearch(config: Config) {
@@ -15,19 +16,36 @@ class BazelFileSearch(config: Config) {
       get() = path.readText()
   }
 
-  private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
-  private val fileSuffix = ".bzl"
+  enum class BazelFileType { Build, Workspace, Bzl }
 
-  private val buildPaths: List<Path> by lazy {
-    config.path.toFile().walkBottomUp()
-      .onEnter { !it.name.startsWith(".") }
+  private val workspaceFilePaths = workspaceFileNames.map { config.path.resolve(it) }
+
+  private val buildPaths: Map<Path, BazelFileType> by lazy {
+    val paths = config.path.toFile().walkBottomUp()
+      .onEnter { !(it.name.startsWith(".") || it.toPath().isSymbolicLink()) }
       .filter { it.isFile }
-      .filter { fileNames.contains(it.name) || it.name.endsWith(fileSuffix) }
+      .filter { buildFileNames.contains(it.name) || it.name.endsWith(fileSuffix) || workspaceFilePaths.contains(it.toPath()) }
       .map { it.toPath() }
-      .toList()
+      .toMutableList()
+    if (paths.containsAll(workspaceFilePaths)) {
+      paths.remove(workspaceFilePaths[0])
+    }
+    paths.associateWith {
+      when (it.fileName.toString()) {
+        in buildFileNames -> BazelFileType.Build
+        in workspaceFileNames -> BazelFileType.Workspace
+        else -> BazelFileType.Bzl
+      }
+    }
   }
 
-  val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { createBazelFile(it) } }
+  val buildDefinitions: Map<BazelFile, BazelFileType> by lazy { buildPaths.mapKeys { createBazelFile(it.key) } }
+
+  companion object {
+    private val buildFileNames = listOf("BUILD.bazel", "BUILD")
+    private val workspaceFileNames = listOf("WORKSPACE", "WORKSPACE.bazel")
+    private const val fileSuffix = ".bzl"
+  }
 
   companion object {
     fun createBazelFile(path: Path): BazelFile = LazyBazelFile(path)

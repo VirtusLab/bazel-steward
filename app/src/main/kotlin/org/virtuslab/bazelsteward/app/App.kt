@@ -14,7 +14,10 @@ import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.config.ConfigEntry
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
+import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
+import org.virtuslab.bazelsteward.core.rules.RuleLibrary
+import org.virtuslab.bazelsteward.core.rules.RuleUpdateSearch
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 private val logger = KotlinLogging.logger {}
@@ -23,7 +26,8 @@ class App(private val ctx: Context) {
   suspend fun run() {
     ctx.gitOperations.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
-    logger.debug { definitions.map { it.path } }
+
+    logger.debug { definitions.map { it.key.path } }
     val mavenData = ctx.mavenDataExtractor.extract()
     logger.debug { "Repositories " + mavenData.repositories.toString() }
     logger.debug { "Dependencies: " + mavenData.dependencies.map { it.id.name + " " + it.version.value }.toString() }
@@ -41,7 +45,7 @@ class App(private val ctx: Context) {
       ctx.updateLogic.selectUpdate(it.key, it.value)
     }
     logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
-    val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions, updateSuggestions)
+    val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions.map { it.key }, updateSuggestions)
 
     val bazelVersion = runCatching { BazelVersion.extractBazelVersion(ctx.config.path) }
       .onFailure { logger.error { "Can't extract Bazel version" } }.getOrNull()
@@ -53,6 +57,14 @@ class App(private val ctx: Context) {
       val bazelVersionFiles = BazelVersionFileSearch(ctx.config).bazelVersionFiles
       ctx.fileUpdateSearch.searchBazelVersionFiles(bazelVersionFiles, listOfNotNull(bazelUpdateSuggestions))
     }.orEmpty()
+
+    val usedBazelRules = ctx.bazelRulesExtractor.extractCurrentRules(definitions)
+    val latestRules = usedBazelRules.associateWith(ctx.githubRulesResolver::resolveRuleVersions)
+
+    val ruleUpdateSuggestions = latestRules.mapNotNull { (originalRule, versionMap) ->
+      ctx.updateLogic.selectUpdate(RuleLibrary(originalRule, SimpleVersion(originalRule.tag)), versionMap.values.toList())
+    }
+    val ruleChangeSuggestions = RuleUpdateSearch.searchBuildFiles(definitions.map { it.key }, ruleUpdateSuggestions)
 
     (changeSuggestions + bazelChangeSuggestions).forEach { change ->
       val branch = change.branch
@@ -73,6 +85,19 @@ class App(private val ctx: Context) {
         }
 
         CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${branch.name}" }
+      }
+    }
+
+    ruleChangeSuggestions.forEach { change ->
+      val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
+      if (!ctx.gitHostClient.checkIfPrExists(branch)) {
+        logger.info { "Creating branch ${branch.name}" }
+        ctx.gitOperations.createBranchWithChange(change)
+        if (ctx.config.pushToRemote) {
+          ctx.gitOperations.pushBranchToOrigin(branch)
+          ctx.gitHostClient.openNewPR(branch)
+        }
+        ctx.gitOperations.checkoutBaseBranch()
       }
     }
   }
