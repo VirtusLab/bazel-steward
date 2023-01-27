@@ -5,6 +5,7 @@ library(
     ),
     deps = [
         "//bazel",
+        "//bazel:rules",
         "//common",
         "//config",
         "//core",

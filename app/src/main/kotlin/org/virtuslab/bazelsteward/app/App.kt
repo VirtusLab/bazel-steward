@@ -12,7 +12,9 @@ class App(private val ctx: Context) {
   suspend fun run() {
     ctx.gitOperations.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
-    logger.debug { definitions.map { it.path } }
+    val usedBazelRules = ctx.bazelRulesExtractor.extractCurrentRules(definitions) // CHANGE LOCATION
+
+    logger.debug { definitions.map { it.key.path } }
     val mavenData = ctx.mavenDataExtractor.extract()
     logger.debug { "Repositories " + mavenData.repositories.toString() }
     logger.debug { "Dependencies: " + mavenData.dependencies.map { it.id.name + " " + it.version.value }.toString() }
@@ -21,7 +23,7 @@ class App(private val ctx: Context) {
       ctx.updateLogic.selectUpdate(it.key, it.value)
     }
     logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
-    val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions, updateSuggestions)
+    val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions.map { it.key }, updateSuggestions)
 
     val bazelVersion = runCatching { BazelVersion.extractBazelVersion(ctx.config.path) }
       .onFailure { logger.error { "Can't extract Bazel version" } }.getOrNull()

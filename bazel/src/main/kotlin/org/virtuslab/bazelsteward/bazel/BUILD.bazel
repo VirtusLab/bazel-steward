@@ -1,5 +1,9 @@
 library(
+    name = "bazel",
     srcs = glob(["**/*.kt"]),
+    resources = glob(
+        ["resources/**"],
+    ),
     deps = [
         "//common",
         "//core",

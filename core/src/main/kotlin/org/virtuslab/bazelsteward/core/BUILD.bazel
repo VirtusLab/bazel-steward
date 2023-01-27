@@ -1,6 +1,7 @@
 library(
     srcs = glob(["**/*.kt"]),
     deps = [
+        "@maven//:com_fasterxml_jackson_dataformat_jackson_dataformat_yaml",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_jdk8",

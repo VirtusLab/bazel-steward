@@ -3,5 +3,6 @@ library(
     deps = [
         "//config",
         "//core",
+        "//maven",
     ],
 )

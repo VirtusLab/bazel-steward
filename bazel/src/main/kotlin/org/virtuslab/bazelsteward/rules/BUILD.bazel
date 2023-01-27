@@ -1,15 +1,15 @@
 library(
-    srcs = glob(["kotlin/**/*.kt"]),
-    resources = glob(
-        ["resources/**"],
-    ),
+    name = "rules",
+    srcs = glob(["**/*.kt"]),
+    resources = ["//bazel/resources:rules_resources"],
     deps = [
+        "//common",
+        "//config",
         "//core",
-        "//maven",
         "@maven//:com_fasterxml_jackson_dataformat_jackson_dataformat_yaml",
         "@maven//:com_fasterxml_jackson_module_jackson_module_kotlin",
         "@maven//:com_networknt_json_schema_validator",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_jdk8",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
+        "@maven//:org_json_json_20220924",
     ],
 )
