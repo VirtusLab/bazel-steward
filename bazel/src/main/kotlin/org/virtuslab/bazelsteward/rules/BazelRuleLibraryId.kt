@@ -14,7 +14,7 @@ data class BazelRuleLibraryId(val url: String, val sha256: String) : LibraryId {
 
   init {
     val regex1 = Regex("""^https://github.com/(?<repoName>[^/]+)/(?<ruleName>[^/]+)/releases/download/(?<tag>[^/]+)/(?<artifactName>[^/]+)""")
-    val regex2 = Regex("""^https://github.com/(?<repoName>[^/]+)/(?<ruleName>[^/]+)/archive/(?<artifactName>[^/]+)""")
+    val regex2 = Regex("""^https://github.com/(?<repoName>[^/]+)/(?<ruleName>[^/]+)/archive/(?<artifactName>[^/]+)""") // I am not sure if extracting tag from artifactName in this case will be always successful
     val regex3 = Regex("""^https://github.com/(?<repoName>[^/]+)/(?<ruleName>[^/]+)/archive/refs/tags/(?<artifactName>[^/]+)""")
     val matchResult1 = regex1.matchEntire(url)
     val matchResult2 = regex2.matchEntire(url) ?: regex3.matchEntire(url)
@@ -29,9 +29,12 @@ data class BazelRuleLibraryId(val url: String, val sha256: String) : LibraryId {
       repoName = values["repoName"]?.value!!
       ruleName = values["ruleName"]?.value!!
       artifactName = values["artifactName"]?.value!!
-      tag = artifactName.removeSuffix(".zip").removeSuffix(".tar.gz").removeSuffix(".tgz")
+      if (!isArtifactInAllowedFormat(artifactName)) throw RuntimeException("Artifact $artifactName has an unrecognised format")
+      tag = artifactName.removeSuffix(".zip").removeSuffix(".tar.gz").removeSuffix(".tgz").removeSuffix(".tar")
     } else {
       throw RuntimeException("Could not parse repository URL $url")
     }
   }
+  private fun isArtifactInAllowedFormat(artifact: String): Boolean =
+    listOf(".zip", ".tar.gz", ".tgz", ".tar").any { artifact.endsWith(it) }
 }
