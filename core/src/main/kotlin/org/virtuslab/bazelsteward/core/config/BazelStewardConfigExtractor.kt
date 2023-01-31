@@ -56,9 +56,7 @@ class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(Versioni
   }
 }
 
-class BazelStewardConfigExtractor(repoRoot: Path) {
-
-  private val configFilePath = repoRoot.resolve(".bazel-steward.yaml")
+class BazelStewardConfigExtractor(private val configFilePath: Path) {
 
   suspend fun get(): BazelStewardConfig {
 
