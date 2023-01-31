@@ -36,5 +36,4 @@ class BazelUpdater {
     override val id: BazelLibraryId
       get() = BazelLibraryId
   }
-
 }
