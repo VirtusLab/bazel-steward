@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.config
+package org.virtuslab.bazelsteward.core.config
 
 import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
@@ -46,8 +46,8 @@ class BazelStewardConfigurationTest {
     val expectedConfiguration = BazelStewardConfig(
       MavenConfig(
         listOf(
-          ConfigEntry("commons-io", "commons-io", VersioningSchema.Loose, BumpingStrategy.DEFAULT),
-          ConfigEntry("io.get-coursier", "interface", VersioningSchema.SemVer, BumpingStrategy.LATEST),
+          ConfigEntry("commons-io", "commons-io", VersioningSchema.Loose, BumpingStrategy.Default),
+          ConfigEntry("io.get-coursier", "interface", VersioningSchema.SemVer, BumpingStrategy.Latest),
           ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", VersioningSchema.Regex("^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?".toRegex()), null),
           ConfigEntry("org.jetbrains.kotlinx", null, VersioningSchema.Loose, null),
           ConfigEntry(null, null, VersioningSchema.Loose, null),

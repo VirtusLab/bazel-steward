@@ -1,7 +1,7 @@
 package org.virtuslab.bazelsteward.bazel
 
-import org.virtuslab.bazelsteward.common.BazelFileSearch
 import org.virtuslab.bazelsteward.core.Config
+import org.virtuslab.bazelsteward.core.common.BazelFileSearch
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText

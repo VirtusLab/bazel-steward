@@ -1,5 +1,0 @@
-alias(
-    name = "common",
-    actual = "//common/src/main/kotlin/org/virtuslab/bazelsteward/common",
-    visibility = ["//visibility:public"],
-)

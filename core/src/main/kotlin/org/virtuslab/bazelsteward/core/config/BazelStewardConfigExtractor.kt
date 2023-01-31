@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.config
+package org.virtuslab.bazelsteward.core.config
 
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.JsonValue
@@ -17,7 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
+import java.io.File
 import java.nio.file.Path
+import java.util.zip.ZipFile
 import kotlin.io.path.exists
 
 data class BazelStewardConfig(
@@ -38,7 +40,7 @@ data class ConfigEntry(
 )
 
 enum class BumpingStrategy {
-  DEFAULT, LATEST;
+  Default, Latest, Minor;
 
   @JsonValue
   val lowercaseName = this.toString().lowercase()

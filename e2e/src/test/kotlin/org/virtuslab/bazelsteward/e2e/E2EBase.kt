@@ -3,10 +3,9 @@ package org.virtuslab.bazelsteward.e2e
 import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
-import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.core.GitBranch
+import org.virtuslab.bazelsteward.core.common.GitClient
 import java.io.File
-import java.lang.RuntimeException
 import java.util.jar.JarFile
 
 open class E2EBase {
