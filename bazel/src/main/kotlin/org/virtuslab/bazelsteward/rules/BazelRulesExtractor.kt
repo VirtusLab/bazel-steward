@@ -72,7 +72,6 @@ class BazelRulesExtractor(private val config: Config) {
         .build()
       val response = client.send(request, HttpResponse.BodyHandlers.ofString())
       val releases = yamlReader.readValue(response.body(), object : TypeReference<List<ReleaseInfo>>() {})
-      releases.forEach { t -> println(t) }
       // - czasami zamiast url jest urls z dwoma url'ami
       // - sha256 w body może być podane jako sha-256 (tzn tylko na takie sie natknęłam, ale pewnie by się jakies repo znalazło co robi np. sha 256)
       // 1. sha256 z body, bierzemy tag_name i podmieniamy w tym url co jest użyty w pliku WORKSPACE i sprawdzamy czy pobieranie działa
@@ -118,8 +117,9 @@ class BazelRulesExtractor(private val config: Config) {
       val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
       if (resultFilePath.exists()) {
         yamlReader.readValue(resultFilePath.toFile(), object : TypeReference<List<Repository>>() {})
-          .filter { it.kind == "http_archive" && it.generator_function.isEmpty() &&
-            !it.url.isNullOrEmpty() && !it.sha256.isNullOrEmpty() }
+          .filter {
+            it.kind == "http_archive" && it.generator_function.isEmpty() && !it.url.isNullOrEmpty() && !it.sha256.isNullOrEmpty()
+          }
           .map { BazelRuleLibraryId(it.url!!, it.sha256!!) }
       } else {
         throw RuntimeException("Failed to find a file")
