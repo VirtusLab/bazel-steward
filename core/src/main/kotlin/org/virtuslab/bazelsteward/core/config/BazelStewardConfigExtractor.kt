@@ -17,9 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import java.io.File
 import java.nio.file.Path
-import java.util.zip.ZipFile
 import kotlin.io.path.exists
 
 data class BazelStewardConfig(
