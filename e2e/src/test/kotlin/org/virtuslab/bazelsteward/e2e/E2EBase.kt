@@ -1,10 +1,18 @@
 package org.virtuslab.bazelsteward.e2e
 
 import io.kotest.common.runBlocking
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.slot
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
+import org.virtuslab.bazelsteward.bazel.BazelUpdater
+import org.virtuslab.bazelsteward.bazel.BazelVersion
 import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.core.GitBranch
+import org.virtuslab.bazelsteward.core.library.SemanticVersion
+import org.virtuslab.bazelsteward.maven.MavenData
+import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.io.File
 import java.lang.RuntimeException
 import java.util.jar.JarFile
@@ -94,6 +102,25 @@ open class E2EBase {
           .contains("Your branch is up to date with")
           .contains("nothing to commit, working tree clean")
       }
+    }
+  }
+
+  protected fun mockMavenRepositoryWithVersion(version: String): MavenRepository {
+    return mockk<MavenRepository>().also {
+      val slot = slot<MavenData>()
+      coEvery { it.findVersions(capture(slot)) } answers {
+        mapOf(
+          slot.captured.dependencies[0] to listOfNotNull(
+            SemanticVersion.fromString(version)
+          )
+        )
+      }
+    }
+  }
+
+  protected fun mockBazelUpdaterWithVersion(vararg version: String): BazelUpdater {
+    return mockk<BazelUpdater>().also {
+      coEvery { it.availableVersions(any()) } returns version.map { BazelVersion(it) }
     }
   }
 }

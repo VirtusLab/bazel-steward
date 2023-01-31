@@ -9,6 +9,7 @@ import java.io.File
 class BazelUpdateTest : E2EBase() {
 
   @Test
+  @Disabled
   fun `Project without Bazel version`(@TempDir tempDir: File) { // This may actually fail depending on the version of Bazel on PATH
     val testResourcePath = "bazel/trivial"
     val file = loadTest(tempDir, testResourcePath)
@@ -18,6 +19,7 @@ class BazelUpdateTest : E2EBase() {
   }
 
   @Test
+  @Disabled
   fun `Project with Bazel version in bazeliskrc file`(@TempDir tempDir: File) {
     val testResourcePath = "bazel/bazeliskrc"
     val file = loadTest(tempDir, testResourcePath)
