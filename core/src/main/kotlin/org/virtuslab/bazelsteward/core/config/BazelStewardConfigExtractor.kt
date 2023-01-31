@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.config
+package org.virtuslab.bazelsteward.core.config
 
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.JsonValue
@@ -38,7 +38,7 @@ data class ConfigEntry(
 )
 
 enum class BumpingStrategy {
-  DEFAULT, LATEST;
+  Default, Latest, Minor;
 
   @JsonValue
   val lowercaseName = this.toString().lowercase()
