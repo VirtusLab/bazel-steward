@@ -21,21 +21,20 @@ class BazelUpdater {
     return newerVersionPrefixes.flatMap { versionPrefix -> versionsExtractor.getAllVersions(versionPrefix) }
   }
 
-  companion object {
-    object BazelLibraryId : LibraryId {
-      override fun associatedStrings(): List<String> = listOf("", "USE_BAZEL_VERSION")
+  object BazelLibraryId : LibraryId {
+    override fun associatedStrings(): List<String> = listOf("", "USE_BAZEL_VERSION")
 
-      override val name: String
-        get() = "bazel"
-    }
-
-    data class BazelLibrary(
-      override val version: Version,
-      override val versioningSchema: VersioningSchema = VersioningSchema.SemVer,
-      override val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
-    ) : Library<BazelLibraryId> {
-      override val id: BazelLibraryId
-        get() = BazelLibraryId
-    }
+    override val name: String
+      get() = "bazel"
   }
+
+  data class BazelLibrary(
+    override val version: Version,
+    override val versioningSchema: VersioningSchema = VersioningSchema.SemVer,
+    override val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
+  ) : Library<BazelLibraryId> {
+    override val id: BazelLibraryId
+      get() = BazelLibraryId
+  }
+
 }
