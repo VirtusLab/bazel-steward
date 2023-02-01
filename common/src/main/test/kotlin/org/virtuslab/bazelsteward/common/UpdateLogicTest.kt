@@ -1,4 +1,4 @@
-package common.src.main.test.kotlin.org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.common
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.TestInstance
