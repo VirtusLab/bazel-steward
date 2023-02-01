@@ -43,7 +43,7 @@ class App(private val ctx: Context) {
 
     val bazelChangeSuggestions = bazelVersion?.let {
       val availableBazelVersions = ctx.bazelUpdater.availableVersions(bazelVersion)
-      val bazelLibrary = BazelUpdater.Companion.BazelLibrary(bazelVersion)
+      val bazelLibrary = BazelUpdater.BazelLibrary(bazelVersion)
       val bazelUpdateSuggestions = ctx.updateLogic.selectUpdate(bazelLibrary, availableBazelVersions)
       val bazelVersionFiles = BazelVersionFileSearch(ctx.config).bazelVersionFiles
       ctx.fileUpdateSearch.searchBazelVersionFiles(bazelVersionFiles, listOfNotNull(bazelUpdateSuggestions))
