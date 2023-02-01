@@ -2,7 +2,8 @@ name: Dependencies
 
 on:
   schedule:
-    - cron:  '45 14 * * *'
+    - cron: '0 15 * * *'
+    - cron: '0 12 * * *'
   workflow_dispatch:
 
 jobs:
