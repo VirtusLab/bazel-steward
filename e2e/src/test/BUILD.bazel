@@ -7,6 +7,5 @@ integration_tests(
     deps = [
         "//app/src/main",
         "@maven//:commons_io_commons_io",
-        "@maven//:io_mockk_mockk_jvm",
     ],
 )

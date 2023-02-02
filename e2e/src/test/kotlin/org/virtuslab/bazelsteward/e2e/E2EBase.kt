@@ -1,16 +1,16 @@
 package org.virtuslab.bazelsteward.e2e
 
 import io.kotest.common.runBlocking
-import io.mockk.coEvery
-import io.mockk.mockk
-import io.mockk.slot
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.BazelVersion
 import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.core.GitBranch
+import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
+import org.virtuslab.bazelsteward.core.library.Version
+import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.io.File
@@ -18,7 +18,7 @@ import java.lang.RuntimeException
 import java.util.jar.JarFile
 
 open class E2EBase {
-  private val heads = "refs/heads/"
+  protected val heads = "refs/heads/"
   protected val branchRef = "$heads${GitBranch.bazelPrefix}"
   private val master = "master"
   protected val masterRef = "$heads$master"
@@ -105,22 +105,22 @@ open class E2EBase {
     }
   }
 
-  protected fun mockMavenRepositoryWithVersion(version: String): MavenRepository {
-    return mockk<MavenRepository>().also {
-      val slot = slot<MavenData>()
-      coEvery { it.findVersions(capture(slot)) } answers {
-        mapOf(
-          slot.captured.dependencies[0] to listOfNotNull(
-            SemanticVersion.fromString(version)
-          )
-        )
-      }
+  protected fun mockMavenRepositoryWithVersion(vararg versions: String): MavenRepository {
+    return object : MavenRepository() {
+      override suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> =
+        mapOf(mavenData.dependencies[0] to versions.mapNotNull { SemanticVersion.fromString(it) }.toList())
     }
   }
 
-  protected fun mockBazelUpdaterWithVersion(vararg version: String): BazelUpdater {
-    return mockk<BazelUpdater>().also {
-      coEvery { it.availableVersions(any()) } returns version.map { BazelVersion(it) }
+  protected fun mockBazelUpdaterWithVersion(vararg versions: String): BazelUpdater {
+    return object : BazelUpdater() {
+      override suspend fun availableVersions(from: BazelVersion): List<BazelVersion> = versions.map { BazelVersion(it) }
+    }
+  }
+
+  protected fun mockGitHostClientWithStatus(status: GitHostClient.Companion.PrStatus): CountingGitHostClient {
+    return object : CountingGitHostClient() {
+      override fun checkPrStatus(branch: GitBranch) = status
     }
   }
 }

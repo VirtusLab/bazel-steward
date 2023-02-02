@@ -9,8 +9,8 @@ import org.virtuslab.bazelsteward.core.library.VersioningType
 
 private val logger = KotlinLogging.logger {}
 
-class BazelUpdater {
-  suspend fun availableVersions(from: BazelVersion): List<BazelVersion> {
+open class BazelUpdater {
+  open suspend fun availableVersions(from: BazelVersion): List<BazelVersion> {
     val versionsExtractor = GcsVersionsExtractor()
     val versioning = VersioningSchema(VersioningType.SEMVER.name)
     val bazelSemVer = from.toSemVer(versioning) ?: run { logger.error { "Cannot parse Bazel Version" }; return emptyList() }

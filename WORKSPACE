@@ -93,7 +93,6 @@ maven_install(
         "org.kohsuke:github-api:1.313",
         "io.github.microutils:kotlin-logging-jvm:3.0.4",
         "org.slf4j:slf4j-simple:2.0.6",
-        "io.mockk:mockk-jvm:1.13.3",
     ],
     fetch_sources = True,
     repositories = [

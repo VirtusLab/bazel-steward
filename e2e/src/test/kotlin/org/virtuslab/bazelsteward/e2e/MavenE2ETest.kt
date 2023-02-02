@@ -1,20 +1,20 @@
 package org.virtuslab.bazelsteward.e2e
 
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import io.mockk.verifyOrder
-import org.junit.jupiter.api.Disabled
+import io.kotest.common.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.app.Main
+import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.core.GitHostClient
 import java.io.File
+import java.nio.file.Files
 
 class MavenE2ETest : E2EBase() {
 
   @Test
-  @Disabled
   fun `Maven trivial local test`(@TempDir tempDir: File) {
     val testResourcePath = "maven/trivial"
     val file = loadTest(tempDir, testResourcePath)
@@ -26,7 +26,6 @@ class MavenE2ETest : E2EBase() {
   }
 
   @Test
-  @Disabled
   fun `Check dependency update not in maven central repository`(@TempDir tempDir: File) {
     val testResourcePath = "maven/external"
     val file = loadTest(tempDir, testResourcePath)
@@ -40,10 +39,8 @@ class MavenE2ETest : E2EBase() {
     val testResourcePath = "maven/updating-pr"
     val file = loadTest(tempDir, testResourcePath)
 
-    val gitHostClient =
-      mockk<GitHostClient>(relaxed = true).also { every { it.checkPrStatus(any()) } returns GitHostClient.Companion.PrStatus.NONE }
+    val gitHostClient = mockGitHostClientWithStatus(GitHostClient.Companion.PrStatus.NONE)
     val bazelUpdater = mockBazelUpdaterWithVersion()
-
     val v1 = "1.1.0"
     Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
       it.copy(
@@ -53,7 +50,11 @@ class MavenE2ETest : E2EBase() {
       )
     }
 
-    checkBranchesWithVersions(tempDir, testResourcePath, listOf("$branchRef/arrow-core/$v1", masterRef))
+    val branchV1 = "$branchRef/arrow-core/$v1"
+    checkBranchesWithVersions(tempDir, testResourcePath, listOf(branchV1, masterRef))
+
+    Assertions.assertThat(gitHostClient.openNewPrCalls[0].name).isEqualTo(branchV1.removePrefix(heads))
+    Assertions.assertThat(gitHostClient.closeOldPrsCalls[0].name).isEqualTo(branchV1.removePrefix(heads))
 
     val v2 = "1.1.3"
     Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
@@ -64,47 +65,62 @@ class MavenE2ETest : E2EBase() {
       )
     }
 
-    verify(exactly = 2) { gitHostClient.openNewPR(any()) }
-    verify(exactly = 2) { gitHostClient.closeOldPrs(any()) }
-
+    val branchV2 = "$branchRef/arrow-core/$v2"
     checkBranchesWithVersions(
       tempDir,
       testResourcePath,
-      listOf("$branchRef/arrow-core/$v1", "$branchRef/arrow-core/$v2", masterRef)
+      listOf(branchV1, branchV2, masterRef)
     )
+
+    Assertions.assertThat(gitHostClient.openNewPrCalls[1].name).isEqualTo(branchV2.removePrefix(heads))
+    Assertions.assertThat(gitHostClient.closeOldPrsCalls[1].name).isEqualTo(branchV2.removePrefix(heads))
   }
 
   @Test
-  @Disabled
   fun `Test managing PRs when branch is no longer mergable`(@TempDir tempDir: File) {
     val testResourcePath = "maven/updating-pr"
     val file = loadTest(tempDir, testResourcePath)
 
     val v1 = "1.1.0"
-    Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
-      it.copy(mavenRepository = mockMavenRepositoryWithVersion(v1))
-    }
-
-    checkBranchesWithVersions(tempDir, testResourcePath, listOf("$branchRef/arrow-core/$v1", masterRef))
-
-    val gitHostClient =
-      mockk<GitHostClient>(relaxed = true).also { every { it.checkPrStatus(any()) } returns GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE }
+    val mavenRepository = mockMavenRepositoryWithVersion(v1)
+    val bazelUpdater = mockBazelUpdaterWithVersion()
 
     Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
-      it.copy(mavenRepository = mockMavenRepositoryWithVersion(v1), gitHostClient = gitHostClient)
+      it.copy(mavenRepository = mavenRepository, bazelUpdater = bazelUpdater)
     }
 
-    verifyOrder {
-      GitHostClient.stub.openNewPR(any())
-      GitHostClient.stub.closeOldPrs(any())
-      GitHostClient.stub.openNewPR(any())
-      GitHostClient.stub.closeOldPrs(any())
+    val branchV1 = "$branchRef/arrow-core/$v1"
+    checkBranchesWithVersions(tempDir, testResourcePath, listOf(branchV1, masterRef))
+
+    val gitClient = GitClient(file)
+    val branchName = branchV1.removePrefix(heads)
+    runBlocking {
+      val baseBranch = gitClient.runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
+      gitClient.checkout(branchName)
+      val path = file.toPath().resolve("change.txt")
+      withContext(Dispatchers.IO) {
+        Files.writeString(path, "This is a change")
+      }
+      gitClient.add(path)
+      gitClient.commit("Change commit")
+      gitClient.checkout(baseBranch)
+      gitClient.runGitCommand("branch -D $branchName".split(' '))
     }
+
+
+    val gitHostClient = mockGitHostClientWithStatus(GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE)
+
+    Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
+      it.copy(mavenRepository = mavenRepository, gitHostClient = gitHostClient, bazelUpdater = bazelUpdater)
+    }
+
+    Assertions.assertThat(gitHostClient.openNewPrCalls).hasSize(0)
+    Assertions.assertThat(gitHostClient.closeOldPrsCalls).hasSize(0)
 
     checkBranchesWithVersions(
       tempDir,
       testResourcePath,
-      listOf("$branchRef/arrow-core/$v1", masterRef)
+      listOf(branchV1, masterRef)
     )
   }
 }
