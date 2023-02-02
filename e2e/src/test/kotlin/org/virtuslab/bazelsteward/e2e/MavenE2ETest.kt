@@ -7,8 +7,8 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.app.Main
-import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.common.GitClient
 import java.io.File
 import java.nio.file.Files
 
@@ -172,6 +172,5 @@ class MavenE2ETest : E2EBase() {
       listOf(masterRef),
       skipRemote = true,
     )
-
   }
 }

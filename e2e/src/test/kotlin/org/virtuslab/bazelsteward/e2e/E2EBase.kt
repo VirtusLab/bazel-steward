@@ -3,9 +3,11 @@ package org.virtuslab.bazelsteward.e2e
 import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
+import org.virtuslab.bazelsteward.bazel.BazelUpdater
+import org.virtuslab.bazelsteward.bazel.BazelVersion
 import org.virtuslab.bazelsteward.core.GitBranch
-import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
@@ -62,11 +64,11 @@ open class E2EBase {
     val localRepo = File(File(tempDir, "local"), testResourcePath)
     val remoteRepo = File(tempDir, "remote")
 
-    if(!skipLocal) {
+    if (!skipLocal) {
       checkForBranchesWithVersions(localRepo, branches)
       checkStatusOfBranches(localRepo, branches)
     }
-    if(!skipRemote)
+    if (!skipRemote)
       checkForBranchesWithVersions(remoteRepo, branches)
   }
 

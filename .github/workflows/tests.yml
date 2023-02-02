@@ -17,6 +17,8 @@ jobs:
           java-version: 11
       - name: Run tests
         run: bazel test //... --keep_going --test_output=errors --test_tag_filters=unit
+        env:
+          GITHUB_TOKEN: ${{ inputs.github-token }}
   integration-tests:
     runs-on: ubuntu-latest
     steps:

@@ -4,6 +4,12 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.BazelVersion
 import org.virtuslab.bazelsteward.bazel.BazelVersionFileSearch
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.CLOSED
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.MERGED
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.NONE
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MERGEABLE
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MODIFIED
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.config.ConfigEntry
@@ -11,13 +17,6 @@ import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
-import org.virtuslab.bazelsteward.common.GitOperations
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.CLOSED
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.MERGED
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.NONE
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MERGEABLE
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MODIFIED
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE
 
 private val logger = KotlinLogging.logger {}
 
