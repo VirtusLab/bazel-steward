@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.core.common
 
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.GitBranch

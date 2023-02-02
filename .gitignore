@@ -2,5 +2,8 @@
 .bsp/
 .idea/
 .ijwb/
-bazel-*
+bazel-bin
+bazel-bazel-steward
+bazel-out
+bazel-testlogs
 .DS_Store

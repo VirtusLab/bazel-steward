@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.core.common
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await

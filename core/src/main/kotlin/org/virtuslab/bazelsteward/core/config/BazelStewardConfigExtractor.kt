@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.config
+package org.virtuslab.bazelsteward.core.config
 
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.JsonValue
@@ -38,7 +38,7 @@ data class ConfigEntry(
 )
 
 enum class BumpingStrategy {
-  DEFAULT, LATEST;
+  Default, Latest, Minor;
 
   @JsonValue
   val lowercaseName = this.toString().lowercase()
@@ -46,10 +46,13 @@ enum class BumpingStrategy {
 
 private val logger = KotlinLogging.logger { }
 
-class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema>(VersioningSchema::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): VersioningSchema {
-    val versioningFieldValue = (jp.codec.readTree<JsonNode>(jp) as TextNode).asText().toString()
-    return VersioningSchema(versioningFieldValue)
+class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(VersioningSchema::class.java) {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): VersioningSchema? {
+    val versioningFieldValue = (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString()
+    if (versioningFieldValue.startsWith("regex:")) {
+      return VersioningSchema.Regex(versioningFieldValue.removePrefix("regex:").toRegex())
+    }
+    return VersioningSchema::class.sealedSubclasses.firstOrNull { it.simpleName?.lowercase() == versioningFieldValue }?.objectInstance
   }
 }
 

@@ -7,15 +7,16 @@ import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
-import org.virtuslab.bazelsteward.common.BazelFileSearch
-import org.virtuslab.bazelsteward.common.FileUpdateSearch
-import org.virtuslab.bazelsteward.common.GitClient
-import org.virtuslab.bazelsteward.common.GitOperations
-import org.virtuslab.bazelsteward.common.UpdateLogic
-import org.virtuslab.bazelsteward.config.BazelStewardConfigExtractor
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.common.BazelFileSearch
+import org.virtuslab.bazelsteward.core.common.FileUpdateSearch
+import org.virtuslab.bazelsteward.core.common.GitClient
+import org.virtuslab.bazelsteward.core.common.GitOperations
+import org.virtuslab.bazelsteward.core.common.UpdateLogic
+import org.virtuslab.bazelsteward.core.config.BazelStewardConfig
+import org.virtuslab.bazelsteward.core.config.BazelStewardConfigExtractor
 import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
@@ -25,6 +26,7 @@ private val logger = KotlinLogging.logger {}
 
 data class Context(
   val config: Config,
+  val bazelStewardConfig: BazelStewardConfig,
   val bazelFileSearch: BazelFileSearch,
   val mavenDataExtractor: MavenDataExtractor,
   val mavenRepository: MavenRepository,
@@ -68,13 +70,13 @@ data class Context(
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
       val mr = MavenRepository()
-      val ul = UpdateLogic(bsc)
+      val ul = UpdateLogic()
       val fus = FileUpdateSearch()
       val gc = GitOperations(config)
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
       val bu = BazelUpdater()
 
-      return Context(config, bfs, mde, mr, ul, fus, gc, ghc, bu)
+      return Context(config, bsc, bfs, mde, mr, ul, fus, gc, ghc, bu)
     }
   }
 }

@@ -5,8 +5,6 @@ library(
     ),
     deps = [
         "//bazel",
-        "//common",
-        "//config",
         "//core",
         "//github",
         "//maven",

@@ -3,10 +3,8 @@ package org.virtuslab.bazelsteward.e2e
 import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
-import org.virtuslab.bazelsteward.bazel.BazelUpdater
-import org.virtuslab.bazelsteward.bazel.BazelVersion
-import org.virtuslab.bazelsteward.common.GitClient
 import org.virtuslab.bazelsteward.core.GitBranch
+import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
@@ -14,7 +12,6 @@ import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.io.File
-import java.lang.RuntimeException
 import java.util.jar.JarFile
 
 open class E2EBase {
