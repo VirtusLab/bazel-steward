@@ -35,7 +35,7 @@ class MavenE2ETest : E2EBase() {
   }
 
   @Test
-  fun `Test managing PRs when new version appears`(@TempDir tempDir: File) {
+  fun `Test managing PRs when new version of library appears`(@TempDir tempDir: File) {
     val testResourcePath = "maven/updating-pr"
     val file = loadTest(tempDir, testResourcePath)
 
@@ -77,9 +77,10 @@ class MavenE2ETest : E2EBase() {
   }
 
   @Test
-  fun `Test managing PRs when branch is no longer mergable`(@TempDir tempDir: File) {
+  fun `Test managing PRs when branch is no longer mergeable`(@TempDir tempDir: File) {
     val testResourcePath = "maven/updating-pr"
     val file = loadTest(tempDir, testResourcePath)
+    val localGit = GitClient(file)
 
     val v1 = "1.1.0"
     val mavenRepository = mockMavenRepositoryWithVersion(v1)
@@ -92,21 +93,19 @@ class MavenE2ETest : E2EBase() {
     val branchV1 = "$branchRef/arrow-core/$v1"
     checkBranchesWithVersions(tempDir, testResourcePath, listOf(branchV1, masterRef))
 
-    val gitClient = GitClient(file)
+    val commitMessage = "Commit message 2137"
     val branchName = branchV1.removePrefix(heads)
     runBlocking {
-      val baseBranch = gitClient.runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
-      gitClient.checkout(branchName)
+      localGit.runGitCommand("branch -D $branchName".split(' '))
+
       val path = file.toPath().resolve("change.txt")
       withContext(Dispatchers.IO) {
         Files.writeString(path, "This is a change")
       }
-      gitClient.add(path)
-      gitClient.commit("Change commit")
-      gitClient.checkout(baseBranch)
-      gitClient.runGitCommand("branch -D $branchName".split(' '))
+      localGit.add(path)
+      localGit.commit(commitMessage)
+      localGit.push()
     }
-
 
     val gitHostClient = mockGitHostClientWithStatus(GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE)
 
@@ -122,5 +121,57 @@ class MavenE2ETest : E2EBase() {
       testResourcePath,
       listOf(branchV1, masterRef)
     )
+
+    runBlocking {
+      localGit.checkout(branchName)
+      val log = localGit.runGitCommand("log", "--oneline")
+      Assertions.assertThat(log).contains(commitMessage)
+    }
+  }
+
+  @Test
+  fun `Test managing PRs when branch is no longer mergeable but has been edited by user`(@TempDir tempDir: File) {
+    val testResourcePath = "maven/updating-pr"
+    val file = loadTest(tempDir, testResourcePath)
+    val localGit = GitClient(file)
+
+    val v1 = "1.1.0"
+    val mavenRepository = mockMavenRepositoryWithVersion(v1)
+    val bazelUpdater = mockBazelUpdaterWithVersion()
+
+    Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
+      it.copy(mavenRepository = mavenRepository, bazelUpdater = bazelUpdater)
+    }
+
+    val branchV1 = "$branchRef/arrow-core/$v1"
+    checkBranchesWithVersions(tempDir, testResourcePath, listOf(branchV1, masterRef))
+
+    val branchName = branchV1.removePrefix(heads)
+    runBlocking {
+      localGit.runGitCommand("branch", "-D", branchName)
+    }
+
+    Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
+      it.copy(
+        mavenRepository = mavenRepository,
+        gitHostClient = mockGitHostClientWithStatus(GitHostClient.Companion.PrStatus.OPEN_MODIFIED),
+        bazelUpdater = bazelUpdater
+      )
+    }
+
+    checkBranchesWithVersions(
+      tempDir,
+      testResourcePath,
+      listOf(branchV1, masterRef),
+      skipLocal = true,
+    )
+
+    checkBranchesWithVersions(
+      tempDir,
+      testResourcePath,
+      listOf(masterRef),
+      skipRemote = true,
+    )
+
   }
 }

@@ -55,14 +55,22 @@ open class E2EBase {
     return finalFile
   }
 
-  protected fun checkBranchesWithVersions(tempDir: File, testResourcePath: String, branches: List<String>) {
+  protected fun checkBranchesWithVersions(
+    tempDir: File,
+    testResourcePath: String,
+    branches: List<String>,
+    skipLocal: Boolean = false,
+    skipRemote: Boolean = false
+  ) {
     val localRepo = File(File(tempDir, "local"), testResourcePath)
     val remoteRepo = File(tempDir, "remote")
 
-    checkForBranchesWithVersions(localRepo, branches)
-    checkForBranchesWithVersions(remoteRepo, branches)
-
-    checkStatusOfBranches(localRepo, branches)
+    if(!skipLocal) {
+      checkForBranchesWithVersions(localRepo, branches)
+      checkStatusOfBranches(localRepo, branches)
+    }
+    if(!skipRemote)
+      checkForBranchesWithVersions(remoteRepo, branches)
   }
 
   protected fun checkBranchesWithoutVersions(tempDir: File, testResourcePath: String, branchesPattern: List<String>) {

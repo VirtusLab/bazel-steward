@@ -28,17 +28,7 @@ class GithubClient private constructor(private val config: Config, repository: S
   private val branchToGHPR: Map<String, GHPullRequest> = bazelPRs.associateBy { it.head.ref }
 
   override fun checkPrStatus(branch: GitBranch): PrStatus {
-    val pr = branchToGHPR[branch.name] ?: return PrStatus.NONE
-    return if (pr.isMerged)
-      PrStatus.MERGED
-    else if (pr.state == GHIssueState.CLOSED)
-      PrStatus.CLOSED
-    else if (pr.listCommits().toList().any { it.commit.author.name != "github-actions[bot]" })
-      PrStatus.OPEN_MODIFIED
-    else if (pr.mergeable)
-      PrStatus.OPEN_MERGEABLE
-    else
-      PrStatus.OPEN_NOT_MERGEABLE
+    return checkPrStatus(branchToGHPR[branch.name])
   }
 
   override fun openNewPR(branch: GitBranch) {
@@ -52,9 +42,27 @@ class GithubClient private constructor(private val config: Config, repository: S
   }
 
   override fun closeOldPrs(newBranch: GitBranch) {
-    val oldPrs =
-      bazelPRs.filter { it.head.ref.startsWith(newBranch.libraryPrefix) }.filterNot { it.head.ref == newBranch.name }
+    val statusesToClose = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
+    val oldPrs = bazelPRs
+      .filter { it.head.ref.startsWith(newBranch.libraryPrefix) }
+      .filter { it.head.ref != newBranch.name }
+      .filter { checkPrStatus(it) in statusesToClose }
     oldPrs.forEach { it.close() }
+  }
+
+  private fun checkPrStatus(pr: GHPullRequest?): PrStatus {
+    return if (pr == null)
+      PrStatus.NONE
+    else if (pr.isMerged)
+      PrStatus.MERGED
+    else if (pr.state == GHIssueState.CLOSED)
+      PrStatus.CLOSED
+    else if (pr.listCommits().toList().any { it.commit.author.name != "github-actions[bot]" })
+      PrStatus.OPEN_MODIFIED
+    else if (pr.mergeable)
+      PrStatus.OPEN_MERGEABLE
+    else
+      PrStatus.OPEN_NOT_MERGEABLE
   }
 
   companion object {
