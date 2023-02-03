@@ -13,10 +13,10 @@ class GitOperations(private val config: Config) {
 
   suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {
     val branch = fileChangeSuggestionToBranch(change)
-    try{
+    try {
       git.checkout(branch.name, true)
     } catch (e: RuntimeException) {
-      if(e.message!!.contains(branch.name)) {
+      if (e.message!!.contains(branch.name)) {
         git.deleteBranch(branch.name)
         git.checkout(branch.name, true)
       }
@@ -35,7 +35,7 @@ class GitOperations(private val config: Config) {
     git.checkout(branchName)
     try {
       git.push(branchName)
-    } catch (e: RuntimeException){
+    } catch (e: RuntimeException) {
       git.push(branchName, force = true)
     }
   }

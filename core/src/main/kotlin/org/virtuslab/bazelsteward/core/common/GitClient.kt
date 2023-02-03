@@ -19,7 +19,7 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("checkout", quiet, b, target)
   }
 
-  suspend fun deleteBranch(branchName: String){
+  suspend fun deleteBranch(branchName: String) {
     runGitCommand("branch", quiet, "-D", branchName)
   }
 
@@ -38,7 +38,7 @@ class GitClient(private val repositoryFile: File) {
     if (force) {
       pushList.add("--force")
     }
-    runGitCommand( pushList + (upCmd?.toList() ?: emptyList()))
+    runGitCommand(pushList + (upCmd?.toList() ?: emptyList()))
   }
 
   suspend fun init(initialBranch: String? = null, bare: Boolean = false) {
