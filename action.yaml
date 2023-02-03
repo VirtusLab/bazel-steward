@@ -6,7 +6,7 @@ inputs:
     description: "The path to bazel steward configuration"
     default: ".github/bazel-steward.yaml"
   github-token:
-    description: "A token for the github repository"
+    description: "A token for the Github repository"
     default: ${{ github.token }}
   use-release:
     description: "Whether to use prebuild jar from release, instead of compiling code"
@@ -40,9 +40,9 @@ runs:
       uses: fregante/setup-git-user@v1
     - name: Run bazel steward
       run: |
-        DEBUG_FLAG="-Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG"
-        PUSH_TO_REMOTE_FLAG=${{ inputs.push-to-remote == 'true' && '--push-to-remote' || '' }}
-        java "$DEBUG_FLAG" -jar bazel-steward.jar --github "$PUSH_TO_REMOTE_FLAG" ${{ inputs.additional-args }}
+        PUSH_TO_REMOTE=${{ inputs.push-to-remote == 'true' && '--push-to-remote' || '' }}
+        java "-Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG" -jar bazel-steward.jar \
+        --github $PUSH_TO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
