@@ -19,6 +19,10 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("checkout", quiet, b, target)
   }
 
+  suspend fun deleteBranch(branchName: String){
+    runGitCommand("branch", quiet, "-D", branchName)
+  }
+
   suspend fun add(vararg paths: Path) {
     val names = paths.map { it.toString() }
     runGitCommand(listOf("add") + names)
@@ -28,9 +32,13 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("commit", quiet, "-m", message)
   }
 
-  suspend fun push(branch: String? = null, remote: String = "origin") {
+  suspend fun push(branch: String? = null, remote: String = "origin", force: Boolean = false) {
     val upCmd = branch?.let { Triple("--set-upstream", remote, it) }
-    runGitCommand(listOf("push", quiet) + (upCmd?.toList() ?: emptyList()))
+    val pushList = mutableListOf("push", quiet)
+    if (force) {
+      pushList.add("--force")
+    }
+    runGitCommand( pushList + (upCmd?.toList() ?: emptyList()))
   }
 
   suspend fun init(initialBranch: String? = null, bare: Boolean = false) {

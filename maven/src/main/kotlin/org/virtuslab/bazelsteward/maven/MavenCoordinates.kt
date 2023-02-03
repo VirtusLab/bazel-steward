@@ -12,6 +12,9 @@ data class MavenLibraryId(val group: String, val artifact: String) : LibraryId {
 
   override val name: String
     get() = artifact
+
+  override val groupName: String?
+    get() = group
 }
 
 data class MavenCoordinates(

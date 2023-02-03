@@ -4,4 +4,5 @@ interface LibraryId {
   fun associatedStrings(): List<String>
 
   val name: String
+  val groupName: String?
 }
