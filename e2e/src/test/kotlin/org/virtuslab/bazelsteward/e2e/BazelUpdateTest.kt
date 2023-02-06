@@ -13,7 +13,7 @@ class BazelUpdateTest : E2EBase() {
     val testResourcePath = "bazel/trivial"
     val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
-    val expectedBranches = listOf("arrow-core", "arrow-fx-coroutines").map { "$branchRef/$it/1.1.5" } + masterRef
+    val expectedBranches = listOf("io.arrow-kt/arrow-core", "io.arrow-kt/arrow-fx-coroutines").map { "$branchRef/$it/1.1.5" } + masterRef
     checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
   }
 
@@ -23,7 +23,7 @@ class BazelUpdateTest : E2EBase() {
     val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
     val expectedBranches =
-      listOf("arrow-core" to "1.1.5", "arrow-fx-coroutines" to "1.1.5", "bazel" to "5.4.0")
+      listOf("io.arrow-kt/arrow-core" to "1.1.5", "io.arrow-kt/arrow-fx-coroutines" to "1.1.5", "bazel" to "5.4.0")
         .map { "$branchRef/${it.first}/${it.second}" } + masterRef
     checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
   }
