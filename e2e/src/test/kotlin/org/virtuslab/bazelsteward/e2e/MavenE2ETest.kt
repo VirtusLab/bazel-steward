@@ -23,7 +23,7 @@ class MavenE2ETest : E2EBase() {
     val testResourcePath = "maven/external"
     val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
-    val expectedBranches = listOf("$branchRef/utilis", "$branchRef/bazel/5.3.2", masterRef)
+    val expectedBranches = listOf("$branchRef/com.7theta/utilis", "$branchRef/bazel/5.3.2", masterRef)
     checkBranchesWithoutVersions(tempDir, testResourcePath, expectedBranches)
   }
 }
