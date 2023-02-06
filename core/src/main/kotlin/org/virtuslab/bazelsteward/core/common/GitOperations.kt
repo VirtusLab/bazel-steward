@@ -14,12 +14,10 @@ class GitOperations(private val config: Config) {
   suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {
     val branch = fileChangeSuggestionToBranch(change)
     try {
-      git.checkout(branch.name, true)
+      git.checkout(branch.name, newBranch = true)
     } catch (e: RuntimeException) {
-      if (e.message!!.contains(branch.name)) {
-        git.deleteBranch(branch.name)
-        git.checkout(branch.name, true)
-      }
+      git.deleteBranch(branch.name)
+      git.checkout(branch.name, newBranch = true)
     }
 
     val newContents = change.file.readText()

@@ -26,8 +26,6 @@ class BazelUpdater {
 
     override val name: String
       get() = "bazel"
-    override val groupName: String?
-      get() = null
   }
 
   data class BazelLibrary(
