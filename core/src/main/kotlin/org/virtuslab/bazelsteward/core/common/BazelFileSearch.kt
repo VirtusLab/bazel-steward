@@ -12,7 +12,7 @@ class BazelFileSearch(config: Config) {
   }
 
   enum class BazelFileType {
-    BUILD, WORKSPACE, BZL
+    Build, Workspace, Bzl
   }
 
   private val buildFileNames = listOf("BUILD.bazel", "BUILD")
@@ -26,14 +26,14 @@ class BazelFileSearch(config: Config) {
       .filter { buildFileNames.contains(it.name) || it.name.endsWith(fileSuffix) || workspaceFileNames.contains(it.toPath()) }
       .map { it.toPath() }
       .toMutableList()
-    if (paths.toList().containsAll(workspaceFileNames)) {
+    if (paths.containsAll(workspaceFileNames)) {
       paths.remove(workspaceFileNames[0])
     }
     paths.associateWith {
       when (it.fileName.toString()) {
-        "BUILD.bazel", "BUILD" -> BazelFileType.BUILD
-        "WORKSPACE", "WORKSPACE.bazel" -> BazelFileType.WORKSPACE
-        else -> BazelFileType.BZL
+        in buildFileNames -> BazelFileType.Build
+        "WORKSPACE", "WORKSPACE.bazel" -> BazelFileType.Workspace
+        else -> BazelFileType.Bzl
       }
     }
   }

@@ -9,7 +9,9 @@ import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.config.ConfigEntry
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
+import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
+import org.virtuslab.bazelsteward.core.rules.RuleLibrary
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 private val logger = KotlinLogging.logger {}
@@ -18,7 +20,6 @@ class App(private val ctx: Context) {
   suspend fun run() {
     ctx.gitOperations.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
-    val usedBazelRules = ctx.bazelRulesExtractor.extractCurrentRules(definitions) // CHANGE LOCATION
 
     logger.debug { definitions.map { it.key.path } }
     val mavenData = ctx.mavenDataExtractor.extract()
@@ -51,7 +52,15 @@ class App(private val ctx: Context) {
       ctx.fileUpdateSearch.searchBazelVersionFiles(bazelVersionFiles, listOfNotNull(bazelUpdateSuggestions))
     }.orEmpty()
 
-    (changeSuggestions + bazelChangeSuggestions).forEach { change ->
+    val usedBazelRules = ctx.bazelRulesExtractor.extractCurrentRules(definitions)
+    val latestRules = usedBazelRules.associateWith(ctx.githubRulesResolver::resolveRuleVersions)
+
+    val ruleUpdateSuggestions = latestRules.mapNotNull { (originalRule, versionMap) ->
+      ctx.updateLogic.selectUpdate(RuleLibrary(originalRule, SimpleVersion(originalRule.tag)), versionMap.values.toList())
+    }
+    val ruleChangeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions.map { it.key }, ruleUpdateSuggestions)
+
+    (changeSuggestions + bazelChangeSuggestions + ruleChangeSuggestions).forEach { change ->
       val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
       if (!ctx.gitHostClient.checkIfPrExists(branch)) {
         logger.info { "Creating branch ${branch.name}" }

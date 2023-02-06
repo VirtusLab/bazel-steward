@@ -1,9 +1,10 @@
-package org.virtuslab.bazelsteward.rules
+package org.virtuslab.bazelsteward.core.rules
 
 import org.virtuslab.bazelsteward.core.library.LibraryId
 
 data class BazelRuleLibraryId(val url: String, val sha256: String) : LibraryId {
   override fun associatedStrings(): List<String> = listOf(url, sha256)
+  private val allowedExtensions = listOf(".zip", ".tar.gz", ".tgz", ".tar")
 
   val repoName: String
   val ruleName: String
@@ -19,22 +20,23 @@ data class BazelRuleLibraryId(val url: String, val sha256: String) : LibraryId {
     val matchResult1 = regex1.matchEntire(url)
     val matchResult2 = regex2.matchEntire(url) ?: regex3.matchEntire(url)
     if (matchResult1 != null) {
-      val values = matchResult1.groups as MatchNamedGroupCollection
+      val values = matchResult1.groups
       repoName = values["repoName"]?.value!!
       ruleName = values["ruleName"]?.value!!
       tag = values["tag"]?.value!!
       artifactName = values["artifactName"]?.value!!
     } else if (matchResult2 != null) {
-      val values = matchResult2.groups as MatchNamedGroupCollection
+      val values = matchResult2.groups
       repoName = values["repoName"]?.value!!
       ruleName = values["ruleName"]?.value!!
       artifactName = values["artifactName"]?.value!!
       if (!isArtifactInAllowedFormat(artifactName)) throw RuntimeException("Artifact $artifactName has an unrecognised format")
-      tag = artifactName.removeSuffix(".zip").removeSuffix(".tar.gz").removeSuffix(".tgz").removeSuffix(".tar")
+      tag = artifactName.removeSuffixes(allowedExtensions)
     } else {
       throw RuntimeException("Could not parse repository URL $url")
     }
   }
-  private fun isArtifactInAllowedFormat(artifact: String): Boolean =
-    listOf(".zip", ".tar.gz", ".tgz", ".tar").any { artifact.endsWith(it) }
+
+  private fun String.removeSuffixes(suffixes: Collection<String>): String = suffixes.fold(this) { str, suffix -> str.removeSuffix(suffix) }
+  private fun isArtifactInAllowedFormat(artifact: String): Boolean = allowedExtensions.any { artifact.endsWith(it) }
 }

@@ -40,8 +40,7 @@ class GithubClient private constructor(private val config: Config, repository: S
   }
 
   companion object {
-
-    fun getClient(env: Environment, config: Config): GitHostClient {
+    fun getClient(env: Environment, config: Config): GithubClient {
       val url = env.getOrThrow("GITHUB_API_URL")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")

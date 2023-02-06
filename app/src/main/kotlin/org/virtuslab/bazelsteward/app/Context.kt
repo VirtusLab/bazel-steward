@@ -6,6 +6,7 @@ import kotlinx.cli.default
 import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.kohsuke.github.GitHub
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
@@ -18,6 +19,7 @@ import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.BazelStewardConfig
 import org.virtuslab.bazelsteward.core.config.BazelStewardConfigExtractor
 import org.virtuslab.bazelsteward.github.GithubClient
+import org.virtuslab.bazelsteward.github.GithubRulesResolver
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import org.virtuslab.bazelsteward.rules.BazelRulesExtractor
@@ -37,6 +39,7 @@ data class Context(
   val gitOperations: GitOperations,
   val gitHostClient: GitHostClient,
   val bazelUpdater: BazelUpdater,
+  val githubRulesResolver: GithubRulesResolver,
 ) {
 
   companion object {
@@ -76,15 +79,20 @@ data class Context(
       val bsc = runBlocking { BazelStewardConfigExtractor(config.configPath).get() }
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
-      val bre = BazelRulesExtractor(config)
       val mr = MavenRepository()
       val ul = UpdateLogic()
       val fus = FileUpdateSearch()
       val gc = GitOperations(config)
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
+      val bre = BazelRulesExtractor(config)
       val bu = BazelUpdater()
+      val grr = if (github) {
+        GithubRulesResolver(GitHub.connectUsingOAuth(env.getOrThrow("GITHUB_TOKEN"))) // TODO: refactor
+      } else {
+        GithubRulesResolver(GitHub.connectAnonymously()) // TODO: this may hit rate limit pretty soon
+      }
 
-      return Context(config, bfs, mde, bre, mr, ul, fus, gc, ghc, bu)
+      return Context(config, bsc, bfs, mde, bre, mr, ul, fus, gc, ghc, bu, grr)
     }
   }
 }
