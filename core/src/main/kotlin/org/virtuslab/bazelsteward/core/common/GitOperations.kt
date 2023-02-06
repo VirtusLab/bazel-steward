@@ -13,7 +13,13 @@ class GitOperations(private val config: Config) {
 
   suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {
     val branch = fileChangeSuggestionToBranch(change)
-    git.checkout(branch.name, true)
+    try {
+      git.checkout(branch.name, newBranch = true)
+    } catch (e: RuntimeException) {
+      git.deleteBranch(branch.name)
+      git.checkout(branch.name, newBranch = true)
+    }
+
     val newContents = change.file.readText()
       .replaceRange(change.position, change.position + change.library.version.value.length, change.newVersion.value)
     change.file.toFile().writeText(newContents)
@@ -25,7 +31,11 @@ class GitOperations(private val config: Config) {
   suspend fun pushBranchToOrigin(branch: GitBranch) {
     val branchName = branch.name
     git.checkout(branchName)
-    git.push(branchName)
+    try {
+      git.push(branchName)
+    } catch (e: RuntimeException) {
+      git.push(branchName, force = true)
+    }
   }
 
   companion object {
