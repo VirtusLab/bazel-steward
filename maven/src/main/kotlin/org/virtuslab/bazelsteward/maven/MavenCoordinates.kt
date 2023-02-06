@@ -11,7 +11,7 @@ data class MavenLibraryId(val group: String, val artifact: String) : LibraryId {
   override fun associatedStrings(): List<String> = listOf(group, artifact)
 
   override val name: String
-    get() = "$group/$artifact"
+    get() = "$group:$artifact"
 }
 
 data class MavenCoordinates(
