@@ -50,12 +50,12 @@ class MavenE2ETest : E2EBase() {
       )
     }
 
-    val libraryName = "arrow-core"
+    val libraryName = "io.arrow-kt/arrow-core"
     val branchV1 = "$branchRef/$libraryName/$v1"
     checkBranchesWithVersions(tempDir, testResourcePath, listOf(branchV1, masterRef))
 
     Assertions.assertThat(gitHostClient.openNewPrCalls[0].name).isEqualTo(branchV1.removePrefix(heads))
-    Assertions.assertThat(gitHostClient.closeOldPrsCalls[0].name).isEqualTo(libraryName)
+    Assertions.assertThat(gitHostClient.closeOldPrsCalls[0].name).isEqualTo(libraryName.replace('/', ':'))
 
     val v2 = "1.1.3"
     Main.mainMapContext(arrayOf(file.toString(), "--push-to-remote")) {
@@ -74,7 +74,7 @@ class MavenE2ETest : E2EBase() {
     )
 
     Assertions.assertThat(gitHostClient.openNewPrCalls[1].name).isEqualTo(branchV2.removePrefix(heads))
-    Assertions.assertThat(gitHostClient.closeOldPrsCalls[1].name).isEqualTo(libraryName)
+    Assertions.assertThat(gitHostClient.closeOldPrsCalls[1].name).isEqualTo(libraryName.replace('/', ':'))
   }
 
   @Test
@@ -91,7 +91,7 @@ class MavenE2ETest : E2EBase() {
       it.copy(mavenRepository = mavenRepository, bazelUpdater = bazelUpdater)
     }
 
-    val branchV1 = "$branchRef/arrow-core/$v1"
+    val branchV1 = "$branchRef/io.arrow-kt/arrow-core/$v1"
     checkBranchesWithVersions(tempDir, testResourcePath, listOf(branchV1, masterRef))
 
     val commitMessage = "Commit message 2137"
@@ -144,7 +144,7 @@ class MavenE2ETest : E2EBase() {
       it.copy(mavenRepository = mavenRepository, bazelUpdater = bazelUpdater)
     }
 
-    val branchV1 = "$branchRef/arrow-core/$v1"
+    val branchV1 = "$branchRef/io.arrow-kt/arrow-core/$v1"
     checkBranchesWithVersions(tempDir, testResourcePath, listOf(branchV1, masterRef))
 
     val branchName = branchV1.removePrefix(heads)

@@ -36,7 +36,8 @@ class GithubTest {
 
     val env = Environment.system
     val gitAuthor = GitClient.Companion.GitAuthor("github-actions[bot]", "email@github.com")
-    val config = Config(path = Path.of("."), pushToRemote = false, baseBranch = "base", gitAuthor)
+    val config =
+      Config(path = Path.of("."), configPath = Path.of("."), pushToRemote = false, baseBranch = "base", gitAuthor)
     val gitHostClient = GithubClient.getClient(env, config)
 
     branchToPrStatus.forEach {
