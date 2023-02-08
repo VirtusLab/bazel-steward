@@ -5,9 +5,17 @@ import java.nio.file.Path
 import kotlin.io.path.readText
 
 class BazelFileSearch(config: Config) {
-  data class BazelFile(val path: Path) {
+  interface BazelFile {
+    val path: Path
     val content: String
+  }
+
+  data class BazelFileLazy(override val path: Path): BazelFile {
+    override val content: String
       get() = path.readText()
+  }
+
+  data class BazelFileTest(override val path: Path, override val content: String): BazelFile {
   }
 
   private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
@@ -22,5 +30,7 @@ class BazelFileSearch(config: Config) {
       .toList()
   }
 
-  val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { BazelFile(it) } }
+  val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { BazelFileLazy(it) } }
 }
+
+
