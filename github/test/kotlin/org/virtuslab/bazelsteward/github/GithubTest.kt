@@ -7,6 +7,7 @@ import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
+import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import java.nio.file.Path
@@ -34,7 +35,8 @@ class GithubTest {
     )
 
     val env = Environment.system
-    val config = Config(Path.of("."), false, "base")
+    val gitAuthor = GitClient.Companion.GitAuthor("github-actions[bot]", "email@github.com")
+    val config = Config(path = Path.of("."), pushToRemote = false, baseBranch = "base", gitAuthor)
     val gitHostClient = GithubClient.getClient(env, config)
 
     branchToPrStatus.forEach {

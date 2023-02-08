@@ -1,9 +1,12 @@
 package org.virtuslab.bazelsteward.core
 
+import org.virtuslab.bazelsteward.core.library.LibraryId
+import org.virtuslab.bazelsteward.core.library.Version
+
 interface GitHostClient {
   fun checkPrStatus(branch: GitBranch): PrStatus
   fun openNewPR(branch: GitBranch)
-  fun closeOldPrs(newBranch: GitBranch)
+  fun closePrs(library: LibraryId, filterNotVersion: Version? = null)
 
   companion object {
     enum class PrStatus {
@@ -13,7 +16,7 @@ interface GitHostClient {
     val stub = object : GitHostClient {
       override fun checkPrStatus(branch: GitBranch) = PrStatus.NONE
       override fun openNewPR(branch: GitBranch) {}
-      override fun closeOldPrs(newBranch: GitBranch) {}
+      override fun closePrs(library: LibraryId, filterNotVersion: Version?) {}
     }
   }
 }

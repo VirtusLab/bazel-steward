@@ -60,6 +60,12 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("config", "user.name", name)
   }
 
+  suspend fun getAuthor(): GitAuthor {
+    val email = runGitCommand("config", "user.email").trim()
+    val name = runGitCommand("config", "user.name").trim()
+    return GitAuthor(name, email)
+  }
+
   suspend fun runGitCommand(vararg gitArgs: String?): String = runGitCommand(gitArgs.toList())
 
   suspend fun runGitCommand(gitArgs: List<String?>): String {
@@ -78,5 +84,9 @@ class GitClient(private val repositoryFile: File) {
         "${command.joinToString(" ")}\n$stdout\n$stderr"
       )
     }
+  }
+
+  companion object {
+    data class GitAuthor(val name: String, val email: String)
   }
 }

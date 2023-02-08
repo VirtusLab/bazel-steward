@@ -4,7 +4,7 @@ import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
 
 data class GitBranch(val libraryId: LibraryId, val version: Version) {
-  val libraryPrefix = "$bazelPrefix/${libraryId.name}"
+  private val libraryPrefix = "$bazelPrefix/${libraryId.name}"
   val name = "$libraryPrefix/${version.value}"
 
   companion object {

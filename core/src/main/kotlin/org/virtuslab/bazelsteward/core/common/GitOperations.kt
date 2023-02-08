@@ -12,7 +12,7 @@ class GitOperations(private val config: Config) {
   }
 
   suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {
-    val branch = fileChangeSuggestionToBranch(change)
+    val branch = change.branch
     git.checkout(branch.name, true)
     val newContents = change.file.readText()
       .replaceRange(change.position, change.position + change.library.version.value.length, change.newVersion.value)
@@ -26,10 +26,5 @@ class GitOperations(private val config: Config) {
     val branchName = branch.name
     git.checkout(branchName)
     git.push(branchName, force = force)
-  }
-
-  companion object {
-    fun fileChangeSuggestionToBranch(change: FileUpdateSearch.FileChangeSuggestion) =
-      GitBranch(change.library.id, change.newVersion)
   }
 }

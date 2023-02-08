@@ -58,11 +58,13 @@ data class Context(
       parser.parse(args)
 
       val repoPath = if (github) GithubClient.getRepoPath(env) else Path(repository)
+      val gitClient = GitClient(repoPath.toFile())
       val baseBranchName = baseBranch ?: runBlocking {
-        GitClient(repoPath.toFile()).runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
+        gitClient.runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
       }
+      val gitAuthor = runBlocking { gitClient.getAuthor() }
 
-      val config = Config(repoPath, pushToRemote, baseBranchName)
+      val config = Config(repoPath, pushToRemote, baseBranchName, gitAuthor)
       logger.info { config }
 
       @Suppress("UNUSED_VARIABLE")

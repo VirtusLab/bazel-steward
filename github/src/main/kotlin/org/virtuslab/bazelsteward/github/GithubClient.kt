@@ -10,6 +10,8 @@ import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
+import org.virtuslab.bazelsteward.core.library.LibraryId
+import org.virtuslab.bazelsteward.core.library.Version
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -41,11 +43,11 @@ class GithubClient private constructor(private val config: Config, repository: S
     )
   }
 
-  override fun closeOldPrs(newBranch: GitBranch) {
+  override fun closePrs(library: LibraryId, filterNotVersion: Version?) {
     val statusesToClose = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
     val oldPrs = bazelPRs
-      .filter { it.head.ref.startsWith(newBranch.libraryPrefix) }
-      .filter { it.head.ref != newBranch.name }
+      .filter { it.head.ref.startsWith("${GitBranch.bazelPrefix}/${library.name}") }
+      .filterNot { filterNotVersion?.let { version -> it.head.ref.endsWith(version.value) } ?: true }
       .filter { checkPrStatus(it) in statusesToClose }
     oldPrs.forEach { it.close() }
   }
@@ -57,7 +59,7 @@ class GithubClient private constructor(private val config: Config, repository: S
       PrStatus.MERGED
     else if (pr.state == GHIssueState.CLOSED)
       PrStatus.CLOSED
-    else if (pr.listCommits().toList().any { it.commit.author.name != "github-actions[bot]" })
+    else if (pr.listCommits().toList().any { it.commit.author.name != config.gitAuthor.name })
       PrStatus.OPEN_MODIFIED
     else if (pr.mergeable)
       PrStatus.OPEN_MERGEABLE
