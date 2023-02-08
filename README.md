@@ -2,28 +2,45 @@
 
 Bazel-Steward is a bot that helps you keep your library dependencies up-to-date.
 
-## How to work on the Project with IntelliJ
+## Using with Github
+Create file at  `.github/workflows/` with this content:
+```yaml
+name: Update dependencies
 
-**Note:** Be sure to install:
-  * Bazelisk (instead of Bazel directly) 
-  * IntelliJ with Kotlin and Scala Plugins
+on:
+  schedule:
+    - cron: '30 5 * * 6' # runs every saturday at 5:30 am
 
-### If you have Bazel Plugin Installed
+  jobs:
+    bazel-steward:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+        - uses: VirtusLab/bazel-steward@v0.1.0 # or latest
+```
 
-Bazel Plugin is useful for highlighting BUILD, WORKSPACE and .bzl files, but the project doesn't import well with it.
-It will force import the project using its own model instead of Bazel-BSP. Follow the steps below to avoid this. 
+After every run, it creates a new branch and a pull request with a bumped version for every library it detects to be outdated.
+You can merge the PR, close it, or push your own changes onto the branch.
+Once a PR is opened, it will never open another one for the same version, regardless of what you do with the PR.
 
-1. Ensure you have Bazel Plugin installed in your IntelliJ
-2. Go to `Registry...`
-3. Set `bazel.auto.import.disabled` to True.
-4. Close project in IntelliJ.
-5. If old project was created, you need to delete `.ijwb` directory (most safe solution is to use `git clean -dfx`)
+### Detailed usage
+```yaml
+- uses: VirtusLab/bazel-steward@latest
+  with:
+    # The path to bazel steward configuration
+    # Default: ".github/bazel-steward.yaml"
+    configuration-path: ''
+    
+    # A token for the GitHub repository
+    # Default: ${{ github.token }}
+    github-token: ''
+    
+    # Additional arguments to bazel steward jar
+    additional-args: ''
+```
 
-### Common Setup Steps
+## Contributing
 
-If you do not have Bazel Plugin or followed the instruction above, follow these steps:
-
-1. Run setup-bsp.sh script
-2. Open this project in IntelliJ
-3. Select all `./bazel-*` directories and mark them as excluded. Otherwise they will pollute search scope and other features.
-
+Want to contribute? Look [here](CONTRIBUTING.md)!

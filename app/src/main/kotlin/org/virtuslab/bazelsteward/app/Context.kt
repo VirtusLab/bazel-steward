@@ -54,6 +54,11 @@ data class Context(
         fullName = "base-branch",
         description = "Branch that will be set as a base in pull request"
       )
+      val configPath by parser.option(
+        ArgType.String,
+        fullName = "config-path",
+        description = "Path to the config file"
+      )
 
       parser.parse(args)
 
@@ -63,12 +68,12 @@ data class Context(
         gitClient.runGitCommand("rev-parse --abbrev-ref HEAD".split(' ')).trim()
       }
       val gitAuthor = runBlocking { gitClient.getAuthor() }
+      val configResolvedPath = configPath?.let { Path(it) } ?: repoPath.resolve(".bazel-steward.yaml")
 
-      val config = Config(repoPath, pushToRemote, baseBranchName, gitAuthor)
+      val config = Config(repoPath, configResolvedPath, pushToRemote, baseBranchName, gitAuthor)
       logger.info { config }
 
-      @Suppress("UNUSED_VARIABLE")
-      val bsc = runBlocking { BazelStewardConfigExtractor(repoPath).get() }
+      val bsc = runBlocking { BazelStewardConfigExtractor(config.configPath).get() }
       val bfs = BazelFileSearch(config)
       val mde = MavenDataExtractor(config)
       val mr = MavenRepository()

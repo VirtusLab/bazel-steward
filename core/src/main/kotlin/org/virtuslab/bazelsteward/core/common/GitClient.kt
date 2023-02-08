@@ -19,6 +19,10 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("checkout", quiet, b, target)
   }
 
+  suspend fun deleteBranch(branchName: String) {
+    runGitCommand("branch", quiet, "-D", branchName)
+  }
+
   suspend fun add(vararg paths: Path) {
     val names = paths.map { it.toString() }
     runGitCommand(listOf("add") + names)

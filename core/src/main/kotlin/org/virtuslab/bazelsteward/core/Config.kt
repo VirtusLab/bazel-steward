@@ -5,6 +5,7 @@ import java.nio.file.Path
 
 data class Config(
   val path: Path,
+  val configPath: Path,
   val pushToRemote: Boolean,
   val baseBranch: String,
   val gitAuthor: GitAuthor
