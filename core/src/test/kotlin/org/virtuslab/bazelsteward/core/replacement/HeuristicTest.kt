@@ -8,8 +8,10 @@ import org.virtuslab.bazelsteward.core.common.BazelFileSearch
 import org.virtuslab.bazelsteward.core.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
-import org.virtuslab.bazelsteward.core.library.*
-import org.virtuslab.bazelsteward.maven.*
+import org.virtuslab.bazelsteward.core.library.SemanticVersion
+import org.virtuslab.bazelsteward.core.library.VersioningSchema
+import org.virtuslab.bazelsteward.maven.MavenCoordinates
+import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import kotlin.io.path.Path
 
 class HeuristicTest {
@@ -198,7 +200,6 @@ class HeuristicTest {
       result.position shouldBe 2377
     }
   }
-
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
