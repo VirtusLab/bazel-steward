@@ -11,7 +11,7 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.common.BazelFileSearch
 import org.virtuslab.bazelsteward.core.common.CommandRunner
-import org.virtuslab.bazelsteward.core.rules.BazelRuleLibraryId
+import org.virtuslab.bazelsteward.core.rules.RuleLibraryId
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.createTempFile
@@ -33,7 +33,7 @@ class BazelRulesExtractor(private val config: Config) {
     val strip_prefix: String?,
   )
 
-  suspend fun extractCurrentRules(bazelFiles: Map<BazelFileSearch.BazelFile, BazelFileSearch.BazelFileType>): List<BazelRuleLibraryId> =
+  suspend fun extractCurrentRules(bazelFiles: Map<BazelFileSearch.BazelFile, BazelFileSearch.BazelFileType>): List<RuleLibraryId> =
     withContext(Dispatchers.IO) {
       val dumpRepositoriesContent = javaClass.classLoader.getResource("bazel/resources/dump_repositories.bzlignore")?.readText()
         ?: throw RuntimeException("Could not find dump_repositories template, which is required for detecting used bazel repositories")
@@ -63,10 +63,9 @@ class BazelRulesExtractor(private val config: Config) {
         .filter {
           it.kind == "http_archive" && it.generator_function.isEmpty() && !it.url.isNullOrEmpty() && !it.sha256.isNullOrEmpty()
         }
-        .map { BazelRuleLibraryId(it.url!!, it.sha256!!) }
+        .map { RuleLibraryId.from(it.url!!, it.sha256!!) }
       result
     }
-
 
   private fun deleteFile(file: File) {
     runCatching {

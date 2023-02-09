@@ -3,11 +3,9 @@ package org.virtuslab.bazelsteward.github
 import org.kohsuke.github.GHAsset
 import org.kohsuke.github.GHRelease
 import org.kohsuke.github.GitHub
-import org.virtuslab.bazelsteward.core.library.SimpleVersion
-import org.virtuslab.bazelsteward.core.library.Version
-import org.virtuslab.bazelsteward.core.rules.BazelRuleLibraryId
+import org.virtuslab.bazelsteward.core.rules.RuleLibraryId
+import org.virtuslab.bazelsteward.core.rules.RuleVersion
 import org.virtuslab.bazelsteward.core.rules.RulesResolver
-import java.io.FileInputStream
 import java.net.URL
 import java.security.DigestInputStream
 import java.security.MessageDigest
@@ -15,42 +13,33 @@ import kotlin.math.min
 
 
 class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
-  private val sha256Regex = "\\b[A-Fa-f0-9]{64}\\b".toRegex()
 
-  override fun resolveRuleVersions(ruleId: BazelRuleLibraryId): Map<BazelRuleLibraryId, Version> = // TODO: this should probably suspend
-    ruleId.toRepositoryId().listReleases().associateWith { release ->
-      val shas = sha256Regex.findAll(release.body).map { it.value }.toList()
-      val assets = release.listAssets().toList()
-      if (assets.size > 1) {
-        return@associateWith assets
-          .sortedBy { levenshtein(it.name, ruleId.artifactName) }
-          .asSequence()
-          .map { it to it.sha256() }
-          .firstOrNull { shas.contains(it.second) }
-          ?.let { ruleId.copy(url = it.first.browserDownloadUrl, sha256 = it.second) }
-      }
-      assets.singleOrNull()?.let {
-        ruleId.copy(url = it.browserDownloadUrl, sha256 = shas.singleOrNull() ?: it.sha256())
-      }
-    }.filterValues { it != null }.map { it.value!! to SimpleVersion(it.key.tagName) }.toMap()
+  override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, RuleVersion> =
+    ruleId.toRepositoryId().listReleases().mapNotNull { shaFromBodyAndCurrentUrl(ruleId, it) }.toMap()
 
 
-//  private fun tryShaFromBodyAndCurrentUrl(ruleId: BazelRuleLibraryId, release: GHRelease): Boolean = ruleId.url
+  private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion>? = sha256Regex.findAll(release.body).map { it.value }.toList().singleOrNull()?.let { sha ->
+    val newArtifactName = ruleId.artifactName.replace(ruleId.tag, release.tagName)
+    val rule = when (ruleId) {
+      is RuleLibraryId.ReleaseArtifact -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+      is RuleLibraryId.ArchiveTagRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+      is RuleLibraryId.ArchiveRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+    }
+    rule to RuleVersion(rule.downloadUrl, sha, release.tagName)
+  }
 
 
   private fun RepositoryId.listReleases(): Sequence<GHRelease> =
     gitHubClient.getRepository(this.toString()).listReleases().asSequence()
 
   companion object {
-    private fun BazelRuleLibraryId.toRepositoryId() = RepositoryId(repoName, ruleName)
+    private val sha256Regex = "\\b[A-Fa-f0-9]{64}\\b".toRegex()
+
+    private fun RuleLibraryId.toRepositoryId() = RepositoryId(repoName, ruleName)
 
     private fun GHAsset.sha256() = URL(browserDownloadUrl).getFileChecksum(MessageDigest.getInstance("SHA-256"))
 
     private data class RepositoryId(val user: String, val repository: String) {
-      override fun toString(): String = "$user/$repository"
-    }
-
-    private data class VersionAndSha(val user: String, val repository: String) {
       override fun toString(): String = "$user/$repository"
     }
 
@@ -107,3 +96,20 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
     }
   }
 }
+
+//override fun resolveRuleVersions(ruleId: BazelRuleLibraryId): Map<BazelRuleLibraryId, Version> = // TODO: this should probably suspend
+//  ruleId.toRepositoryId().listReleases().associateWith { release ->
+//    val shas = sha256Regex.findAll(release.body).map { it.value }.toList()
+//    val assets = release.listAssets().toList()
+//    if (assets.size > 1) {
+//      return@associateWith assets
+//        .sortedBy { GithubRulesResolver.levenshtein(it.name, ruleId.artifactName) }
+//        .asSequence()
+//        .map { it to it.sha256() }
+//        .firstOrNull { shas.contains(it.second) }
+//        ?.let { ruleId.copy(url = it.first.browserDownloadUrl, sha256 = it.second) }
+//    }
+//    assets.singleOrNull()?.let {
+//      ruleId.copy(url = it.browserDownloadUrl, sha256 = shas.singleOrNull() ?: it.sha256())
+//    }
+//  }.filterValues { it != null }.map { it.value!! to SimpleVersion(it.key.tagName) }.toMap()

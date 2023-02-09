@@ -12,6 +12,7 @@ import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.core.rules.RuleLibrary
+import org.virtuslab.bazelsteward.core.rules.RuleUpdateSearch
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 private val logger = KotlinLogging.logger {}
@@ -58,9 +59,22 @@ class App(private val ctx: Context) {
     val ruleUpdateSuggestions = latestRules.mapNotNull { (originalRule, versionMap) ->
       ctx.updateLogic.selectUpdate(RuleLibrary(originalRule, SimpleVersion(originalRule.tag)), versionMap.values.toList())
     }
-    val ruleChangeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions.map { it.key }, ruleUpdateSuggestions)
+    val ruleChangeSuggestions = RuleUpdateSearch.searchBuildFiles(definitions.map { it.key }, ruleUpdateSuggestions)
 
-    (changeSuggestions + bazelChangeSuggestions + ruleChangeSuggestions).forEach { change ->
+    (changeSuggestions + bazelChangeSuggestions).forEach { change ->
+      val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
+      if (!ctx.gitHostClient.checkIfPrExists(branch)) {
+        logger.info { "Creating branch ${branch.name}" }
+        ctx.gitOperations.createBranchWithChange(change)
+        if (ctx.config.pushToRemote) {
+          ctx.gitOperations.pushBranchToOrigin(branch)
+          ctx.gitHostClient.openNewPR(branch)
+        }
+        ctx.gitOperations.checkoutBaseBranch()
+      }
+    }
+
+    ruleChangeSuggestions.forEach { change ->
       val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
       if (!ctx.gitHostClient.checkIfPrExists(branch)) {
         logger.info { "Creating branch ${branch.name}" }

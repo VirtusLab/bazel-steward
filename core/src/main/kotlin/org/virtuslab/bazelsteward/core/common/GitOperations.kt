@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.core.common
 
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.GitBranch
+import org.virtuslab.bazelsteward.core.rules.RuleUpdateSearch
 import kotlin.io.path.readText
 
 class GitOperations(private val config: Config) {
@@ -28,6 +29,20 @@ class GitOperations(private val config: Config) {
     return branch
   }
 
+  suspend fun createBranchWithChange(change: RuleUpdateSearch.FileChangeSuggestion): GitBranch {
+    val branch = fileChangeSuggestionToBranch(change)
+    git.checkout(branch.name, true)
+    val contents = change.file.readText()
+    val newContents = change.patches.fold(Pair(contents, 0)) { (content, offset), replacement ->
+      content.replaceRange(replacement.position + offset, replacement.position + offset + replacement.lengthToReplace, replacement.patch) to (offset + replacement.patch.length - replacement.lengthToReplace)
+    }.first
+
+    change.file.toFile().writeText(newContents)
+    git.add(change.file)
+    git.commit("Updated ${change.library.id.name} to ${change.version.value}")
+    return branch
+  }
+
   suspend fun pushBranchToOrigin(branch: GitBranch) {
     val branchName = branch.name
     git.checkout(branchName)
@@ -41,5 +56,8 @@ class GitOperations(private val config: Config) {
   companion object {
     fun fileChangeSuggestionToBranch(change: FileUpdateSearch.FileChangeSuggestion) =
       GitBranch(change.library.id, change.newVersion)
+
+    fun fileChangeSuggestionToBranch(change: RuleUpdateSearch.FileChangeSuggestion) =
+      GitBranch(change.library.id, change.version)
   }
 }

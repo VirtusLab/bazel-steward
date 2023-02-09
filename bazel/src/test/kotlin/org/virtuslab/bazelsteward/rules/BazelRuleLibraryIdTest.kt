@@ -6,7 +6,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.virtuslab.bazelsteward.core.rules.BazelRuleLibraryId
+import org.virtuslab.bazelsteward.core.rules.RuleLibraryId
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BazelRuleLibraryIdTest {
@@ -14,7 +14,7 @@ class BazelRuleLibraryIdTest {
   @ParameterizedTest
   @MethodSource("argumentsForCreateBazelLibraryId")
   fun `should create BazelRuleLibraryId`(url: String, tag: String, artifactName: String) {
-    Assertions.assertThat(BazelRuleLibraryId(url, "sha256"))
+    Assertions.assertThat(RuleLibraryId.from(url, "sha256"))
       .hasFieldOrPropertyWithValue("repoName", "repo1")
       .hasFieldOrPropertyWithValue("ruleName", "name1")
       .hasFieldOrPropertyWithValue("tag", tag)
@@ -32,8 +32,8 @@ class BazelRuleLibraryIdTest {
   @ParameterizedTest
   @MethodSource("argumentsForThrowException")
   fun `should throw an exception when creating BazelRuleLibraryId`(url: String) {
-    Assertions.assertThatThrownBy { BazelRuleLibraryId(url, "sha256") }
-      .hasMessageContaining("Could not parse repository URL")
+    Assertions.assertThatThrownBy { RuleLibraryId.from(url, "sha256") }
+      .hasMessageContaining("Unrecognised artifact URL format")
   }
 
   private fun argumentsForThrowException(): List<Arguments> = listOf(
@@ -48,7 +48,7 @@ class BazelRuleLibraryIdTest {
 
   @Test
   fun `should throw an exception when creating BazelRuleLibraryId`() {
-    Assertions.assertThatThrownBy { BazelRuleLibraryId("https://github.com/repo1/name1/archive/refs/tags/v0.3.1.trr", "sha256") }
-      .hasMessage("Artifact v0.3.1.trr has an unrecognised format")
+    Assertions.assertThatThrownBy { RuleLibraryId.from("https://github.com/repo1/name1/archive/refs/tags/v0.3.1.trr", "sha256") }
+      .hasMessageContaining("Unrecognised artifact URL format")
   }
 }
