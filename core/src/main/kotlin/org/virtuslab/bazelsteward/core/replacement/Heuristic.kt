@@ -7,6 +7,8 @@ import org.virtuslab.bazelsteward.core.library.LibraryId
 
 interface Heuristic {
   val name: String
-  fun <Lib : LibraryId> apply(files: List<BazelFileSearch.BazelFile>,
-                             updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>): FileUpdateSearch.FileChangeSuggestion?
+  fun <Lib : LibraryId> apply(
+    files: List<BazelFileSearch.BazelFile>,
+    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>
+  ): FileUpdateSearch.FileChangeSuggestion?
 }

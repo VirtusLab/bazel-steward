@@ -10,13 +10,12 @@ class BazelFileSearch(config: Config) {
     val content: String
   }
 
-  data class BazelFileLazy(override val path: Path): BazelFile {
+  data class BazelFileLazy(override val path: Path) : BazelFile {
     override val content: String
       get() = path.readText()
   }
 
-  data class BazelFileTest(override val path: Path, override val content: String): BazelFile {
-  }
+  data class BazelFileTest(override val path: Path, override val content: String) : BazelFile
 
   private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
   private val fileSuffix = ".bzl"
@@ -32,5 +31,3 @@ class BazelFileSearch(config: Config) {
 
   val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { BazelFileLazy(it) } }
 }
-
-

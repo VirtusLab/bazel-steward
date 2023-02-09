@@ -5,7 +5,7 @@ import org.virtuslab.bazelsteward.core.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.library.LibraryId
 
-class WholeVersionHeuristic: Heuristic {
+class WholeVersionHeuristic : Heuristic {
   override val name: String
     get() = "whole-version"
 
@@ -23,6 +23,4 @@ class WholeVersionHeuristic: Heuristic {
       updateSuggestion.currentLibrary, updateSuggestion.suggestedVersion, matchResult.second, versionGroup.range.first
     )
   }
-
-
 }

@@ -25,12 +25,12 @@ class FileUpdateSearch {
     files: List<BazelFileSearch.BazelFile>,
     updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>
   ): FileChangeSuggestion? {
-     val allHeuristics = listOf(
-       WholeVersionHeuristic(),
-       VersionHeuristic()
-     )
-    for( heuristic in allHeuristics ){
-      heuristic.apply(files, updateSuggestion)?.let{ return it }
+    val allHeuristics = listOf(
+      WholeVersionHeuristic(),
+      VersionHeuristic(),
+    )
+    for (heuristic in allHeuristics) {
+      heuristic.apply(files, updateSuggestion)?.let { return it }
     }
     return null
   }
