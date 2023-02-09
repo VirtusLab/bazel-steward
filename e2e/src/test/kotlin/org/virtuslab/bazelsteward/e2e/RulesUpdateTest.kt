@@ -13,7 +13,7 @@ class RulesUpdateTest : E2EBase() {
     val file = loadTest(tempDir, testResourcePath)
     Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
     val expectedBranches =
-      listOf("arrow-core" to "1.1.5", "arrow-fx-coroutines" to "1.1.5", "bazel" to "5.3.2", "rules_jvm_external" to "4.5")
+      listOf("io.arrow-kt/arrow-core" to "1.1.5", "io.arrow-kt/arrow-fx-coroutines" to "1.1.5", "bazel" to "5.3.2", "rules_jvm_external" to "4.5")
         .map { "$branchRef/${it.first}/${it.second}" } + masterRef
 
     checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
