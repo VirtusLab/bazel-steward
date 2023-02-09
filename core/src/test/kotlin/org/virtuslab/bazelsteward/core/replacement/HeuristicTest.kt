@@ -92,7 +92,7 @@ class HeuristicTest {
     fun `should return correct position offset for artifact with version in variable`() {
       val fileUpdateSearch = FileUpdateSearch()
       val lib = MavenCoordinates(
-        MavenLibraryId("io.grpc" , "grpc-core"),
+        MavenLibraryId("io.grpc", "grpc-core"),
         SemanticVersion(1, 2, 0, "", ""),
         VersioningSchema.SemVer,
         BumpingStrategy.Default
@@ -170,7 +170,7 @@ class HeuristicTest {
     fun `should return null for artifact with version in variable`() {
       val wholeLibraryHeuristic = WholeLibraryHeuristic()
       val lib = MavenCoordinates(
-        MavenLibraryId("io.grpc" , "grpc-core"),
+        MavenLibraryId("io.grpc", "grpc-core"),
         SemanticVersion(1, 2, 0, "", ""),
         VersioningSchema.SemVer,
         BumpingStrategy.Default
@@ -247,7 +247,7 @@ class HeuristicTest {
     fun `should return correct position for artifact with version in variable`() {
       val versionOnlyHeuristic = VersionOnlyHeuristic()
       val lib = MavenCoordinates(
-        MavenLibraryId("io.grpc" , "grpc-core"),
+        MavenLibraryId("io.grpc", "grpc-core"),
         SemanticVersion(1, 2, 0, "", ""),
         VersioningSchema.SemVer,
         BumpingStrategy.Default

@@ -15,7 +15,7 @@ class VersionOnlyHeuristic : Heuristic {
     val currentVersion = updateSuggestion.currentLibrary.version.value
     val regex = Regex(Regex.escape(currentVersion))
     val matchResult = files.firstNotNullOfOrNull { regex.find(it.content)?.to(it.path) } ?: return null
-    matchResult.first.next()?.let{ return null }
+    matchResult.first.next()?.let { return null }
     val versionGroup = matchResult.first.groups[0] ?: return null
     return FileUpdateSearch.FileChangeSuggestion(
       updateSuggestion.currentLibrary, updateSuggestion.suggestedVersion, matchResult.second, versionGroup.range.first

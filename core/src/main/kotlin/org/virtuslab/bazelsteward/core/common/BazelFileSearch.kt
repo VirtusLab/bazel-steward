@@ -15,8 +15,6 @@ class BazelFileSearch(config: Config) {
       get() = path.readText()
   }
 
-  private fun createBazelFile(path: Path): BazelFile = LazyBazelFile(path)
-
   private val fileNames = setOf("""BUILD.bazel""", "BUILD", "WORKSPACE")
   private val fileSuffix = ".bzl"
 
@@ -30,4 +28,8 @@ class BazelFileSearch(config: Config) {
   }
 
   val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { createBazelFile(it) } }
+
+  companion object {
+    fun createBazelFile(path: Path): BazelFile = LazyBazelFile(path)
+  }
 }
