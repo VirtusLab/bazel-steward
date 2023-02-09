@@ -3,8 +3,8 @@ package org.virtuslab.bazelsteward.core.common
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
-import org.virtuslab.bazelsteward.core.replacement.VersionHeuristic
-import org.virtuslab.bazelsteward.core.replacement.WholeVersionHeuristic
+import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
+import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import java.nio.file.Path
 
 class FileUpdateSearch {
@@ -26,8 +26,8 @@ class FileUpdateSearch {
     updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>
   ): FileChangeSuggestion? {
     val allHeuristics = listOf(
-      WholeVersionHeuristic(),
-      VersionHeuristic(),
+      WholeLibraryHeuristic(),
+      VersionOnlyHeuristic(),
     )
     for (heuristic in allHeuristics) {
       heuristic.apply(files, updateSuggestion)?.let { return it }

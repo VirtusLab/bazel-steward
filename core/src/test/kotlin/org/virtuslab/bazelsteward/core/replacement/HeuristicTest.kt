@@ -12,13 +12,19 @@ import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
+import java.nio.file.Path
 import kotlin.io.path.Path
 
 class HeuristicTest {
 
+  val correctPositionFor235: Int = 2401
+  val correctPositionFor120: Int = 2263
+
+  data class TestBazelFile(override val path: Path, override val content: String) : BazelFileSearch.BazelFile
+
   private fun getBazelFile(fileName: String): BazelFileSearch.BazelFile {
     val url = this::class.java.classLoader.getResource(fileName)!!
-    return BazelFileSearch.BazelFileTest(Path(url.path), url.readText())
+    return TestBazelFile(Path(url.path), url.readText())
   }
 
   @Nested
@@ -26,7 +32,7 @@ class HeuristicTest {
   inner class SearchBuildFilesTest {
 
     @Test
-    fun `should return right position offset`() {
+    fun `should return correct position offset`() {
       val fileUpdateSearch = FileUpdateSearch()
       val lib = MavenCoordinates(
         MavenLibraryId("com.7theta", "utilis"),
@@ -41,11 +47,11 @@ class HeuristicTest {
 
       val result: List<FileUpdateSearch.FileChangeSuggestion> =
         fileUpdateSearch.searchBuildFiles(files, listOf(updateSuggestion))
-      result[0].position shouldBe 2377
+      result[0].position shouldBe correctPositionFor235
     }
 
     @Test
-    fun `should return right position offset with wrong artifact`() {
+    fun `should return correct position offset with wrong artifact`() {
       val fileUpdateSearch = FileUpdateSearch()
       val lib = MavenCoordinates(
         MavenLibraryId("com.10theta", "utilis"),
@@ -60,11 +66,11 @@ class HeuristicTest {
 
       val result: List<FileUpdateSearch.FileChangeSuggestion> =
         fileUpdateSearch.searchBuildFiles(files, listOf(updateSuggestion))
-      result[0].position shouldBe 2377
+      result[0].position shouldBe correctPositionFor235
     }
 
     @Test
-    fun `should return right position offset without artifact`() {
+    fun `should return correct position offset without artifact`() {
       val fileUpdateSearch = FileUpdateSearch()
       val lib = MavenCoordinates(
         MavenLibraryId("", ""),
@@ -79,17 +85,36 @@ class HeuristicTest {
 
       val result: List<FileUpdateSearch.FileChangeSuggestion> =
         fileUpdateSearch.searchBuildFiles(files, listOf(updateSuggestion))
-      result[0].position shouldBe 2377
+      result[0].position shouldBe correctPositionFor235
+    }
+
+    @Test
+    fun `should return correct position offset for artifact with version in variable`() {
+      val fileUpdateSearch = FileUpdateSearch()
+      val lib = MavenCoordinates(
+        MavenLibraryId("io.grpc" , "grpc-core"),
+        SemanticVersion(1, 2, 0, "", ""),
+        VersioningSchema.SemVer,
+        BumpingStrategy.Default
+      )
+      val suggestedVersion = SemanticVersion(2, 4, 0, "", "")
+      val updateSuggestion = UpdateLogic.UpdateSuggestion(lib, suggestedVersion)
+
+      val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
+
+      val result: List<FileUpdateSearch.FileChangeSuggestion> =
+        fileUpdateSearch.searchBuildFiles(files, listOf(updateSuggestion))
+      result[0].position shouldBe correctPositionFor120
     }
   }
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-  inner class WholeVersionHeuristicTest {
+  inner class WholeLibraryHeuristicTest {
 
     @Test
-    fun `should return right position WholeVersionHeuristic`() {
-      val wholeVersionHeuristic = WholeVersionHeuristic()
+    fun `should return correct position`() {
+      val wholeLibraryHeuristic = WholeLibraryHeuristic()
       val lib = MavenCoordinates(
         MavenLibraryId("com.7theta", "utilis"),
         SemanticVersion(2, 3, 5, "", ""),
@@ -101,13 +126,13 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val result = wholeVersionHeuristic.apply(files, updateSuggestion)!!
-      result.position shouldBe 2377
+      val result = wholeLibraryHeuristic.apply(files, updateSuggestion)!!
+      result.position shouldBe correctPositionFor235
     }
 
     @Test
-    fun `should return right position WholeVersionHeuristic with wrong artifact`() {
-      val wholeVersionHeuristic = WholeVersionHeuristic()
+    fun `should return null with wrong artifact`() {
+      val wholeLibraryHeuristic = WholeLibraryHeuristic()
       val lib = MavenCoordinates(
         MavenLibraryId("com.10theta", "utilis"),
         SemanticVersion(2, 3, 5, "", ""),
@@ -119,13 +144,13 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val result = wholeVersionHeuristic.apply(files, updateSuggestion)
+      val result = wholeLibraryHeuristic.apply(files, updateSuggestion)
       result shouldBe null
     }
 
     @Test
-    fun `should return right position WholeVersionHeuristic without artifact`() {
-      val wholeVersionHeuristic = WholeVersionHeuristic()
+    fun `should return correct position without artifact`() {
+      val wholeLibraryHeuristic = WholeLibraryHeuristic()
       val lib = MavenCoordinates(
         MavenLibraryId("", ""),
         SemanticVersion(2, 3, 5, "", ""),
@@ -137,18 +162,36 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val result = wholeVersionHeuristic.apply(files, updateSuggestion)!!
-      result.position shouldBe 2377
+      val result = wholeLibraryHeuristic.apply(files, updateSuggestion)!!
+      result.position shouldBe correctPositionFor235
+    }
+
+    @Test
+    fun `should return null for artifact with version in variable`() {
+      val wholeLibraryHeuristic = WholeLibraryHeuristic()
+      val lib = MavenCoordinates(
+        MavenLibraryId("io.grpc" , "grpc-core"),
+        SemanticVersion(1, 2, 0, "", ""),
+        VersioningSchema.SemVer,
+        BumpingStrategy.Default
+      )
+      val suggestedVersion = SemanticVersion(2, 4, 0, "", "")
+      val updateSuggestion = UpdateLogic.UpdateSuggestion(lib, suggestedVersion)
+
+      val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
+
+      val result = wholeLibraryHeuristic.apply(files, updateSuggestion)
+      result shouldBe null
     }
   }
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-  inner class VersionHeuristicTest {
+  inner class VersionOnlyHeuristicTest {
 
     @Test
-    fun `should return right position offset VersionHeuristic`() {
-      val versionHeuristic = VersionHeuristic()
+    fun `should return correct position offset `() {
+      val versionOnlyHeuristic = VersionOnlyHeuristic()
       val lib = MavenCoordinates(
         MavenLibraryId("com.7theta", "utilis"),
         SemanticVersion(2, 3, 5, "", ""),
@@ -160,13 +203,13 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val result = versionHeuristic.apply(files, updateSuggestion)!!
-      result.position shouldBe 2377
+      val result = versionOnlyHeuristic.apply(files, updateSuggestion)!!
+      result.position shouldBe correctPositionFor235
     }
 
     @Test
-    fun `should return right position offset VersionHeuristic with wrong artifact`() {
-      val versionHeuristic = VersionHeuristic()
+    fun `should return correct position offset with wrong artifact`() {
+      val versionOnlyHeuristic = VersionOnlyHeuristic()
       val lib = MavenCoordinates(
         MavenLibraryId("com.10theta", "utilis"),
         SemanticVersion(2, 3, 5, "", ""),
@@ -178,13 +221,13 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val result = versionHeuristic.apply(files, updateSuggestion)!!
-      result.position shouldBe 2377
+      val result = versionOnlyHeuristic.apply(files, updateSuggestion)!!
+      result.position shouldBe correctPositionFor235
     }
 
     @Test
-    fun `should return right position offset VersionHeuristic without artifact`() {
-      val versionHeuristic = VersionHeuristic()
+    fun `should return correct position offset without artifact`() {
+      val versionOnlyHeuristic = VersionOnlyHeuristic()
       val lib = MavenCoordinates(
         MavenLibraryId("", ""),
         SemanticVersion(2, 3, 5, "", ""),
@@ -196,8 +239,44 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val result = versionHeuristic.apply(files, updateSuggestion)!!
-      result.position shouldBe 2377
+      val result = versionOnlyHeuristic.apply(files, updateSuggestion)!!
+      result.position shouldBe correctPositionFor235
+    }
+
+    @Test
+    fun `should return correct position for artifact with version in variable`() {
+      val versionOnlyHeuristic = VersionOnlyHeuristic()
+      val lib = MavenCoordinates(
+        MavenLibraryId("io.grpc" , "grpc-core"),
+        SemanticVersion(1, 2, 0, "", ""),
+        VersioningSchema.SemVer,
+        BumpingStrategy.Default
+      )
+      val suggestedVersion = SemanticVersion(2, 4, 0, "", "")
+      val updateSuggestion = UpdateLogic.UpdateSuggestion(lib, suggestedVersion)
+
+      val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
+
+      val result = versionOnlyHeuristic.apply(files, updateSuggestion)!!
+      result.position shouldBe correctPositionFor120
+    }
+
+    @Test
+    fun `should return null when two libraries have same version`() {
+      val versionOnlyHeuristic = VersionOnlyHeuristic()
+      val lib = MavenCoordinates(
+        MavenLibraryId("", ""),
+        SemanticVersion(1, 6, 0, "", ""),
+        VersioningSchema.SemVer,
+        BumpingStrategy.Default
+      )
+      val suggestedVersion = SemanticVersion(2, 4, 0, "", "")
+      val updateSuggestion = UpdateLogic.UpdateSuggestion(lib, suggestedVersion)
+
+      val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
+
+      val result = versionOnlyHeuristic.apply(files, updateSuggestion)
+      result shouldBe null
     }
   }
 
@@ -218,10 +297,10 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val wholeVersionHeuristic = WholeVersionHeuristic()
-      val result1 = wholeVersionHeuristic.apply(files, updateSuggestion)!!
-      val versionHeuristic = VersionHeuristic()
-      val result2 = versionHeuristic.apply(files, updateSuggestion)!!
+      val wholeLibraryHeuristic = WholeLibraryHeuristic()
+      val result1 = wholeLibraryHeuristic.apply(files, updateSuggestion)!!
+      val versionOnlyHeuristic = VersionOnlyHeuristic()
+      val result2 = versionOnlyHeuristic.apply(files, updateSuggestion)!!
 
       result1.position shouldBe result2.position
     }
@@ -239,13 +318,13 @@ class HeuristicTest {
 
       val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
 
-      val wholeVersionHeuristic = WholeVersionHeuristic()
-      val result1 = wholeVersionHeuristic.apply(files, updateSuggestion)
-      val versionHeuristic = VersionHeuristic()
-      val result2 = versionHeuristic.apply(files, updateSuggestion)!!
+      val wholeLibraryHeuristic = WholeLibraryHeuristic()
+      val result1 = wholeLibraryHeuristic.apply(files, updateSuggestion)
+      val versionOnlyHeuristic = VersionOnlyHeuristic()
+      val result2 = versionOnlyHeuristic.apply(files, updateSuggestion)!!
 
       result1 shouldBe null
-      result2.position shouldBe 2377
+      result2.position shouldBe correctPositionFor235
     }
   }
 }

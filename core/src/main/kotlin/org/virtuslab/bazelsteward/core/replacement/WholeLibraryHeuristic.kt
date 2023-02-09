@@ -5,9 +5,8 @@ import org.virtuslab.bazelsteward.core.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.library.LibraryId
 
-class WholeVersionHeuristic : Heuristic {
-  override val name: String
-    get() = "whole-version"
+class WholeLibraryHeuristic : Heuristic {
+  override val name: String = "whole-library"
 
   override fun <Lib : LibraryId> apply(
     files: List<BazelFileSearch.BazelFile>,
