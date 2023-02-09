@@ -97,7 +97,7 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
   }
 }
 
-//override fun resolveRuleVersions(ruleId: BazelRuleLibraryId): Map<BazelRuleLibraryId, Version> = // TODO: this should probably suspend
+// override fun resolveRuleVersions(ruleId: BazelRuleLibraryId): Map<BazelRuleLibraryId, Version> =
 //  ruleId.toRepositoryId().listReleases().associateWith { release ->
 //    val shas = sha256Regex.findAll(release.body).map { it.value }.toList()
 //    val assets = release.listAssets().toList()
