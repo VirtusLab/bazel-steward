@@ -11,12 +11,10 @@ import java.security.DigestInputStream
 import java.security.MessageDigest
 import kotlin.math.min
 
-
 class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
 
   override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, RuleVersion> =
     ruleId.toRepositoryId().listReleases().mapNotNull { shaFromBodyAndCurrentUrl(ruleId, it) }.toMap()
-
 
   private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion>? = sha256Regex.findAll(release.body).map { it.value }.toList().singleOrNull()?.let { sha ->
     val newArtifactName = ruleId.artifactName.replace(ruleId.tag, release.tagName)
@@ -27,7 +25,6 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
     }
     rule to RuleVersion(rule.downloadUrl, sha, release.tagName)
   }
-
 
   private fun RepositoryId.listReleases(): Sequence<GHRelease> =
     gitHubClient.getRepository(this.toString()).listReleases().asSequence()
