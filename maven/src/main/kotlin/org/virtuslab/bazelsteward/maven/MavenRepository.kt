@@ -43,8 +43,8 @@ object CoursierCache {
 
 private val logger = KotlinLogging.logger {}
 
-class MavenRepository {
-  suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> =
+open class MavenRepository {
+  open suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> =
     withContext(Dispatchers.IO) {
       coroutineScope {
         val mavenRepositories = mavenData.repositories.map { coursierapi.MavenRepository.of(it) }

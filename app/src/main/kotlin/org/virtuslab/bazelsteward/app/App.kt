@@ -4,7 +4,12 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.BazelVersion
 import org.virtuslab.bazelsteward.bazel.BazelVersionFileSearch
-import org.virtuslab.bazelsteward.core.common.GitOperations
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.CLOSED
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.MERGED
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.NONE
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MERGEABLE
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MODIFIED
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.config.ConfigEntry
 import org.virtuslab.bazelsteward.core.library.Library
@@ -50,15 +55,24 @@ class App(private val ctx: Context) {
     }.orEmpty()
 
     (changeSuggestions + bazelChangeSuggestions).forEach { change ->
-      val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
-      if (!ctx.gitHostClient.checkIfPrExists(branch)) {
-        logger.info { "Creating branch ${branch.name}" }
-        ctx.gitOperations.createBranchWithChange(change)
-        if (ctx.config.pushToRemote) {
-          ctx.gitOperations.pushBranchToOrigin(branch)
-          ctx.gitHostClient.openNewPR(branch)
+      val branch = change.branch
+      when (val prStatus = ctx.gitHostClient.checkPrStatus(branch)) {
+        NONE, OPEN_NOT_MERGEABLE -> {
+          logger.info { "Creating branch ${branch.name}" }
+          runCatching {
+            ctx.gitOperations.createBranchWithChange(change)
+            if (ctx.config.pushToRemote) {
+              ctx.gitOperations.pushBranchToOrigin(branch, force = prStatus == OPEN_NOT_MERGEABLE)
+              if (prStatus == NONE) {
+                ctx.gitHostClient.openNewPR(branch)
+                ctx.gitHostClient.closePrs(change.library.id, filterNotVersion = change.library.version)
+              }
+            }
+          }.exceptionOrNull()?.let { logger.error("Failed at creating branch ${branch.name}", it) }
+          ctx.gitOperations.checkoutBaseBranch()
         }
-        ctx.gitOperations.checkoutBaseBranch()
+
+        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${branch.name}" }
       }
     }
   }

@@ -3,14 +3,22 @@ package org.virtuslab.bazelsteward.e2e
 import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
+import org.virtuslab.bazelsteward.bazel.BazelUpdater
+import org.virtuslab.bazelsteward.bazel.BazelVersion
 import org.virtuslab.bazelsteward.core.GitBranch
+import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.common.GitClient
+import org.virtuslab.bazelsteward.core.library.SemanticVersion
+import org.virtuslab.bazelsteward.core.library.Version
+import org.virtuslab.bazelsteward.maven.MavenCoordinates
+import org.virtuslab.bazelsteward.maven.MavenData
+import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.io.File
 import java.util.jar.JarFile
 
 open class E2EBase {
-  private val heads = "refs/heads/"
-  protected val branchRef = "$heads${GitBranch.branchPrefix}"
+  protected val heads = "refs/heads/"
+  protected val branchRef = "$heads${GitBranch.bazelPrefix}"
   private val master = "master"
   protected val masterRef = "$heads$master"
 
@@ -46,14 +54,22 @@ open class E2EBase {
     return finalFile
   }
 
-  protected fun checkBranchesWithVersions(tempDir: File, testResourcePath: String, branches: List<String>) {
+  protected fun checkBranchesWithVersions(
+    tempDir: File,
+    testResourcePath: String,
+    branches: List<String>,
+    skipLocal: Boolean = false,
+    skipRemote: Boolean = false
+  ) {
     val localRepo = File(File(tempDir, "local"), testResourcePath)
     val remoteRepo = File(tempDir, "remote")
 
-    checkForBranchesWithVersions(localRepo, branches)
-    checkForBranchesWithVersions(remoteRepo, branches)
-
-    checkStatusOfBranches(localRepo, branches)
+    if (!skipLocal) {
+      checkForBranchesWithVersions(localRepo, branches)
+      checkStatusOfBranches(localRepo, branches)
+    }
+    if (!skipRemote)
+      checkForBranchesWithVersions(remoteRepo, branches)
   }
 
   protected fun checkBranchesWithoutVersions(tempDir: File, testResourcePath: String, branchesPattern: List<String>) {
@@ -93,6 +109,25 @@ open class E2EBase {
           .contains("Your branch is up to date with")
           .contains("nothing to commit, working tree clean")
       }
+    }
+  }
+
+  protected fun mockMavenRepositoryWithVersion(vararg versions: String): MavenRepository {
+    return object : MavenRepository() {
+      override suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> =
+        mapOf(mavenData.dependencies[0] to versions.mapNotNull { SemanticVersion.fromString(it) }.toList())
+    }
+  }
+
+  protected fun mockBazelUpdaterWithVersion(vararg versions: String): BazelUpdater {
+    return object : BazelUpdater() {
+      override suspend fun availableVersions(from: BazelVersion): List<BazelVersion> = versions.map { BazelVersion(it) }
+    }
+  }
+
+  protected fun mockGitHostClientWithStatus(status: GitHostClient.Companion.PrStatus): CountingGitHostClient {
+    return object : CountingGitHostClient() {
+      override fun checkPrStatus(branch: GitBranch) = status
     }
   }
 }

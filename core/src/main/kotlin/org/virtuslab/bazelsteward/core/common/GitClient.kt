@@ -33,12 +33,12 @@ class GitClient(private val repositoryFile: File) {
   }
 
   suspend fun push(branch: String? = null, remote: String = "origin", force: Boolean = false) {
-    val upCmd = branch?.let { Triple("--set-upstream", remote, it) }
-    val pushList = mutableListOf("push", quiet)
-    if (force) {
-      pushList.add("--force")
-    }
-    runGitCommand(pushList + (upCmd?.toList() ?: emptyList()))
+    val args = mutableListOf("push", quiet)
+    if (branch != null)
+      args.addAll(listOf("--set-upstream", remote, branch))
+    if (force)
+      args.add("--force")
+    runGitCommand(args)
   }
 
   suspend fun init(initialBranch: String? = null, bare: Boolean = false) {
@@ -64,6 +64,12 @@ class GitClient(private val repositoryFile: File) {
     runGitCommand("config", "user.name", name)
   }
 
+  suspend fun getAuthor(): GitAuthor {
+    val email = runGitCommand("config", "user.email").trim()
+    val name = runGitCommand("config", "user.name").trim()
+    return GitAuthor(name, email)
+  }
+
   suspend fun runGitCommand(vararg gitArgs: String?): String = runGitCommand(gitArgs.toList())
 
   suspend fun runGitCommand(gitArgs: List<String?>): String {
@@ -82,5 +88,9 @@ class GitClient(private val repositoryFile: File) {
         "${command.joinToString(" ")}\n$stdout\n$stderr"
       )
     }
+  }
+
+  companion object {
+    data class GitAuthor(val name: String, val email: String)
   }
 }

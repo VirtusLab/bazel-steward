@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.core.common
 
+import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
@@ -11,7 +12,9 @@ class FileUpdateSearch {
     val newVersion: Version,
     val file: Path,
     val position: Int
-  )
+  ) {
+    val branch = GitBranch(library.id, newVersion)
+  }
 
   fun <Lib : LibraryId> searchBuildFiles(
     buildDefinitions: List<BazelFileSearch.BazelFile>,
@@ -47,7 +50,8 @@ class FileUpdateSearch {
     val markers = updateSuggestion.currentLibrary.id.associatedStrings()
     val currentVersion = updateSuggestion.currentLibrary.version.value
     val regex =
-      (markers.map { """(?:${Regex.escape(it)})""" } + "(${Regex.escape(currentVersion)})").reduce { acc, s -> "$acc*.*$s" }.let(::Regex)
+      (markers.map { """(?:${Regex.escape(it)})""" } + "(${Regex.escape(currentVersion)})").reduce { acc, s -> "$acc*.*$s" }
+        .let(::Regex)
     val matchResult = files.firstNotNullOfOrNull { regex.find(it.content)?.to(it.path) } ?: return null
     val versionGroup = matchResult.first.groups[1] ?: return null
     return FileChangeSuggestion(

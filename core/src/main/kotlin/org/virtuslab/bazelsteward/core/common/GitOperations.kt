@@ -12,7 +12,7 @@ class GitOperations(private val config: Config) {
   }
 
   suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {
-    val branch = fileChangeSuggestionToBranch(change)
+    val branch = change.branch
     try {
       git.checkout(branch.name, newBranch = true)
     } catch (e: RuntimeException) {
@@ -28,7 +28,7 @@ class GitOperations(private val config: Config) {
     return branch
   }
 
-  suspend fun pushBranchToOrigin(branch: GitBranch) {
+  suspend fun pushBranchToOrigin(branch: GitBranch, force: Boolean) {
     val branchName = branch.name
     git.checkout(branchName)
     try {
@@ -36,10 +36,5 @@ class GitOperations(private val config: Config) {
     } catch (e: RuntimeException) {
       git.push(branchName, force = true)
     }
-  }
-
-  companion object {
-    fun fileChangeSuggestionToBranch(change: FileUpdateSearch.FileChangeSuggestion) =
-      GitBranch(change.library.id, change.newVersion)
   }
 }
