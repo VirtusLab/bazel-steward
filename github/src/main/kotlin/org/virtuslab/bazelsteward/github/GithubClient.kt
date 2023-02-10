@@ -64,7 +64,6 @@ class GithubClient private constructor(
       pr.close()
       Thread.sleep(1000)
       pr.reopen()
-
     }
   }
 
