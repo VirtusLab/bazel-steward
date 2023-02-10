@@ -33,6 +33,7 @@ data class MavenConfig(
 data class ConfigEntry(
   val group: String?,
   val artifact: String?,
+  val pin: String?,
   val versioning: VersioningSchema?,
   val bumping: BumpingStrategy?,
 )

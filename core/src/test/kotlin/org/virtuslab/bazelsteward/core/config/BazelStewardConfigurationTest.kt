@@ -46,11 +46,11 @@ class BazelStewardConfigurationTest {
     val expectedConfiguration = BazelStewardConfig(
       MavenConfig(
         listOf(
-          ConfigEntry("commons-io", "commons-io", VersioningSchema.Loose, BumpingStrategy.Default),
-          ConfigEntry("io.get-coursier", "interface", VersioningSchema.SemVer, BumpingStrategy.Latest),
-          ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", VersioningSchema.Regex("^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?".toRegex()), null),
-          ConfigEntry("org.jetbrains.kotlinx", null, VersioningSchema.Loose, null),
-          ConfigEntry(null, null, VersioningSchema.Loose, null),
+          ConfigEntry("commons-io", "commons-io", null, VersioningSchema.Loose, BumpingStrategy.Default),
+          ConfigEntry("io.get-coursier", "interface", null, VersioningSchema.SemVer, BumpingStrategy.Latest),
+          ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", null, VersioningSchema.Regex("^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?".toRegex()), null),
+          ConfigEntry("org.jetbrains.kotlinx", null, null, VersioningSchema.Loose, null),
+          ConfigEntry(null, null, null, VersioningSchema.Loose, null),
         ),
       )
     )
