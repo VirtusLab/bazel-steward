@@ -23,11 +23,10 @@ class GithubClient private constructor(
   private val repository: String,
   token: String,
   patToken: String? = null
-) :
-  GitHostClient {
+) : GitHostClient {
 
-  private val ghRepository = getRepository(token)
-  private val ghPatRepository = patToken?.let { getRepository(it) }
+  private val ghRepository = createClient(token)
+  private val ghPatRepository = patToken?.let { createClient(it) }
 
   private val bazelPRs: List<GHPullRequest> =
     ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
@@ -81,7 +80,7 @@ class GithubClient private constructor(
       }
   }
 
-  private fun getRepository(token: String): GHRepository {
+  private fun createClient(token: String): GHRepository {
     return GitHubBuilder().withOAuthToken(token).withEndpoint(url).build().getRepository(repository)
       ?: throw IllegalStateException("Github repository must exist")
   }
