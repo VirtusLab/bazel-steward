@@ -32,7 +32,7 @@ class GitOperations(private val config: Config) {
     val branchName = branch.name
     git.checkout(branchName)
     try {
-      git.push(branchName)
+      git.push(branchName, force = force)
     } catch (e: RuntimeException) {
       git.push(branchName, force = true)
     }

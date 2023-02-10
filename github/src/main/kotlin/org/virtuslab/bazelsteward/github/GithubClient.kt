@@ -12,6 +12,7 @@ import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
+import java.lang.RuntimeException
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -39,19 +40,12 @@ class GithubClient private constructor(
 
   override fun openNewPR(branch: GitBranch) {
     logger.info { "Creating pull request for ${branch.name}" }
-    val pr = ghRepository.createPullRequest(
+    ghRepository.createPullRequest(
       "Updated ${branch.libraryId.name} to ${branch.version.value}",
       branch.name,
       config.baseBranch,
       ""
     )
-
-    ghPatRepository?.let {
-      val pullRequest = it.getPullRequest(pr.number)
-      pullRequest.close()
-      Thread.sleep(1000)
-      pullRequest.reopen()
-    }
   }
 
   override fun closePrs(library: LibraryId, filterNotVersion: Version?) {
@@ -61,6 +55,17 @@ class GithubClient private constructor(
       .filterNot { filterNotVersion?.let { version -> it.head.ref.endsWith(version.value) } ?: true }
       .filter { checkPrStatus(it) in statusesToClose }
     oldPrs.forEach { it.close() }
+  }
+
+  fun reopenPr(branch: GitBranch) {
+    ghPatRepository?.let { repository ->
+      val pr = repository.queryPullRequests().state(GHIssueState.OPEN).head(branch.name).list().firstOrNull()
+        ?: throw RuntimeException("PR ${branch.name} not found")
+      pr.close()
+      Thread.sleep(1000)
+      pr.reopen()
+
+    }
   }
 
   private fun checkPrStatus(pr: GHPullRequest?): PrStatus {
