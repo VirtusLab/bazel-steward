@@ -8,6 +8,9 @@ inputs:
   github-token:
     description: "A token for the Github repository"
     default: ${{ github.token }}
+  github-pat-token:
+    description: "A token for triggering the workflows by closing and reopening pull requests"
+    required: false
   use-release:
     description: "Whether to use prebuild jar from release, instead of compiling code"
     default: "true"
@@ -41,11 +44,12 @@ runs:
     - name: Run bazel steward
       run: |
         PUSH_TO_REMOTE=${{ inputs.push-to-remote == 'true' && '--push-to-remote' || '' }}
-        java "-Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG" -jar bazel-steward.jar \
+        java -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG -jar bazel-steward.jar \
         --github $PUSH_TO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_PAT_TOKEN: ${{ inputs.github-pat-token }}
 
 branding:
   icon: 'umbrella'

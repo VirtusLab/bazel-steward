@@ -3,7 +3,7 @@ package org.virtuslab.bazelsteward.github
 import mu.KotlinLogging
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHPullRequest
-import org.kohsuke.github.GitHub
+import org.kohsuke.github.GHRepository
 import org.kohsuke.github.GitHubBuilder
 import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
@@ -17,12 +17,17 @@ import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
 
-class GithubClient private constructor(private val config: Config, repository: String, token: String, url: String) :
+class GithubClient private constructor(
+  private val config: Config,
+  private val url: String,
+  private val repository: String,
+  token: String,
+  patToken: String? = null
+) :
   GitHostClient {
-  private val github: GitHub = GitHubBuilder().withOAuthToken(token).withEndpoint(url).build()
 
-  private val ghRepository =
-    github.getRepository(repository) ?: throw IllegalStateException("Github repository must exist")
+  private val ghRepository = getRepository(token)
+  private val ghPatRepository = patToken?.let { getRepository(it) }
 
   private val bazelPRs: List<GHPullRequest> =
     ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
@@ -35,12 +40,19 @@ class GithubClient private constructor(private val config: Config, repository: S
 
   override fun openNewPR(branch: GitBranch) {
     logger.info { "Creating pull request for ${branch.name}" }
-    ghRepository.createPullRequest(
+    val pr = ghRepository.createPullRequest(
       "Updated ${branch.libraryId.name} to ${branch.version.value}",
       branch.name,
       config.baseBranch,
       ""
     )
+
+    ghPatRepository?.let {
+      val pullRequest = it.getPullRequest(pr.number)
+      pullRequest.close()
+      Thread.sleep(1000)
+      pullRequest.reopen()
+    }
   }
 
   override fun closePrs(library: LibraryId, filterNotVersion: Version?) {
@@ -67,13 +79,19 @@ class GithubClient private constructor(private val config: Config, repository: S
       PrStatus.OPEN_NOT_MERGEABLE
   }
 
+  private fun getRepository(token: String): GHRepository {
+    return GitHubBuilder().withOAuthToken(token).withEndpoint(url).build().getRepository(repository)
+      ?: throw IllegalStateException("Github repository must exist")
+  }
+
   companion object {
 
     fun getClient(env: Environment, config: Config): GitHostClient {
       val url = env.getOrThrow("GITHUB_API_URL")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
-      return GithubClient(config, repository, token, url)
+      val patToken = env["GITHUB_PAT_TOKEN"].let { if (it.isNullOrBlank()) null else it }
+      return GithubClient(config, url, repository, token, patToken)
     }
 
     fun getRepoPath(env: Environment): Path {
