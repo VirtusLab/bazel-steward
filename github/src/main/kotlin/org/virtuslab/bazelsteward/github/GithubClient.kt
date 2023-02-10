@@ -73,10 +73,12 @@ class GithubClient private constructor(
       PrStatus.CLOSED
     else if (pr.listCommits().toList().any { it.commit.author.name != config.gitAuthor.name })
       PrStatus.OPEN_MODIFIED
-    else if (pr.mergeable)
-      PrStatus.OPEN_MERGEABLE
     else
-      PrStatus.OPEN_NOT_MERGEABLE
+      when (pr.mergeable) {
+        null -> PrStatus.OPEN_MODIFIED
+        true -> PrStatus.OPEN_MERGEABLE
+        false -> PrStatus.OPEN_NOT_MERGEABLE
+      }
   }
 
   private fun getRepository(token: String): GHRepository {
