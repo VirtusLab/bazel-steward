@@ -14,4 +14,4 @@ jobs:
           fetch-depth: 0
       - uses: VirtusLab/bazel-steward@latest
         with:
-          github-token: ${{ secrets.PAT_GITHUB_TOKEN_2 }}
+          github-pat-token: ${{ secrets.PAT_GITHUB_TOKEN }}
