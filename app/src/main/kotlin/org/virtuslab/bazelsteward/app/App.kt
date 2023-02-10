@@ -72,7 +72,7 @@ class App(private val ctx: Context) {
           ctx.gitOperations.checkoutBaseBranch()
         }
 
-        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${branch.name}" }
+        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${branch.name}, PR status: ${prStatus.name}" }
       }
     }
   }
