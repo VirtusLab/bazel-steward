@@ -19,6 +19,7 @@ class HeuristicTest {
 
   val correctPositionFor235: Int = 2401
   val correctPositionFor120: Int = 2263
+  val correctPositionFor160: Int = 2464
 
   data class TestBazelFile(override val path: Path, override val content: String) : BazelFileSearch.BazelFile
 
@@ -106,6 +107,25 @@ class HeuristicTest {
         fileUpdateSearch.searchBuildFiles(files, listOf(updateSuggestion))
       result[0].position shouldBe correctPositionFor120
     }
+
+    @Test
+    fun `should return correct position offset when two libraries have same version`() {
+      val fileUpdateSearch = FileUpdateSearch()
+      val lib = MavenCoordinates(
+        MavenLibraryId("org.jetbrains.kotlinx", "kotlinx-coroutines-core"),
+        SemanticVersion(1, 6, 0, "", ""),
+        VersioningSchema.SemVer,
+        BumpingStrategy.Default
+      )
+      val suggestedVersion = SemanticVersion(2, 4, 0, "", "")
+      val updateSuggestion = UpdateLogic.UpdateSuggestion(lib, suggestedVersion)
+
+      val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
+
+      val result: List<FileUpdateSearch.FileChangeSuggestion> =
+        fileUpdateSearch.searchBuildFiles(files, listOf(updateSuggestion))
+      result[0].position shouldBe correctPositionFor160
+    }
   }
 
   @Nested
@@ -182,6 +202,24 @@ class HeuristicTest {
 
       val result = wholeLibraryHeuristic.apply(files, updateSuggestion)
       result shouldBe null
+    }
+
+    @Test
+    fun `should return correct position offset when two libraries have same version`() {
+      val wholeLibraryHeuristic = WholeLibraryHeuristic()
+      val lib = MavenCoordinates(
+        MavenLibraryId("org.jetbrains.kotlinx", "kotlinx-coroutines-core"),
+        SemanticVersion(1, 6, 0, "", ""),
+        VersioningSchema.SemVer,
+        BumpingStrategy.Default
+      )
+      val suggestedVersion = SemanticVersion(2, 4, 0, "", "")
+      val updateSuggestion = UpdateLogic.UpdateSuggestion(lib, suggestedVersion)
+
+      val files = listOf(getBazelFile("WORKSPACE.bzlignore"))
+
+      val result = wholeLibraryHeuristic.apply(files, updateSuggestion)!!
+      result.position shouldBe correctPositionFor160
     }
   }
 
@@ -265,7 +303,7 @@ class HeuristicTest {
     fun `should return null when two libraries have same version`() {
       val versionOnlyHeuristic = VersionOnlyHeuristic()
       val lib = MavenCoordinates(
-        MavenLibraryId("", ""),
+        MavenLibraryId("org.jetbrains.kotlinx", "kotlinx-coroutines-core"),
         SemanticVersion(1, 6, 0, "", ""),
         VersioningSchema.SemVer,
         BumpingStrategy.Default
