@@ -20,7 +20,7 @@ import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Path
 import kotlin.io.path.exists
 
-data class BazelStewardConfig(
+data class RepoConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   val maven: MavenConfig = MavenConfig()
 )
@@ -56,9 +56,9 @@ class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(Versioni
   }
 }
 
-class BazelStewardConfigExtractor(private val configFilePath: Path) {
+class RepoConfigParser(private val configFilePath: Path) {
 
-  suspend fun get(): BazelStewardConfig {
+  suspend fun get(): RepoConfig {
 
     return withContext(Dispatchers.IO) {
       val schemaContent = javaClass.classLoader.getResource("bazel-steward-schema.json")?.readText()
@@ -66,12 +66,12 @@ class BazelStewardConfigExtractor(private val configFilePath: Path) {
       val schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaContent)
 
       runCatching {
-        if (!configFilePath.exists()) return@withContext BazelStewardConfig()
+        if (!configFilePath.exists()) return@withContext RepoConfig()
         val configContent = configFilePath.toFile()
           .readLines()
           .filterNot { it.startsWith("#") }
           .joinToString("\n")
-          .ifEmpty { return@withContext BazelStewardConfig() }
+          .ifEmpty { return@withContext RepoConfig() }
         val yamlReader = ObjectMapper(YAMLFactory())
         val kotlinModule = KotlinModule()
         kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
@@ -80,7 +80,7 @@ class BazelStewardConfigExtractor(private val configFilePath: Path) {
         if (validationResult.isNotEmpty()) {
           throw Exception(validationResult.joinToString(System.lineSeparator()) { it.message.removePrefix("$.") })
         } else {
-          yamlReader.readValue(configContent, BazelStewardConfig::class.java)
+          yamlReader.readValue(configContent, RepoConfig::class.java)
         }
       }.getOrElse {
         logger.error { "Could not parse $configFilePath file!" }

@@ -5,7 +5,7 @@ import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHPullRequest
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
-import org.virtuslab.bazelsteward.core.Config
+import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -17,7 +17,7 @@ import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
 
-class GithubClient private constructor(private val config: Config, repository: String, token: String, url: String) :
+class GithubClient private constructor(private val appConfig: AppConfig, repository: String, token: String, url: String) :
   GitHostClient {
   private val github: GitHub = GitHubBuilder().withOAuthToken(token).withEndpoint(url).build()
 
@@ -38,7 +38,7 @@ class GithubClient private constructor(private val config: Config, repository: S
     ghRepository.createPullRequest(
       "Updated ${branch.libraryId.name} to ${branch.version.value}",
       branch.name,
-      config.baseBranch,
+      appConfig.baseBranch,
       ""
     )
   }
@@ -59,7 +59,7 @@ class GithubClient private constructor(private val config: Config, repository: S
       PrStatus.MERGED
     else if (pr.state == GHIssueState.CLOSED)
       PrStatus.CLOSED
-    else if (pr.listCommits().toList().any { it.commit.author.name != config.gitAuthor.name })
+    else if (pr.listCommits().toList().any { it.commit.author.name != appConfig.gitAuthor.name })
       PrStatus.OPEN_MODIFIED
     else if (pr.mergeable)
       PrStatus.OPEN_MERGEABLE
@@ -68,11 +68,11 @@ class GithubClient private constructor(private val config: Config, repository: S
   }
 
   companion object {
-    fun getClient(env: Environment, config: Config): GithubClient {
+    fun getClient(env: Environment, appConfig: AppConfig): GithubClient {
       val url = env.getOrThrow("GITHUB_API_URL")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
-      return GithubClient(config, repository, token, url)
+      return GithubClient(appConfig, repository, token, url)
     }
 
     fun getRepoPath(env: Environment): Path {

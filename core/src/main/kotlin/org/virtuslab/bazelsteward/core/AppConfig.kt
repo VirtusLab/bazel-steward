@@ -3,7 +3,7 @@ package org.virtuslab.bazelsteward.core
 import org.virtuslab.bazelsteward.core.common.GitClient.Companion.GitAuthor
 import java.nio.file.Path
 
-data class Config(
+data class AppConfig(
   val path: Path,
   val configPath: Path,
   val pushToRemote: Boolean,

@@ -8,7 +8,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.kohsuke.github.GitHub
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
-import org.virtuslab.bazelsteward.core.Config
+import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.common.BazelFileSearch
@@ -16,8 +16,8 @@ import org.virtuslab.bazelsteward.core.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.config.BazelStewardConfig
-import org.virtuslab.bazelsteward.core.config.BazelStewardConfigExtractor
+import org.virtuslab.bazelsteward.core.config.RepoConfig
+import org.virtuslab.bazelsteward.core.config.RepoConfigParser
 import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.github.GithubRulesResolver
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
@@ -28,8 +28,8 @@ import kotlin.io.path.Path
 private val logger = KotlinLogging.logger {}
 
 data class Context(
-  val config: Config,
-  val bazelStewardConfig: BazelStewardConfig,
+  val appConfig: AppConfig,
+  val repoConfig: RepoConfig,
   val bazelFileSearch: BazelFileSearch,
   val mavenDataExtractor: MavenDataExtractor,
   val bazelRulesExtractor: BazelRulesExtractor,
@@ -53,7 +53,7 @@ data class Context(
         description = "Push to remote",
         fullName = "push-to-remote",
         shortName = "p"
-      ).default(false)
+      ).default(true)
       val baseBranch by parser.option(
         ArgType.String,
         fullName = "base-branch",
@@ -75,22 +75,22 @@ data class Context(
       val gitAuthor = runBlocking { gitClient.getAuthor() }
       val configResolvedPath = configPath?.let { Path(it) } ?: repoPath.resolve(".bazel-steward.yaml")
 
-      val config = Config(repoPath, configResolvedPath, pushToRemote, baseBranchName, gitAuthor)
-      logger.info { config }
+      val appConfig = AppConfig(repoPath, configResolvedPath, pushToRemote, baseBranchName, gitAuthor)
+      logger.info { appConfig }
 
-      val bsc = runBlocking { BazelStewardConfigExtractor(config.configPath).get() }
-      val bfs = BazelFileSearch(config)
-      val mde = MavenDataExtractor(config)
+      val bsc = runBlocking { RepoConfigParser(appConfig.configPath).get() }
+      val bfs = BazelFileSearch(appConfig)
+      val mde = MavenDataExtractor(appConfig)
       val mr = MavenRepository()
       val ul = UpdateLogic()
       val fus = FileUpdateSearch()
-      val gc = GitOperations(config)
-      val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
-      val bre = BazelRulesExtractor(config)
+      val gc = GitOperations(appConfig)
+      val ghc = if (github) GithubClient.getClient(env, appConfig) else GitHostClient.stub
+      val bre = BazelRulesExtractor(appConfig)
       val bu = BazelUpdater()
       val grr = GithubRulesResolver(env["GITHUB_TOKEN"]?.let(GitHub::connectUsingOAuth) ?: GitHub.connectAnonymously())
 
-      return Context(config, bsc, bfs, mde, bre, mr, ul, fus, gc, ghc, bu, grr)
+      return Context(appConfig, bsc, bfs, mde, bre, mr, ul, fus, gc, ghc, bu, grr)
     }
   }
 }

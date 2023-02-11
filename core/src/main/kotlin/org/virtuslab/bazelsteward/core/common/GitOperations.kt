@@ -1,15 +1,15 @@
 package org.virtuslab.bazelsteward.core.common
 
-import org.virtuslab.bazelsteward.core.Config
+import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.rules.RuleUpdateSearch
 import kotlin.io.path.readText
 
-class GitOperations(private val config: Config) {
-  private val git = GitClient(config.path.toFile())
+class GitOperations(private val appConfig: AppConfig) {
+  private val git = GitClient(appConfig.path.toFile())
 
   suspend fun checkoutBaseBranch() {
-    git.checkout(config.baseBranch)
+    git.checkout(appConfig.baseBranch)
   }
 
   suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {

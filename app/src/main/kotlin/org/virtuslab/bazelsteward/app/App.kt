@@ -28,7 +28,7 @@ class App(private val ctx: Context) {
     ctx.gitOperations.checkoutBaseBranch()
     val definitions = ctx.bazelFileSearch.buildDefinitions
 
-    logger.debug { definitions.map { it.key.path } }
+    logger.debug { "Build definition files: " + definitions.map { it.key.path } }
     val mavenData = ctx.mavenDataExtractor.extract()
     logger.debug { "Repositories " + mavenData.repositories.toString() }
     logger.debug { "Dependencies: " + mavenData.dependencies.map { it.id.name + " " + it.version.value }.toString() }
@@ -48,14 +48,14 @@ class App(private val ctx: Context) {
     logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
     val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions.map { it.key }, updateSuggestions)
 
-    val bazelVersion = runCatching { BazelVersion.extractBazelVersion(ctx.config.path) }
+    val bazelVersion = runCatching { BazelVersion.extractBazelVersion(ctx.appConfig.path) }
       .onFailure { logger.error { "Can't extract Bazel version" } }.getOrNull()
 
     val bazelChangeSuggestions = bazelVersion?.let {
       val availableBazelVersions = ctx.bazelUpdater.availableVersions(bazelVersion)
       val bazelLibrary = BazelUpdater.BazelLibrary(bazelVersion)
       val bazelUpdateSuggestions = ctx.updateLogic.selectUpdate(bazelLibrary, availableBazelVersions)
-      val bazelVersionFiles = BazelVersionFileSearch(ctx.config).bazelVersionFiles
+      val bazelVersionFiles = BazelVersionFileSearch(ctx.appConfig).bazelVersionFiles
       ctx.fileUpdateSearch.searchBazelVersionFiles(bazelVersionFiles, listOfNotNull(bazelUpdateSuggestions))
     }.orEmpty()
 
@@ -74,7 +74,7 @@ class App(private val ctx: Context) {
           logger.info { "Creating branch ${branch.name}" }
           runCatching {
             ctx.gitOperations.createBranchWithChange(change)
-            if (ctx.config.pushToRemote) {
+            if (ctx.appConfig.pushToRemote) {
               ctx.gitOperations.pushBranchToOrigin(branch, force = prStatus == OPEN_NOT_MERGEABLE)
               if (prStatus == NONE) {
                 ctx.gitHostClient.openNewPR(branch)
@@ -94,7 +94,7 @@ class App(private val ctx: Context) {
       if (ctx.gitHostClient.checkPrStatus(branch) in listOf(NONE, OPEN_NOT_MERGEABLE)) {
         logger.info { "Creating branch ${branch.name}" }
         ctx.gitOperations.createBranchWithChange(change)
-        if (ctx.config.pushToRemote) {
+        if (ctx.appConfig.pushToRemote) {
           ctx.gitOperations.pushBranchToOrigin(branch, force = true)
           ctx.gitHostClient.openNewPR(branch)
         }
@@ -111,8 +111,8 @@ class App(private val ctx: Context) {
   private fun <Lib : LibraryId> getConfigurableSetupForLibrary(library: Library<Lib>): Pair<VersioningSchema, BumpingStrategy> {
     return when (val libraryId = library.id) {
       is MavenLibraryId -> {
-        val versioningForDependency = getConfigEntryFromConfigs(libraryId, ctx.bazelStewardConfig.maven.configs.filter { it.versioning != null })
-        val bumpingForDependency = getConfigEntryFromConfigs(libraryId, ctx.bazelStewardConfig.maven.configs.filter { it.bumping != null })
+        val versioningForDependency = getConfigEntryFromConfigs(libraryId, ctx.repoConfig.maven.configs.filter { it.versioning != null })
+        val bumpingForDependency = getConfigEntryFromConfigs(libraryId, ctx.repoConfig.maven.configs.filter { it.bumping != null })
         Pair(
           versioningForDependency?.versioning ?: VersioningSchema.Loose,
           bumpingForDependency?.bumping ?: BumpingStrategy.Default

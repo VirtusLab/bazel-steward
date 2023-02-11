@@ -1,11 +1,11 @@
 package org.virtuslab.bazelsteward.core.common
 
-import org.virtuslab.bazelsteward.core.Config
+import org.virtuslab.bazelsteward.core.AppConfig
 import java.nio.file.Path
 import kotlin.io.path.isSymbolicLink
 import kotlin.io.path.readText
 
-class BazelFileSearch(config: Config) {
+class BazelFileSearch(appConfig: AppConfig) {
   interface BazelFile {
     val path: Path
     val content: String
@@ -18,10 +18,10 @@ class BazelFileSearch(config: Config) {
 
   enum class BazelFileType { Build, Workspace, Bzl }
 
-  private val workspaceFilePaths = workspaceFileNames.map { config.path.resolve(it) }
+  private val workspaceFilePaths = workspaceFileNames.map { appConfig.path.resolve(it) }
 
   private val buildPaths: Map<Path, BazelFileType> by lazy {
-    val paths = config.path.toFile().walkBottomUp()
+    val paths = appConfig.path.toFile().walkBottomUp()
       .onEnter { !(it.name.startsWith(".") || it.toPath().isSymbolicLink()) }
       .filter { it.isFile }
       .filter { buildFileNames.contains(it.name) || it.name.endsWith(fileSuffix) || workspaceFilePaths.contains(it.toPath()) }

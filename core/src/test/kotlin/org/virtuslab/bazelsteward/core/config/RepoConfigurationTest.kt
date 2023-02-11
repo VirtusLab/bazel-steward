@@ -8,12 +8,12 @@ import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.io.File
 
-class BazelStewardConfigurationTest {
+class RepoConfigurationTest {
 
   @Test
   fun `should throw an exception when maven object in config file is not correct`(@TempDir tempDir: File) {
     copyConfigFileToTempLocation(tempDir, ".bazel-steward-fail.yaml")
-    Assertions.assertThatThrownBy { runBlocking { BazelStewardConfigExtractor(tempDir.toPath().resolve(".bazel-steward.yaml")).get() } }
+    Assertions.assertThatThrownBy { runBlocking { RepoConfigParser(tempDir.toPath().resolve(".bazel-steward.yaml")).get() } }
       .hasMessage(
         listOf(
           "maven.configs[0].grouop: is not defined in the schema and the schema does not allow additional properties",
@@ -29,21 +29,21 @@ class BazelStewardConfigurationTest {
   @Test
   fun `should throw an exception when versioning regex does not contain all required named groups`(@TempDir tempDir: File) {
     copyConfigFileToTempLocation(tempDir, ".bazel-steward-fail2.yaml")
-    Assertions.assertThatThrownBy { runBlocking { BazelStewardConfigExtractor(tempDir.toPath().resolve(".bazel-steward.yaml")).get() } }
+    Assertions.assertThatThrownBy { runBlocking { RepoConfigParser(tempDir.toPath().resolve(".bazel-steward.yaml")).get() } }
       .hasMessageContaining("does not contain all required groups: <major>, <minor>, <patch>, <preRelease>, <buildMetaData>")
   }
 
   @Test
   fun `should create default configuration when config file is not declared`(@TempDir tempDir: File) {
-    val configuration = runBlocking { BazelStewardConfigExtractor(tempDir.toPath().resolve(".bazel-steward.yaml")).get() }
-    Assertions.assertThat(configuration).usingRecursiveComparison().isEqualTo(BazelStewardConfig())
+    val configuration = runBlocking { RepoConfigParser(tempDir.toPath().resolve(".bazel-steward.yaml")).get() }
+    Assertions.assertThat(configuration).usingRecursiveComparison().isEqualTo(RepoConfig())
   }
 
   @Test
   fun `should create configuration when config file is correct`(@TempDir tempDir: File) {
     copyConfigFileToTempLocation(tempDir, ".bazel-steward-correct.yaml")
-    val configuration = runBlocking { BazelStewardConfigExtractor(tempDir.toPath().resolve(".bazel-steward.yaml")).get() }
-    val expectedConfiguration = BazelStewardConfig(
+    val configuration = runBlocking { RepoConfigParser(tempDir.toPath().resolve(".bazel-steward.yaml")).get() }
+    val expectedConfiguration = RepoConfig(
       MavenConfig(
         listOf(
           ConfigEntry("commons-io", "commons-io", VersioningSchema.Loose, BumpingStrategy.Default),
