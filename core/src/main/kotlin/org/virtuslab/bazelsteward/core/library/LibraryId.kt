@@ -1,7 +1,7 @@
 package org.virtuslab.bazelsteward.core.library
 
-interface LibraryId {
-  fun associatedStrings(): List<String>
-
-  val name: String
+abstract class LibraryId {
+  abstract fun associatedStrings(): List<String>
+  abstract val name: String
+  final override fun toString(): String = name
 }

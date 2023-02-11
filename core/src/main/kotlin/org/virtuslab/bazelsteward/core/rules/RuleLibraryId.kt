@@ -2,7 +2,7 @@ package org.virtuslab.bazelsteward.core.rules
 
 import org.virtuslab.bazelsteward.core.library.LibraryId
 
-sealed class RuleLibraryId : LibraryId {
+sealed class RuleLibraryId : LibraryId() {
   abstract val sha256: String
   abstract val tag: String
   abstract val artifactName: String

@@ -7,7 +7,7 @@ import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 
-data class MavenLibraryId(val group: String, val artifact: String) : LibraryId {
+data class MavenLibraryId(val group: String, val artifact: String) : LibraryId() {
   override fun associatedStrings(): List<String> = listOf(group, artifact)
 
   override val name: String

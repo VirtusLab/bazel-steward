@@ -5,10 +5,7 @@ import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHPullRequest
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
-import org.virtuslab.bazelsteward.core.AppConfig
-import org.virtuslab.bazelsteward.core.Environment
-import org.virtuslab.bazelsteward.core.GitBranch
-import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.*
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
@@ -26,7 +23,7 @@ class GithubClient private constructor(private val appConfig: AppConfig, reposit
 
   private val bazelPRs: List<GHPullRequest> =
     ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
-      .filter { it.head.ref.startsWith(GitBranch.bazelPrefix) }
+      .filter { it.head.ref.startsWith(BazelStewardGitBranch.bazelPrefix) }
   private val branchToGHPR: Map<String, GHPullRequest> = bazelPRs.associateBy { it.head.ref }
 
   override fun checkPrStatus(branch: GitBranch): PrStatus {
@@ -36,17 +33,29 @@ class GithubClient private constructor(private val appConfig: AppConfig, reposit
   override fun openNewPR(branch: GitBranch) {
     logger.info { "Creating pull request for ${branch.name}" }
     ghRepository.createPullRequest(
-      "Updated ${branch.libraryId.name} to ${branch.version.value}",
+      "Updated ${branch.name}",
       branch.name,
       appConfig.baseBranch,
       ""
     )
   }
 
+  override fun getOpenPRs(): List<PullRequest> {
+    val openStatuses = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
+    return bazelPRs
+      .filter { checkPrStatus(it) in openStatuses }
+      .map { PullRequest(GitBranch(it.head.ref)) }
+  }
+
+  override fun closePrs(pullRequest: List<PullRequest>) {
+    val names = pullRequest.map { it.branch.name }
+    bazelPRs.filter { it.head.ref in names }.forEach { it.close() }
+  }
+
   override fun closePrs(library: LibraryId, filterNotVersion: Version?) {
     val statusesToClose = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
     val oldPrs = bazelPRs
-      .filter { it.head.ref.startsWith("${GitBranch.bazelPrefix}/${library.name}") }
+      .filter { it.head.ref.startsWith("${BazelStewardGitBranch.bazelPrefix}/${library.name}") }
       .filterNot { filterNotVersion?.let { version -> it.head.ref.endsWith(version.value) } ?: true }
       .filter { checkPrStatus(it) in statusesToClose }
     oldPrs.forEach { it.close() }

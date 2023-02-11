@@ -11,11 +11,12 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.common.BazelFileSearch
 import org.virtuslab.bazelsteward.core.common.CommandRunner
+import org.virtuslab.bazelsteward.core.library.SimpleVersion
+import org.virtuslab.bazelsteward.core.rules.RuleLibrary
 import org.virtuslab.bazelsteward.core.rules.RuleLibraryId
 import java.io.File
-import kotlin.io.path.Path
-import kotlin.io.path.createTempFile
-import kotlin.io.path.exists
+import java.nio.file.Path
+import kotlin.io.path.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -33,16 +34,19 @@ class BazelRulesExtractor(private val appConfig: AppConfig) {
     val strip_prefix: String?,
   )
 
-  suspend fun extractCurrentRules(bazelFiles: Map<BazelFileSearch.BazelFile, BazelFileSearch.BazelFileType>): List<RuleLibraryId> =
+  suspend fun extractCurrentRules(workspaceRoot: Path): List<RuleLibrary> =
     withContext(Dispatchers.IO) {
       val dumpRepositoriesContent = javaClass.classLoader.getResource("bazel/resources/dump_repositories.bzlignore")?.readText()
         ?: throw RuntimeException("Could not find dump_repositories template, which is required for detecting used bazel repositories")
       val tempFileForBzl = createTempFile(directory = appConfig.path, suffix = ".bzl").toFile()
       tempFileForBzl.appendText(dumpRepositoriesContent)
 
-      val workspaceFilePath = bazelFiles.entries.first { it.value == BazelFileSearch.BazelFileType.Workspace }.key
-      val originalContent = workspaceFilePath.content
-      workspaceFilePath.path.toFile().appendText(
+      val workspaceFilePath = listOf("WORKSPACE.bazel", "WORKSPACE")
+        .map { workspaceRoot.resolve(it) }
+        .find { it.exists() } ?: throw RuntimeException("Could not find workspace file in $workspaceRoot")
+
+      val originalContent = workspaceFilePath.readText()
+      workspaceFilePath.appendText(
         """
         |load("${tempFileForBzl.name}", "dump_all_repositories", "repositories_as_json")
         |dump_all_repositories(
@@ -52,7 +56,7 @@ class BazelRulesExtractor(private val appConfig: AppConfig) {
       )
       // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
       CommandRunner.run("bazel build @all_external_repositories//:result.json".split(' '), appConfig.path.toFile())
-      workspaceFilePath.path.toFile().writeText(originalContent)
+      workspaceFilePath.writeText(originalContent)
       deleteFile(tempFileForBzl)
       val bazelPath = CommandRunner.run("bazel info output_base".split(' '), appConfig.path.toFile()).removeSuffix("\n")
       val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
@@ -64,7 +68,7 @@ class BazelRulesExtractor(private val appConfig: AppConfig) {
           it.kind == "http_archive" && it.generator_function.isEmpty() && !it.url.isNullOrEmpty() && !it.sha256.isNullOrEmpty()
         }
         .map { RuleLibraryId.from(it.url!!, it.sha256!!) }
-      result
+      result.map { RuleLibrary(it, SimpleVersion(it.tag)) }
     }
 
   private fun deleteFile(file: File) {

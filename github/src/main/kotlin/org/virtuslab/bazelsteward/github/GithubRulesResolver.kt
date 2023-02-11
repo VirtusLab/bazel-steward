@@ -16,15 +16,16 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
   override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, RuleVersion> =
     ruleId.toRepositoryId().listReleases().mapNotNull { shaFromBodyAndCurrentUrl(ruleId, it) }.toMap()
 
-  private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion>? = sha256Regex.findAll(release.body).map { it.value }.toList().singleOrNull()?.let { sha ->
-    val newArtifactName = ruleId.artifactName.replace(ruleId.tag, release.tagName)
-    val rule = when (ruleId) {
-      is RuleLibraryId.ReleaseArtifact -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
-      is RuleLibraryId.ArchiveTagRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
-      is RuleLibraryId.ArchiveRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+  private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion>? =
+    sha256Regex.findAll(release.body).map { it.value }.toList().singleOrNull()?.let { sha ->
+      val newArtifactName = ruleId.artifactName.replace(ruleId.tag, release.tagName)
+      val rule = when (ruleId) {
+        is RuleLibraryId.ReleaseArtifact -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+        is RuleLibraryId.ArchiveTagRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+        is RuleLibraryId.ArchiveRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+      }
+      rule to RuleVersion(rule.downloadUrl, sha, release.tagName)
     }
-    rule to RuleVersion(rule.downloadUrl, sha, release.tagName)
-  }
 
   private fun RepositoryId.listReleases(): Sequence<GHRelease> =
     gitHubClient.getRepository(this.toString()).listReleases().asSequence()

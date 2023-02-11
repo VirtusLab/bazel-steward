@@ -8,15 +8,16 @@ import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import java.nio.file.Path
 
+data class FileChangeSuggestion(
+  val library: Library<LibraryId>,
+  val newVersion: Version,
+  val file: Path,
+  val position: Int
+) {
+  val branch = GitBranch("${library.id} $newVersion")
+}
+
 class FileUpdateSearch {
-  data class FileChangeSuggestion(
-    val library: Library<LibraryId>,
-    val newVersion: Version,
-    val file: Path,
-    val position: Int
-  ) {
-    val branch = GitBranch(library.id, newVersion)
-  }
 
   fun <Lib : LibraryId, V : Version> searchBuildFiles(
     buildDefinitions: List<BazelFileSearch.BazelFile>,
@@ -29,12 +30,9 @@ class FileUpdateSearch {
     updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
   ): FileChangeSuggestion? {
     val allHeuristics = listOf(
-      WholeLibraryHeuristic(),
-      VersionOnlyHeuristic(),
+      WholeLibraryHeuristic,
+      VersionOnlyHeuristic,
     )
-    for (heuristic in allHeuristics) {
-      heuristic.apply(files, updateSuggestion)?.let { return it }
-    }
     return null
   }
 

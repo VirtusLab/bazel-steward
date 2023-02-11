@@ -9,7 +9,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.readLines
 import kotlin.io.path.readText
 
-data class BazelVersion(override val value: String) : Version {
+data class BazelVersion(override val value: String) : Version() {
 
   companion object {
     private const val bazelVersionFileName = ".bazelversion"

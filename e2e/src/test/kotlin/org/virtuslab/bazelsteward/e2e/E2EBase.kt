@@ -5,8 +5,10 @@ import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.BazelVersion
+import org.virtuslab.bazelsteward.core.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
@@ -18,7 +20,7 @@ import java.util.jar.JarFile
 
 open class E2EBase {
   protected val heads = "refs/heads/"
-  protected val branchRef = "$heads${GitBranch.bazelPrefix}"
+  protected val branchRef = "$heads${BazelStewardGitBranch.bazelPrefix}"
   private val master = "master"
   protected val masterRef = "$heads$master"
 
@@ -127,7 +129,9 @@ open class E2EBase {
 
   protected fun mockGitHostClientWithStatus(status: GitHostClient.Companion.PrStatus): CountingGitHostClient {
     return object : CountingGitHostClient() {
+      override fun closePrs(pullRequest: List<PullRequest>) {}
       override fun checkPrStatus(branch: GitBranch) = status
+      override fun getOpenPRs(): List<PullRequest> = emptyList()
     }
   }
 }

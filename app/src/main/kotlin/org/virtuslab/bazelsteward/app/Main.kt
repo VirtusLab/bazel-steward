@@ -16,8 +16,23 @@ class Main {
 
     fun mainMapContext(args: Array<String>, f: (Context) -> Context = { x -> x }) {
       val ctx = f(Context.fromArgs(args, Environment.system))
+      val dependencyKinds = listOf(
+        BazelVersionDependencyKind(ctx.bazelUpdater),
+        MavenDependencyKind(ctx.mavenDataExtractor, ctx.mavenRepository),
+        BazelRulesDependencyKind(ctx.bazelRulesExtractor, ctx.githubRulesResolver)
+      )
       runBlocking {
-        App(ctx).run()
+        //App(ctx).run()
+        App20(
+          ctx.gitOperations,
+          dependencyKinds,
+          ctx.updateLogic,
+          FileFinder(ctx.appConfig.path),
+          FileChangeSuggester(),
+          PullRequestSuggester(),
+          ctx.gitHostClient,
+          ctx.appConfig
+        ).run()
       }
     }
   }

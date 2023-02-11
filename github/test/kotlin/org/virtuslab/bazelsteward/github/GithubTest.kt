@@ -49,12 +49,12 @@ class GithubTest {
 
   private fun simpleBranch(branch: String): GitBranch {
     val split = branch.split('/', limit = 3)
-    val lib = object : LibraryId {
+    val lib = object : LibraryId() {
       override fun associatedStrings(): List<String> = emptyList()
       override val name = split[1]
     }
     val ver = SimpleVersion(split[2])
 
-    return GitBranch(lib, ver)
+    return GitBranch(lib.name + ver.value)
   }
 }

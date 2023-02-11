@@ -26,9 +26,7 @@ private val logger = KotlinLogging.logger {}
 class App(private val ctx: Context) {
   suspend fun run() {
     ctx.gitOperations.checkoutBaseBranch()
-    val definitions = ctx.bazelFileSearch.buildDefinitions
 
-    logger.debug { "Build definition files: " + definitions.map { it.key.path } }
     val mavenData = ctx.mavenDataExtractor.extract()
     logger.debug { "Repositories " + mavenData.repositories.toString() }
     logger.debug { "Dependencies: " + mavenData.dependencies.map { it.id.name + " " + it.version.value }.toString() }
@@ -46,6 +44,8 @@ class App(private val ctx: Context) {
       ctx.updateLogic.selectUpdate(it.key, it.value)
     }
     logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
+    val definitions = ctx.bazelFileSearch.buildDefinitions
+    logger.debug { "Build definition files: " + definitions.map { it.key.path } }
     val changeSuggestions = ctx.fileUpdateSearch.searchBuildFiles(definitions.map { it.key }, updateSuggestions)
 
     val bazelVersion = runCatching { BazelVersion.extractBazelVersion(ctx.appConfig.path) }
@@ -59,19 +59,19 @@ class App(private val ctx: Context) {
       ctx.fileUpdateSearch.searchBazelVersionFiles(bazelVersionFiles, listOfNotNull(bazelUpdateSuggestions))
     }.orEmpty()
 
-    val usedBazelRules = ctx.bazelRulesExtractor.extractCurrentRules(definitions)
-    val latestRules = usedBazelRules.associateWith(ctx.githubRulesResolver::resolveRuleVersions)
+    //val usedBazelRules = ctx.bazelRulesExtractor.extractCurrentRules(definitions)
+    //val latestRules = usedBazelRules.associateWith(ctx.githubRulesResolver::resolveRuleVersions)
 
-    val ruleUpdateSuggestions = latestRules.mapNotNull { (originalRule, versionMap) ->
-      ctx.updateLogic.selectUpdate(RuleLibrary(originalRule, SimpleVersion(originalRule.tag)), versionMap.values.toList())
-    }
-    val ruleChangeSuggestions = RuleUpdateSearch.searchBuildFiles(definitions.map { it.key }, ruleUpdateSuggestions)
+//    val ruleUpdateSuggestions = latestRules.mapNotNull { (originalRule, versionMap) ->
+//      ctx.updateLogic.selectUpdate(RuleLibrary(originalRule, SimpleVersion(originalRule.tag)), versionMap.values.toList())
+//    }
+    //val ruleChangeSuggestions = RuleUpdateSearch.searchBuildFiles(definitions.map { it.key }, ruleUpdateSuggestions)
 
     (changeSuggestions + bazelChangeSuggestions).forEach { change ->
       val branch = change.branch
       when (val prStatus = ctx.gitHostClient.checkPrStatus(branch)) {
         NONE, OPEN_NOT_MERGEABLE -> {
-          logger.info { "Creating branch ${branch.name}" }
+          logger.info { "Creating branch $branch" }
           runCatching {
             ctx.gitOperations.createBranchWithChange(change)
             if (ctx.appConfig.pushToRemote) {
@@ -81,26 +81,26 @@ class App(private val ctx: Context) {
                 ctx.gitHostClient.closePrs(change.library.id, filterNotVersion = change.library.version)
               }
             }
-          }.exceptionOrNull()?.let { logger.error("Failed at creating branch ${branch.name}", it) }
+          }.exceptionOrNull()?.let { logger.error("Failed at creating branch $branch", it) }
           ctx.gitOperations.checkoutBaseBranch()
         }
 
-        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${branch.name}" }
+        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping $branch" }
       }
     }
 
-    ruleChangeSuggestions.forEach { change ->
-      val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
-      if (ctx.gitHostClient.checkPrStatus(branch) in listOf(NONE, OPEN_NOT_MERGEABLE)) {
-        logger.info { "Creating branch ${branch.name}" }
-        ctx.gitOperations.createBranchWithChange(change)
-        if (ctx.appConfig.pushToRemote) {
-          ctx.gitOperations.pushBranchToOrigin(branch, force = true)
-          ctx.gitHostClient.openNewPR(branch)
-        }
-        ctx.gitOperations.checkoutBaseBranch()
-      }
-    }
+//    ruleChangeSuggestions.forEach { change ->
+//      val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
+//      if (ctx.gitHostClient.checkPrStatus(branch) in listOf(NONE, OPEN_NOT_MERGEABLE)) {
+//        logger.info { "Creating branch ${branch}" }
+//        ctx.gitOperations.createBranchWithChange(change)
+//        if (ctx.appConfig.pushToRemote) {
+//          ctx.gitOperations.pushBranchToOrigin(branch, force = true)
+//          ctx.gitHostClient.openNewPR(branch)
+//        }
+//        ctx.gitOperations.checkoutBaseBranch()
+//      }
+//    }
   }
 
   private fun getConfigEntryFromConfigs(libraryId: MavenLibraryId, configs: List<ConfigEntry>): ConfigEntry? =

@@ -3,7 +3,21 @@ package org.virtuslab.bazelsteward.core.common
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.rules.RuleUpdateSearch
+import java.nio.file.Path
 import kotlin.io.path.readText
+import kotlin.io.path.writeText
+
+data class FileChange(
+  val file: Path,
+  val offset: Int,
+  val length: Int,
+  val replacement: String
+)
+
+data class CommitSuggestion(
+  val message: String,
+  val changes: List<FileChange>
+)
 
 class GitOperations(private val appConfig: AppConfig) {
   private val git = GitClient(appConfig.path.toFile())
@@ -12,7 +26,7 @@ class GitOperations(private val appConfig: AppConfig) {
     git.checkout(appConfig.baseBranch)
   }
 
-  suspend fun createBranchWithChange(change: FileUpdateSearch.FileChangeSuggestion): GitBranch {
+  suspend fun createBranchWithChange(change: FileChangeSuggestion): GitBranch {
     val branch = change.branch
     try {
       git.checkout(branch.name, newBranch = true)
@@ -53,11 +67,26 @@ class GitOperations(private val appConfig: AppConfig) {
     }
   }
 
+  suspend fun createBranchWithChange(branch: GitBranch, commits: List<CommitSuggestion>) {
+    git.checkout(branch.name, newBranch = true)
+    commits.forEach { commit ->
+      commit.changes.groupBy { it.file }.forEach { (path, changes) ->
+        val contents = path.readText()
+        val newContents = changes.fold(Pair(contents, 0)) { (content, offset), replacement ->
+          content.replaceRange(replacement.offset + offset, replacement.offset + offset + replacement.length, replacement.replacement) to (offset + replacement.replacement.length - replacement.length)
+        }.first
+        path.writeText(newContents)
+        git.add(path)
+      }
+      git.commit(commit.message)
+    }
+  }
+
   companion object {
-    fun fileChangeSuggestionToBranch(change: FileUpdateSearch.FileChangeSuggestion) =
-      GitBranch(change.library.id, change.newVersion)
+    fun fileChangeSuggestionToBranch(change: FileChangeSuggestion) =
+      change.branch
 
     fun fileChangeSuggestionToBranch(change: RuleUpdateSearch.FileChangeSuggestion) =
-      GitBranch(change.library.id, change.version)
+      GitBranch("${change.library.id} ${change.version}")
   }
 }
