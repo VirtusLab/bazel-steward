@@ -5,8 +5,13 @@ import java.nio.file.Path
 import kotlin.io.path.readText
 
 class BazelFileSearch(config: Config) {
-  data class BazelFile(val path: Path) {
+  interface BazelFile {
+    val path: Path
     val content: String
+  }
+
+  private data class LazyBazelFile(override val path: Path) : BazelFile {
+    override val content: String
       get() = path.readText()
   }
 
@@ -22,5 +27,9 @@ class BazelFileSearch(config: Config) {
       .toList()
   }
 
-  val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { BazelFile(it) } }
+  val buildDefinitions: List<BazelFile> by lazy { buildPaths.map { createBazelFile(it) } }
+
+  companion object {
+    fun createBazelFile(path: Path): BazelFile = LazyBazelFile(path)
+  }
 }

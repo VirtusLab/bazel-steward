@@ -4,6 +4,8 @@ import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
+import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
+import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import java.nio.file.Path
 
 class FileUpdateSearch {
@@ -26,15 +28,14 @@ class FileUpdateSearch {
     files: List<BazelFileSearch.BazelFile>,
     updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>
   ): FileChangeSuggestion? {
-    val markers = updateSuggestion.currentLibrary.id.associatedStrings()
-    val currentVersion = updateSuggestion.currentLibrary.version.value
-    val regex =
-      (markers + currentVersion).map { """(${Regex.escape(it)})""" }.reduce { acc, s -> "$acc.*$s" }.let { Regex(it) }
-    val matchResult = files.firstNotNullOfOrNull { regex.find(it.content)?.to(it.path) } ?: return null
-    val versionGroup = matchResult.first.groups[3] ?: return null
-    return FileChangeSuggestion(
-      updateSuggestion.currentLibrary, updateSuggestion.suggestedVersion, matchResult.second, versionGroup.range.first
+    val allHeuristics = listOf(
+      WholeLibraryHeuristic(),
+      VersionOnlyHeuristic(),
     )
+    for (heuristic in allHeuristics) {
+      heuristic.apply(files, updateSuggestion)?.let { return it }
+    }
+    return null
   }
 
   fun <Lib : LibraryId> searchBazelVersionFiles(

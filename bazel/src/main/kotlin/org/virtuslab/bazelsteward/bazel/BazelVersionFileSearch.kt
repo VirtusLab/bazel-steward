@@ -10,6 +10,6 @@ class BazelVersionFileSearch(config: Config) {
   private val fileNames = setOf(".bazelversion", ".bazeliskrc")
 
   val bazelVersionFiles: List<BazelFileSearch.BazelFile> by lazy {
-    config.path.listDirectoryEntries().filter { fileNames.contains(it.name) }.map { BazelFileSearch.BazelFile(it) }
+    config.path.listDirectoryEntries().filter { fileNames.contains(it.name) }.map { BazelFileSearch.createBazelFile(it) }
   }
 }
