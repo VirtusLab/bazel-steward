@@ -88,11 +88,7 @@ data class Context(
       val ghc = if (github) GithubClient.getClient(env, config) else GitHostClient.stub
       val bre = BazelRulesExtractor(config)
       val bu = BazelUpdater()
-      val grr = if (github) {
-        GithubRulesResolver(GitHub.connectUsingOAuth(env.getOrThrow("GITHUB_TOKEN"))) // TODO: refactor
-      } else {
-        GithubRulesResolver(GitHub.connectAnonymously()) // TODO: this may hit rate limit pretty soon
-      }
+      val grr = GithubRulesResolver(env["GITHUB_TOKEN"]?.let(GitHub::connectUsingOAuth) ?: GitHub.connectAnonymously())
 
       return Context(config, bsc, bfs, mde, bre, mr, ul, fus, gc, ghc, bu, grr)
     }

@@ -45,9 +45,6 @@ class BazelFileSearch(config: Config) {
     private val buildFileNames = listOf("BUILD.bazel", "BUILD")
     private val workspaceFileNames = listOf("WORKSPACE", "WORKSPACE.bazel")
     private const val fileSuffix = ".bzl"
-  }
-
-  companion object {
     fun createBazelFile(path: Path): BazelFile = LazyBazelFile(path)
   }
 }

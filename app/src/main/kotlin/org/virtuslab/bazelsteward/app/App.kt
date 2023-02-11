@@ -10,6 +10,7 @@ import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.NONE
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MERGEABLE
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MODIFIED
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE
+import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.config.ConfigEntry
 import org.virtuslab.bazelsteward.core.library.Library
@@ -90,11 +91,11 @@ class App(private val ctx: Context) {
 
     ruleChangeSuggestions.forEach { change ->
       val branch = GitOperations.Companion.fileChangeSuggestionToBranch(change)
-      if (!ctx.gitHostClient.checkIfPrExists(branch)) {
+      if (ctx.gitHostClient.checkPrStatus(branch) in listOf(NONE, OPEN_NOT_MERGEABLE)) {
         logger.info { "Creating branch ${branch.name}" }
         ctx.gitOperations.createBranchWithChange(change)
         if (ctx.config.pushToRemote) {
-          ctx.gitOperations.pushBranchToOrigin(branch)
+          ctx.gitOperations.pushBranchToOrigin(branch, force = true)
           ctx.gitHostClient.openNewPR(branch)
         }
         ctx.gitOperations.checkoutBaseBranch()

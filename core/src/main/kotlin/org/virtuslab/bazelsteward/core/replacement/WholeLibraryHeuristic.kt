@@ -4,13 +4,14 @@ import org.virtuslab.bazelsteward.core.common.BazelFileSearch
 import org.virtuslab.bazelsteward.core.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.library.LibraryId
+import org.virtuslab.bazelsteward.core.library.Version
 
 class WholeLibraryHeuristic : Heuristic {
   override val name: String = "whole-library"
 
-  override fun <Lib : LibraryId> apply(
+  override fun <Lib : LibraryId, V : Version> apply(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib>
+    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
   ): FileUpdateSearch.FileChangeSuggestion? {
     val markers = updateSuggestion.currentLibrary.id.associatedStrings()
     val currentVersion = updateSuggestion.currentLibrary.version.value

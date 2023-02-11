@@ -10,7 +10,7 @@ class Main {
   companion object {
     @JvmStatic
     fun main(args: Array<String>) {
-      logger.info { args }
+      logger.info { args.toList() }
       mainMapContext(args)
     }
 
