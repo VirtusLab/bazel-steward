@@ -9,10 +9,10 @@ import org.virtuslab.bazelsteward.core.library.Version
 object VersionOnlyHeuristic : Heuristic {
   override val name: String = "version-only"
 
-  override fun <Lib : LibraryId, V : Version> apply(
+  override fun apply(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
-  ): LibraryUpdate<Lib, V>? {
+    updateSuggestion: UpdateLogic.UpdateSuggestion
+  ): LibraryUpdate? {
     val currentVersion = updateSuggestion.currentLibrary.version.value
     val regex = Regex(Regex.escape(currentVersion))
     val matchResult = files.firstNotNullOfOrNull { regex.find(it.content)?.to(it.path) } ?: return null

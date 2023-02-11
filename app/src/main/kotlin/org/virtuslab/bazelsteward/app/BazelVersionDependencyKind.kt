@@ -16,7 +16,7 @@ class BazelVersionDependencyKind(
 
   override val name: String = "bazel"
 
-  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library<BazelUpdater.BazelLibraryId>, List<Version>> {
+  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library, List<Version>> {
     val version = BazelVersion.extractBazelVersion(workspaceRoot)
       ?: throw RuntimeException("Could not find bazel version")
     val library = BazelUpdater.BazelLibrary(version)

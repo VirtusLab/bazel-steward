@@ -13,10 +13,10 @@ import org.virtuslab.bazelsteward.core.rules.RuleVersion
 object BazelRuleHeuristic : Heuristic {
   override val name: String = "bazel-rule-default"
 
-  override fun <Lib : LibraryId, V : Version> apply(
+  override fun apply(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
-  ): LibraryUpdate<Lib, V>? {
+    updateSuggestion: UpdateLogic.UpdateSuggestion
+  ): LibraryUpdate? {
     if (updateSuggestion.currentLibrary is RuleLibrary && updateSuggestion.suggestedVersion is RuleVersion) {
       val currentUrl = updateSuggestion.currentLibrary.id.downloadUrl
       val currentVersion = updateSuggestion.currentLibrary.version.value

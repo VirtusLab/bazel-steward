@@ -9,10 +9,10 @@ import org.virtuslab.bazelsteward.core.library.Version
 object WholeLibraryHeuristic : Heuristic {
   override val name: String = "whole-library"
 
-  override fun <Lib : LibraryId, V : Version> apply(
+  override fun apply(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
-  ): LibraryUpdate<Lib, V>? {
+    updateSuggestion: UpdateLogic.UpdateSuggestion
+  ): LibraryUpdate? {
     val markers = updateSuggestion.currentLibrary.id.associatedStrings()
     val currentVersion = updateSuggestion.currentLibrary.version.value
     val regex =

@@ -32,7 +32,7 @@ open class BazelUpdater {
     override val version: Version,
     override val versioningSchema: VersioningSchema = VersioningSchema.SemVer,
     override val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
-  ) : Library<BazelLibraryId> {
+  ) : Library {
     override val id: BazelLibraryId = BazelLibraryId
   }
 }

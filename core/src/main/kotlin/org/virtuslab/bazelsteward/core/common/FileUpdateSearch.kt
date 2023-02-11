@@ -9,7 +9,7 @@ import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import java.nio.file.Path
 
 data class FileChangeSuggestion(
-  val library: Library<LibraryId>,
+  val library: Library,
   val newVersion: Version,
   val file: Path,
   val position: Int
@@ -19,15 +19,15 @@ data class FileChangeSuggestion(
 
 class FileUpdateSearch {
 
-  fun <Lib : LibraryId, V : Version> searchBuildFiles(
+  fun searchBuildFiles(
     buildDefinitions: List<BazelFileSearch.BazelFile>,
-    updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib, V>>
+    updateSuggestions: List<UpdateLogic.UpdateSuggestion>
   ): List<FileChangeSuggestion> =
     updateSuggestions.mapNotNull { suggestion -> findSuggestion(buildDefinitions, suggestion) }
 
-  private fun <Lib : LibraryId, V : Version> findSuggestion(
+  private fun findSuggestion(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
+    updateSuggestion: UpdateLogic.UpdateSuggestion
   ): FileChangeSuggestion? {
     val allHeuristics = listOf(
       WholeLibraryHeuristic,
@@ -36,15 +36,15 @@ class FileUpdateSearch {
     return null
   }
 
-  fun <Lib : LibraryId, V : Version> searchBazelVersionFiles(
+  fun searchBazelVersionFiles(
     buildDefinitions: List<BazelFileSearch.BazelFile>,
-    updateSuggestions: List<UpdateLogic.UpdateSuggestion<Lib, V>>
+    updateSuggestions: List<UpdateLogic.UpdateSuggestion>
   ): List<FileChangeSuggestion> =
     updateSuggestions.mapNotNull { suggestion -> findBazelSuggestion(buildDefinitions, suggestion) }
 
-  private fun <Lib : LibraryId, V : Version> findBazelSuggestion(
+  private fun findBazelSuggestion(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
+    updateSuggestion: UpdateLogic.UpdateSuggestion
   ): FileChangeSuggestion? {
     val markers = updateSuggestion.currentLibrary.id.associatedStrings()
     val currentVersion = updateSuggestion.currentLibrary.version.value

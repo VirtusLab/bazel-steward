@@ -19,7 +19,7 @@ data class MavenCoordinates(
   override val version: Version,
   override val versioningSchema: VersioningSchema,
   override val bumpingStrategy: BumpingStrategy,
-) : Library<MavenLibraryId> {
+) : Library {
   companion object {
     fun of(
       group: String,

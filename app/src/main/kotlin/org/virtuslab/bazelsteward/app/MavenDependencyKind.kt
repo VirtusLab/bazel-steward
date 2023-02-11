@@ -17,9 +17,9 @@ class MavenDependencyKind(
 
   override val name: String = "maven"
 
-  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library<MavenLibraryId>, List<Version>> {
+  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library, List<Version>> {
     val data = mavenDataExtractor.extract()
-    return mavenRepository.findVersions(data) as Map<Library<MavenLibraryId>, List<Version>>
+    return mavenRepository.findVersions(data) as Map<Library, List<Version>>
   }
 
   override val defaultSearchPatterns: List<PathPattern> = listOf(

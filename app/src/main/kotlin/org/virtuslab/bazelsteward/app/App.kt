@@ -108,7 +108,7 @@ class App(private val ctx: Context) {
       ?: configs.firstOrNull { it.group == libraryId.group && it.artifact == null }
       ?: configs.firstOrNull { it.group == null && it.artifact == null }
 
-  private fun <Lib : LibraryId> getConfigurableSetupForLibrary(library: Library<Lib>): Pair<VersioningSchema, BumpingStrategy> {
+  private fun getConfigurableSetupForLibrary(library: Library): Pair<VersioningSchema, BumpingStrategy> {
     return when (val libraryId = library.id) {
       is MavenLibraryId -> {
         val versioningForDependency = getConfigEntryFromConfigs(libraryId, ctx.repoConfig.maven.configs.filter { it.versioning != null })

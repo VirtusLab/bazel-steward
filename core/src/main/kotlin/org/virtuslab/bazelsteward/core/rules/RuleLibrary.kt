@@ -10,4 +10,4 @@ data class RuleLibrary(
   override val version: Version,
   override val versioningSchema: VersioningSchema = VersioningSchema.Loose,
   override val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
-) : Library<RuleLibraryId>
+) : Library

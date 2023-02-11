@@ -6,15 +6,15 @@ import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
 
-data class LibraryUpdate<Lib : LibraryId, V : Version>(
-  val updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>,
+data class LibraryUpdate(
+  val updateSuggestion: UpdateLogic.UpdateSuggestion,
   val fileChanges: List<FileChange>
 )
 
 interface Heuristic {
   val name: String
-  fun <Lib : LibraryId, V : Version> apply(
+  fun apply(
     files: List<BazelFileSearch.BazelFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>
-  ): LibraryUpdate<Lib, V>?
+    updateSuggestion: UpdateLogic.UpdateSuggestion
+  ): LibraryUpdate?
 }

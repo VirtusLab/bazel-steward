@@ -7,14 +7,14 @@ import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 
 class UpdateLogic {
-  data class UpdateSuggestion<Lib : LibraryId, V : Version>(val currentLibrary: Library<Lib>, val suggestedVersion: V)
+  data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: Version)
 
-  fun <Lib : LibraryId, V : Version> selectUpdate(
-    library: Library<Lib>,
-    availableVersions: List<V>
-  ): UpdateSuggestion<Lib, V>? {
+  fun selectUpdate(
+    library: Library,
+    availableVersions: List<Version>
+  ): UpdateSuggestion? {
 
-    fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): V? =
+    fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
         .mapNotNull { version -> version.toSemVer(library.versioningSchema)?.let { version to it } }
         .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }

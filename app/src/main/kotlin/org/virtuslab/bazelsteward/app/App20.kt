@@ -56,7 +56,7 @@ private val logger = KotlinLogging.logger {}
 
 interface DependencyKind<LibId : LibraryId> {
   val name: String
-  suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library<LibId>, List<Version>>
+  suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library, List<Version>>
   val defaultSearchPatterns: List<PathPattern>
   val defaultVersionDetectionHeuristics: List<Heuristic>
 }
@@ -84,11 +84,11 @@ class FileFinder(private val workspaceRoot: Path) {
 
 
 class FileChangeSuggester {
-  fun <Lib : LibraryId, V : Version> suggestChanges(
+  fun suggestChanges(
     files: List<TextFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion<Lib, V>,
+    updateSuggestion: UpdateLogic.UpdateSuggestion,
     heuristics: List<Heuristic>
-  ): LibraryUpdate<Lib, V>? {
+  ): LibraryUpdate? {
     return heuristics.firstNotNullOfOrNull { heuristic ->
       heuristic.apply(files.map { BazelFileSearch.createBazelFile(it.path) }, updateSuggestion)
     }
@@ -97,7 +97,7 @@ class FileChangeSuggester {
 
 class PullRequestSuggester {
   // TODO: extend with grouping logic, labels, commiting strategies, configurable messages etc.
-  fun suggestPullRequests(updates: List<LibraryUpdate<*, *>>): List<PullRequestSuggestion> {
+  fun suggestPullRequests(updates: List<LibraryUpdate>): List<PullRequestSuggestion> {
     return updates.map { update ->
       val versionFrom = update.updateSuggestion.currentLibrary.version
       val versionTo = update.updateSuggestion.suggestedVersion
