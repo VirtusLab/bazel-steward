@@ -19,5 +19,4 @@ data class RuleLibrary(
   override fun withBumpingStrategy(strategy: BumpingStrategy): Library {
     return copy(bumpingStrategy = strategy)
   }
-
 }

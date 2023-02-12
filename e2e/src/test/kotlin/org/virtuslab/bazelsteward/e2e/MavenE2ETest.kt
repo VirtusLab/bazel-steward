@@ -4,11 +4,8 @@ import io.kotest.common.runBlocking
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.virtuslab.bazelsteward.app.Main
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.common.GitClient
-import org.virtuslab.bazelsteward.maven.MavenDataExtractor
-import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import java.nio.file.Path
 import kotlin.io.path.writeText
 
@@ -45,15 +42,7 @@ class MavenE2ETest : E2EBase() {
 
     val v1 = "1.1.0"
     runBazelStewardWith(workspaceRoot) {
-      it.copy(
-        gitHostClient = gitHostClient,
-        dependencyKinds = listOf(
-          MavenDependencyKind(
-            MavenDataExtractor(it.appConfig),
-            mockMavenRepositoryWithVersion(v1)
-          )
-        )
-      )
+      it.withGitHostClient(gitHostClient).withMavenOnly(versions = listOf(v1))
     }
 
     val branchV1 = branch(libraryName, v1)
@@ -64,15 +53,7 @@ class MavenE2ETest : E2EBase() {
 
     val v2 = "1.1.3"
     runBazelStewardWith(workspaceRoot) {
-      it.copy(
-        gitHostClient = gitHostClient,
-        dependencyKinds = listOf(
-          MavenDependencyKind(
-            MavenDataExtractor(it.appConfig),
-            mockMavenRepositoryWithVersion(v2)
-          )
-        )
-      )
+      it.withGitHostClient(gitHostClient).withMavenOnly(versions = listOf(v2))
     }
 
     val branchV2 = branch(libraryName, v2)
@@ -91,17 +72,8 @@ class MavenE2ETest : E2EBase() {
 
     val v1 = "1.1.0"
 
-    val mavenRepository = mockMavenRepositoryWithVersion(v1)
-
     runBazelStewardWith(workspaceRoot) {
-      it.copy(
-        dependencyKinds = listOf(
-          MavenDependencyKind(
-            MavenDataExtractor(it.appConfig),
-            mavenRepository
-          )
-        )
-      )
+      it.withMavenOnly(versions = listOf(v1))
     }
 
     val branchV1 = branch("io.arrow-kt/arrow-core", v1)
@@ -121,15 +93,7 @@ class MavenE2ETest : E2EBase() {
     val gitHostClient = mockGitHostClientWithStatus(GitHostClient.PrStatus.OPEN_NOT_MERGEABLE)
 
     runBazelStewardWith(workspaceRoot) {
-      it.copy(
-        gitHostClient = gitHostClient,
-        dependencyKinds = listOf(
-          MavenDependencyKind(
-            MavenDataExtractor(it.appConfig),
-            mavenRepository
-          )
-        )
-      )
+      it.withGitHostClient(gitHostClient).withMavenOnly(versions = listOf(v1))
     }
 
     Assertions.assertThat(gitHostClient.openNewPrCalls).hasSize(0)
@@ -151,17 +115,9 @@ class MavenE2ETest : E2EBase() {
     val localGit = GitClient(workspaceRoot)
 
     val v1 = "1.1.0"
-    val mavenRepository = mockMavenRepositoryWithVersion(v1)
 
     runBazelStewardWith(workspaceRoot) {
-      it.copy(
-        dependencyKinds = listOf(
-          MavenDependencyKind(
-            MavenDataExtractor(it.appConfig),
-            mavenRepository
-          )
-        )
-      )
+      it.withMavenOnly(versions = listOf(v1))
     }
 
     val branchV1 = branch("io.arrow-kt/arrow-core", v1)
@@ -173,15 +129,7 @@ class MavenE2ETest : E2EBase() {
     }
 
     runBazelStewardWith(workspaceRoot) {
-      it.copy(
-        gitHostClient = mockGitHostClientWithStatus(GitHostClient.PrStatus.OPEN_MODIFIED),
-        dependencyKinds = listOf(
-          MavenDependencyKind(
-            MavenDataExtractor(it.appConfig),
-            mavenRepository
-          )
-        )
-      )
+      it.withPRStatus(GitHostClient.PrStatus.OPEN_MODIFIED).withMavenOnly(versions = listOf(v1))
     }
 
     checkBranchesWithVersions(tempDir, project, listOf(branchV1, masterRef), skipLocal = true)

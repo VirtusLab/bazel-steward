@@ -5,8 +5,12 @@ import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHPullRequest
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
-import org.virtuslab.bazelsteward.core.*
+import org.virtuslab.bazelsteward.core.Environment
+import org.virtuslab.bazelsteward.core.GitBranch
+import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
+import org.virtuslab.bazelsteward.core.NewPullRequest
+import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitClient
 import java.nio.file.Path
 import kotlin.io.path.Path

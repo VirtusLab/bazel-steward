@@ -10,7 +10,10 @@ import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import org.virtuslab.bazelsteward.core.replacement.*
+import org.virtuslab.bazelsteward.core.replacement.Heuristic
+import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
+import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
+import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.nio.file.Path
@@ -245,5 +248,4 @@ class HeuristicTest {
   ): FileChange? {
     return resolver.resolve(files, UpdateSuggestion(library, version), heuristics.toList())?.fileChanges?.firstOrNull()
   }
-
 }

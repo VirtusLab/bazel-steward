@@ -11,10 +11,9 @@ import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
-
 class MavenDependencyKind(
-    private val mavenDataExtractor: MavenDataExtractor,
-    private val mavenRepository: MavenRepository
+  private val mavenDataExtractor: MavenDataExtractor,
+  private val mavenRepository: MavenRepository
 ) : DependencyKind<MavenCoordinates> {
 
   override val name: String = "maven"
@@ -27,14 +26,14 @@ class MavenDependencyKind(
   }
 
   override val defaultSearchPatterns: List<PathPattern> = listOf(
-      PathPattern.Glob("**/BUILD{,.bazel}"),
-      PathPattern.Glob("**/*.bzl"),
-      PathPattern.Exact("WORKSPACE.bazel"),
-      PathPattern.Exact("WORKSPACE")
+    PathPattern.Glob("**/BUILD{,.bazel}"),
+    PathPattern.Glob("**/*.bzl"),
+    PathPattern.Exact("WORKSPACE.bazel"),
+    PathPattern.Exact("WORKSPACE")
   )
 
   override val defaultVersionDetectionHeuristics: List<Heuristic> = listOf(
-      WholeLibraryHeuristic,
-      VersionOnlyHeuristic
+    WholeLibraryHeuristic,
+    VersionOnlyHeuristic
   )
 }

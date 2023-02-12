@@ -14,7 +14,8 @@ object VersionOnlyHeuristic : Heuristic {
     matchResult.first.next()?.let { return null }
     val versionGroup = matchResult.first.groups[0] ?: return null
     return LibraryUpdate(
-      updateSuggestion, listOf(
+      updateSuggestion,
+      listOf(
         FileChange(
           matchResult.second,
           versionGroup.range.first,

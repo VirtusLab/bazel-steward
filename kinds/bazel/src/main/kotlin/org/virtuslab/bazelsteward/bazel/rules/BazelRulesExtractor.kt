@@ -15,7 +15,12 @@ import org.virtuslab.bazelsteward.core.rules.RuleLibrary
 import org.virtuslab.bazelsteward.core.rules.RuleLibraryId
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.appendText
+import kotlin.io.path.createTempFile
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 private val logger = KotlinLogging.logger {}
 

@@ -49,5 +49,4 @@ class GitOperations(private val appConfig: AppConfig) {
       git.commit(commit.message)
     }
   }
-
 }

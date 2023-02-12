@@ -9,7 +9,6 @@ import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
-import java.nio.file.Path
 
 /**
  * You need to set four env vars to run this test suite:

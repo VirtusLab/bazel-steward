@@ -15,7 +15,8 @@ object WholeLibraryHeuristic : Heuristic {
     val matchResult = files.firstNotNullOfOrNull { regex.find(it.content)?.to(it.path) } ?: return null
     val versionGroup = matchResult.first.groups[3] ?: return null
     return LibraryUpdate(
-      updateSuggestion, listOf(
+      updateSuggestion,
+      listOf(
         FileChange(
           matchResult.second,
           versionGroup.range.first,

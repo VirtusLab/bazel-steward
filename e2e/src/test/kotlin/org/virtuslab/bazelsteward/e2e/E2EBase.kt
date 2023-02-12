@@ -9,12 +9,13 @@ import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
-import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenData
+import org.virtuslab.bazelsteward.maven.MavenDataExtractor
+import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.io.File
 import java.nio.file.Path
@@ -24,7 +25,7 @@ import kotlin.io.path.createDirectories
 
 open class E2EBase {
   protected val heads = "refs/heads/"
-  protected val branchRef = "$heads${BazelStewardGitBranch.bazelPrefix}"
+  private val branchRef = "$heads${BazelStewardGitBranch.bazelPrefix}"
   private val master = "master"
   protected val masterRef = "$heads$master"
 
@@ -36,7 +37,7 @@ open class E2EBase {
   }
 
   protected fun expectedBranchPrefixes(vararg libs: String): List<String> {
-    return libs.map { "$branchRef/${it}/" } + masterRef
+    return libs.map { "$branchRef/$it/" } + masterRef
   }
 
   protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = listOf("--push-to-remote")) {
@@ -154,6 +155,27 @@ open class E2EBase {
           .contains("nothing to commit, working tree clean")
       }
     }
+  }
+
+  protected fun App.withMavenOnly(versions: List<String>): App {
+    return this.copy(
+      dependencyKinds = listOf(
+        MavenDependencyKind(
+          MavenDataExtractor(this.appConfig),
+          mockMavenRepositoryWithVersion(*versions.toTypedArray())
+        )
+      )
+    )
+  }
+
+  protected fun App.withGitHostClient(gitHostClient: GitHostClient): App {
+    return this.copy(
+      gitHostClient = gitHostClient
+    )
+  }
+
+  protected fun App.withPRStatus(status: GitHostClient.PrStatus): App {
+    return this.withGitHostClient(mockGitHostClientWithStatus(status))
   }
 
   protected fun mockMavenRepositoryWithVersion(vararg versions: String): MavenRepository {
