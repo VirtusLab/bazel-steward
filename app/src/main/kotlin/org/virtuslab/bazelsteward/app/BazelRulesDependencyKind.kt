@@ -1,5 +1,7 @@
 package org.virtuslab.bazelsteward.app
 
+import org.virtuslab.bazelsteward.core.DependencyKind
+import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.BazelRuleHeuristic
 import org.virtuslab.bazelsteward.core.replacement.Heuristic

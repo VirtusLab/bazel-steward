@@ -2,7 +2,8 @@ package org.virtuslab.bazelsteward.app
 
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.BazelVersion
-import org.virtuslab.bazelsteward.core.library.Library
+import org.virtuslab.bazelsteward.core.DependencyKind
+import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.Heuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic

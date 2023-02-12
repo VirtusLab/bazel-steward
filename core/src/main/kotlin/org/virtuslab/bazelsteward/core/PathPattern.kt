@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.app
+package org.virtuslab.bazelsteward.core
 
 import java.nio.file.FileSystems
 import java.nio.file.PathMatcher

@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.app
+package org.virtuslab.bazelsteward.core
 
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.common.TextFile
@@ -26,6 +26,6 @@ class FileFinder(private val workspaceRoot: Path) {
 
     val matchedExactly = exactMatchers.map { workspaceRoot.resolve(it.value) }.filter { it.exists() }
 
-    return (matchedExactly + matchedByPattern).map(TextFile::from)
+    return (matchedExactly + matchedByPattern).map(TextFile.Companion::from)
   }
 }

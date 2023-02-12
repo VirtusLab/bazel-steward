@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.app
+package org.virtuslab.bazelsteward.core
 
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
