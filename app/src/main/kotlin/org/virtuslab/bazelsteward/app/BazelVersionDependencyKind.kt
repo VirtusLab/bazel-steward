@@ -1,7 +1,7 @@
 package org.virtuslab.bazelsteward.app
 
-import org.virtuslab.bazelsteward.bazel.BazelUpdater
-import org.virtuslab.bazelsteward.bazel.BazelVersion
+import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
+import org.virtuslab.bazelsteward.bazel.version.BazelVersion
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Version

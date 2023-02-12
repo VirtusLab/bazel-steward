@@ -1,7 +1,0 @@
-unit_tests(
-    srcs = glob(["**/*.kt"]),
-    test_package = "org.virtuslab.bazelsteward.rules",
-    deps = [
-        "//bazel:rules",
-    ],
-)

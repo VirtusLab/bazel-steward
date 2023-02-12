@@ -1,7 +1,0 @@
-unit_tests(
-    srcs = glob(["**/*.kt"]),
-    test_package = "org.virtuslab.bazelsteward.maven",
-    deps = [
-        "//maven/src/main/kotlin/org/virtuslab/bazelsteward/maven",
-    ],
-)

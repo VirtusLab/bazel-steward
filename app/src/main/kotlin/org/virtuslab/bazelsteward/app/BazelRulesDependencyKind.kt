@@ -7,7 +7,7 @@ import org.virtuslab.bazelsteward.core.replacement.BazelRuleHeuristic
 import org.virtuslab.bazelsteward.core.replacement.Heuristic
 import org.virtuslab.bazelsteward.core.rules.RuleLibrary
 import org.virtuslab.bazelsteward.github.GithubRulesResolver
-import org.virtuslab.bazelsteward.rules.BazelRulesExtractor
+import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import java.nio.file.Path
 
 class BazelRulesDependencyKind(

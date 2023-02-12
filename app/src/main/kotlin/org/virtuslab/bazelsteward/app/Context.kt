@@ -7,7 +7,7 @@ import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.kohsuke.github.GitHub
-import org.virtuslab.bazelsteward.bazel.BazelUpdater
+import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -20,7 +20,7 @@ import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.github.GithubRulesResolver
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenRepository
-import org.virtuslab.bazelsteward.rules.BazelRulesExtractor
+import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}

@@ -4,8 +4,8 @@ import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
-import org.virtuslab.bazelsteward.bazel.BazelUpdater
-import org.virtuslab.bazelsteward.bazel.BazelVersion
+import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
+import org.virtuslab.bazelsteward.bazel.version.BazelVersion
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.PullRequest
