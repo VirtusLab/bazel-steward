@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.core.replacement
+package org.virtuslab.bazelsteward.app
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
@@ -10,6 +10,7 @@ import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
+import org.virtuslab.bazelsteward.core.replacement.*
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.nio.file.Path
