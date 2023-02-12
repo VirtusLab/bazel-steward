@@ -3,6 +3,7 @@ package org.virtuslab.bazelsteward.app
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.Environment
+import org.virtuslab.bazelsteward.core.replacement.FileChangeSuggester
 
 private val logger = KotlinLogging.logger {}
 

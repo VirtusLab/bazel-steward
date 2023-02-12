@@ -3,9 +3,9 @@ package org.virtuslab.bazelsteward.e2e
 import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
+import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.BazelVersion
-import org.virtuslab.bazelsteward.core.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.PullRequest
@@ -129,7 +129,6 @@ open class E2EBase {
 
   protected fun mockGitHostClientWithStatus(status: GitHostClient.Companion.PrStatus): CountingGitHostClient {
     return object : CountingGitHostClient() {
-      override fun closePrs(pullRequest: List<PullRequest>) {}
       override fun checkPrStatus(branch: GitBranch) = status
       override fun getOpenPRs(): List<PullRequest> = emptyList()
     }

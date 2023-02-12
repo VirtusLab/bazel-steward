@@ -2,105 +2,19 @@ package org.virtuslab.bazelsteward.app
 
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.AppConfig
-import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
-import org.virtuslab.bazelsteward.core.common.*
-import org.virtuslab.bazelsteward.core.replacement.Heuristic
-import java.lang.Exception
-import java.nio.file.FileSystems
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.PathMatcher
-import kotlin.io.path.exists
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.CLOSED
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.MERGED
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.NONE
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MERGEABLE
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_MODIFIED
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.OPEN_NOT_MERGEABLE
+import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.*
+import org.virtuslab.bazelsteward.core.common.GitOperations
+import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.config.ConfigEntry
 import org.virtuslab.bazelsteward.core.config.RepoConfig
-import org.virtuslab.bazelsteward.core.library.*
-import org.virtuslab.bazelsteward.core.replacement.LibraryUpdate
+import org.virtuslab.bazelsteward.core.library.Library
+import org.virtuslab.bazelsteward.core.library.VersioningSchema
+import org.virtuslab.bazelsteward.core.replacement.FileChangeSuggester
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
-import java.util.stream.Collectors
-
-sealed interface PathPattern {
-  sealed class JavaPathMatcher(pattern: String, prefix: String) : PathPattern {
-    val matcher: PathMatcher = FileSystems.getDefault().getPathMatcher(prefix + pattern)
-  }
-
-  val value: String
-
-  data class Glob(override val value: String) : JavaPathMatcher(value, "glob:")
-  data class Regex(override val value: String) : JavaPathMatcher(value, "regex:")
-  data class Exact(override val value: String) : PathPattern
-}
 
 private val logger = KotlinLogging.logger {}
-
-interface DependencyKind<LibId : LibraryId> {
-  val name: String
-  suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library, List<Version>>
-  val defaultSearchPatterns: List<PathPattern>
-  val defaultVersionDetectionHeuristics: List<Heuristic>
-}
-
-// TODO add logging
-class FileFinder(private val workspaceRoot: Path) {
-
-  fun find(patterns: List<PathPattern>): List<TextFile> {
-    val javaMatchers = patterns.filterIsInstance<PathPattern.JavaPathMatcher>()
-    val exactMatchers = patterns.filterIsInstance<PathPattern.Exact>()
-
-    val matchedByPattern = if (javaMatchers.isNotEmpty()) {
-      Files.walk(workspaceRoot)
-        .filter { path -> javaMatchers.any { it.matcher.matches(path) } }
-        .collect(Collectors.toList())
-    } else {
-      emptyList<Path>()
-    }
-
-    val matchedExactly = exactMatchers.map { workspaceRoot.resolve(it.value) }.filter { it.exists() }
-
-    return (matchedExactly + matchedByPattern).map(TextFile::from)
-  }
-}
-
-
-class PullRequestSuggester {
-  // TODO: extend with grouping logic, labels, commiting strategies, configurable messages etc.
-  fun suggestPullRequests(updates: List<LibraryUpdate>): List<PullRequestSuggestion> {
-    return updates.map { update ->
-      val versionFrom = update.updateSuggestion.currentLibrary.version
-      val versionTo = update.updateSuggestion.suggestedVersion
-      val libraryId = update.updateSuggestion.currentLibrary.id
-      val branch = BazelStewardGitBranch(libraryId, versionTo)
-      val title = "Updated $libraryId to $versionTo"
-      val body = "Updates $libraryId from $versionFrom to $versionTo"
-      val commits = listOf(CommitSuggestion(title, update.fileChanges))
-      PullRequestSuggestion(
-        branch.gitBranch,
-        branch.prefix,
-        title,
-        body,
-        labels = listOf("automatic"),
-        commits
-      )
-    }
-  }
-}
-
-
-data class PullRequestSuggestion(
-  val branch: GitBranch,
-  val branchPrefix: String,
-  val title: String,
-  val body: String,
-  val labels: List<String>,
-  val commits: List<CommitSuggestion>
-)
 
 class App(
   private val gitOperations: GitOperations,

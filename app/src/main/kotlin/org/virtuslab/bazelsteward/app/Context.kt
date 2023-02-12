@@ -11,8 +11,6 @@ import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitHostClient
-import org.virtuslab.bazelsteward.core.common.BazelFileSearch
-import org.virtuslab.bazelsteward.core.common.FileUpdateSearch
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
@@ -30,12 +28,10 @@ private val logger = KotlinLogging.logger {}
 data class Context(
   val appConfig: AppConfig,
   val repoConfig: RepoConfig,
-  val bazelFileSearch: BazelFileSearch,
   val mavenDataExtractor: MavenDataExtractor,
   val bazelRulesExtractor: BazelRulesExtractor,
   val mavenRepository: MavenRepository,
   val updateLogic: UpdateLogic,
-  val fileUpdateSearch: FileUpdateSearch,
   val gitOperations: GitOperations,
   val gitHostClient: GitHostClient,
   val bazelUpdater: BazelUpdater,
@@ -79,18 +75,16 @@ data class Context(
       logger.info { appConfig }
 
       val bsc = runBlocking { RepoConfigParser(appConfig.configPath).get() }
-      val bfs = BazelFileSearch()
       val mde = MavenDataExtractor(appConfig)
       val mr = MavenRepository()
       val ul = UpdateLogic()
-      val fus = FileUpdateSearch()
       val gc = GitOperations(appConfig)
       val ghc = if (github) GithubClient.getClient(env, appConfig) else GitHostClient.stub
       val bre = BazelRulesExtractor(appConfig)
       val bu = BazelUpdater()
       val grr = GithubRulesResolver(env["GITHUB_TOKEN"]?.let(GitHub::connectUsingOAuth) ?: GitHub.connectAnonymously())
 
-      return Context(appConfig, bsc, bfs, mde, bre, mr, ul, fus, gc, ghc, bu, grr)
+      return Context(appConfig, bsc, mde, bre, mr, ul, gc, ghc, bu, grr)
     }
   }
 }

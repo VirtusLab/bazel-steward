@@ -12,11 +12,11 @@ import java.nio.file.Path
 
 class BazelVersionDependencyKind(
   private val bazelUpdater: BazelUpdater
-) : DependencyKind<BazelUpdater.BazelLibraryId> {
+) : DependencyKind<BazelUpdater.BazelLibrary> {
 
   override val name: String = "bazel"
 
-  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<Library, List<Version>> {
+  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<BazelUpdater.BazelLibrary, List<Version>> {
     val version = BazelVersion.extractBazelVersion(workspaceRoot)
       ?: throw RuntimeException("Could not find bazel version")
     val library = BazelUpdater.BazelLibrary(version)

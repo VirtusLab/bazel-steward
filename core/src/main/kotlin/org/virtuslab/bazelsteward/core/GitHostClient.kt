@@ -6,7 +6,7 @@ interface GitHostClient {
   fun checkPrStatus(branch: GitBranch): PrStatus
   fun openNewPR(branch: GitBranch)
   fun getOpenPRs(): List<PullRequest>
-  fun closePrs(pullRequest: List<PullRequest>)
+  fun closePrs(pullRequests: List<PullRequest>)
 
   companion object {
     enum class PrStatus {
@@ -17,7 +17,7 @@ interface GitHostClient {
       override fun checkPrStatus(branch: GitBranch) = PrStatus.NONE
       override fun openNewPR(branch: GitBranch) {}
       override fun getOpenPRs(): List<PullRequest> = emptyList()
-      override fun closePrs(pullRequest: List<PullRequest>) {}
+      override fun closePrs(pullRequests: List<PullRequest>) {}
     }
   }
 }
