@@ -21,7 +21,7 @@ class MavenDataExtractor(private val appConfig: AppConfig) {
 
   private suspend fun extractFromFile(fileName: String): List<String> = withContext(Dispatchers.IO) {
     val process =
-      ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(appConfig.path.toFile()).start().onExit().await()
+      ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(appConfig.workspaceRoot.toFile()).start().onExit().await()
     val xml = process.inputStream.bufferedReader().use { it.readText() }
     val fileLocation = Regex(regexPattern.format(fileName)).find(xml)?.let { it.groups[1]?.value }
       ?: throw RuntimeException("Failed to find file")

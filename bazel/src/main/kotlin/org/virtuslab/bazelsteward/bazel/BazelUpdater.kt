@@ -34,5 +34,13 @@ open class BazelUpdater {
     override val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
   ) : Library {
     override val id: BazelLibraryId = BazelLibraryId
+
+    override fun withVersioningSchema(schema: VersioningSchema): Library {
+      return copy(versioningSchema = schema)
+    }
+
+    override fun withBumpingStrategy(strategy: BumpingStrategy): Library {
+      return copy(bumpingStrategy = strategy)
+    }
   }
 }

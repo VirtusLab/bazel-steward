@@ -79,7 +79,7 @@ data class Context(
       logger.info { appConfig }
 
       val bsc = runBlocking { RepoConfigParser(appConfig.configPath).get() }
-      val bfs = BazelFileSearch(appConfig)
+      val bfs = BazelFileSearch()
       val mde = MavenDataExtractor(appConfig)
       val mr = MavenRepository()
       val ul = UpdateLogic()

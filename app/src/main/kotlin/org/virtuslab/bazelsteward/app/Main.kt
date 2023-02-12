@@ -22,16 +22,16 @@ class Main {
         BazelRulesDependencyKind(ctx.bazelRulesExtractor, ctx.githubRulesResolver)
       )
       runBlocking {
-        //App(ctx).run()
-        App20(
+        App(
           ctx.gitOperations,
           dependencyKinds,
           ctx.updateLogic,
-          FileFinder(ctx.appConfig.path),
+          FileFinder(ctx.appConfig.workspaceRoot),
           FileChangeSuggester(),
           PullRequestSuggester(),
           ctx.gitHostClient,
-          ctx.appConfig
+          ctx.appConfig,
+          ctx.repoConfig
         ).run()
       }
     }

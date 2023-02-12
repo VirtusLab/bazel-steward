@@ -20,6 +20,15 @@ data class MavenCoordinates(
   override val versioningSchema: VersioningSchema,
   override val bumpingStrategy: BumpingStrategy,
 ) : Library {
+
+  override fun withVersioningSchema(schema: VersioningSchema): Library {
+    return copy(versioningSchema = schema)
+  }
+
+  override fun withBumpingStrategy(strategy: BumpingStrategy): Library {
+    return copy(bumpingStrategy = strategy)
+  }
+
   companion object {
     fun of(
       group: String,

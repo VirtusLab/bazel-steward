@@ -1,20 +1,16 @@
 package org.virtuslab.bazelsteward.core.replacement
 
-import org.virtuslab.bazelsteward.core.common.BazelFileSearch
 import org.virtuslab.bazelsteward.core.common.FileChange
-import org.virtuslab.bazelsteward.core.common.FileChangeSuggestion
+import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.library.LibraryId
-import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.rules.RuleLibrary
-import org.virtuslab.bazelsteward.core.rules.RuleUpdateSearch
 import org.virtuslab.bazelsteward.core.rules.RuleVersion
 
 object BazelRuleHeuristic : Heuristic {
   override val name: String = "bazel-rule-default"
 
   override fun apply(
-    files: List<BazelFileSearch.BazelFile>,
+    files: List<TextFile>,
     updateSuggestion: UpdateLogic.UpdateSuggestion
   ): LibraryUpdate? {
     if (updateSuggestion.currentLibrary is RuleLibrary && updateSuggestion.suggestedVersion is RuleVersion) {

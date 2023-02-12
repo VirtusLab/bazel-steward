@@ -10,4 +10,14 @@ data class RuleLibrary(
   override val version: Version,
   override val versioningSchema: VersioningSchema = VersioningSchema.Loose,
   override val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
-) : Library
+) : Library {
+
+  override fun withVersioningSchema(schema: VersioningSchema): Library {
+    return copy(versioningSchema = schema)
+  }
+
+  override fun withBumpingStrategy(strategy: BumpingStrategy): Library {
+    return copy(bumpingStrategy = strategy)
+  }
+
+}

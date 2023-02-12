@@ -7,15 +7,17 @@ import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
 import org.virtuslab.bazelsteward.core.*
 import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
-import org.virtuslab.bazelsteward.core.library.LibraryId
-import org.virtuslab.bazelsteward.core.library.Version
 import java.nio.file.Path
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
 
-class GithubClient private constructor(private val appConfig: AppConfig, repository: String, token: String, url: String) :
-  GitHostClient {
+class GithubClient private constructor(
+  private val appConfig: AppConfig,
+  repository: String,
+  token: String,
+  url: String
+) : GitHostClient {
   private val github: GitHub = GitHubBuilder().withOAuthToken(token).withEndpoint(url).build()
 
   private val ghRepository =
@@ -23,7 +25,7 @@ class GithubClient private constructor(private val appConfig: AppConfig, reposit
 
   private val bazelPRs: List<GHPullRequest> =
     ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
-      .filter { it.head.ref.startsWith(BazelStewardGitBranch.bazelPrefix) }
+
   private val branchToGHPR: Map<String, GHPullRequest> = bazelPRs.associateBy { it.head.ref }
 
   override fun checkPrStatus(branch: GitBranch): PrStatus {
@@ -50,15 +52,6 @@ class GithubClient private constructor(private val appConfig: AppConfig, reposit
   override fun closePrs(pullRequest: List<PullRequest>) {
     val names = pullRequest.map { it.branch.name }
     bazelPRs.filter { it.head.ref in names }.forEach { it.close() }
-  }
-
-  override fun closePrs(library: LibraryId, filterNotVersion: Version?) {
-    val statusesToClose = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
-    val oldPrs = bazelPRs
-      .filter { it.head.ref.startsWith("${BazelStewardGitBranch.bazelPrefix}/${library.name}") }
-      .filterNot { filterNotVersion?.let { version -> it.head.ref.endsWith(version.value) } ?: true }
-      .filter { checkPrStatus(it) in statusesToClose }
-    oldPrs.forEach { it.close() }
   }
 
   private fun checkPrStatus(pr: GHPullRequest?): PrStatus {

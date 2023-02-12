@@ -2,7 +2,6 @@ package org.virtuslab.bazelsteward.core.common
 
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.Library
-import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 

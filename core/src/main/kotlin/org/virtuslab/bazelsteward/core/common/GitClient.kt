@@ -70,7 +70,5 @@ class GitClient(private val repositoryFile: File) {
     return CommandRunner.run(listOf(git) + gitArgs.filterNotNull(), repositoryFile)
   }
 
-  companion object {
-    data class GitAuthor(val name: String, val email: String)
-  }
+  data class GitAuthor(val name: String, val email: String)
 }
