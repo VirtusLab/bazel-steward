@@ -1,0 +1,17 @@
+# solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
+def _sort_by_kind_then_name(x):
+    return x["kind"] + x["name"]
+
+def repositories_as_json():
+    return json.encode_indent(sorted(native.existing_rules().values(), key = _sort_by_kind_then_name), indent=' ')
+
+def _dump_all_repositories_impl(repository_ctx):
+    repository_ctx.file("BUILD", executable = False, content = "exports_files(['result.json'])")
+    repository_ctx.file("result.json", executable = False, content = repository_ctx.attr.repositories_json)
+
+dump_all_repositories = repository_rule(
+    implementation = _dump_all_repositories_impl,
+    attrs = {
+        "repositories_json": attr.string(mandatory = True),
+    },
+)

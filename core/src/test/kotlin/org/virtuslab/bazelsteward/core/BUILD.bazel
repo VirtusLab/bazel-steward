@@ -5,7 +5,6 @@ unit_tests(
     test_package = "org.virtuslab.bazelsteward.core",
     deps = [
         "//core",
-        "//maven",  #TODO: fix this
         "@maven//:commons_io_commons_io",
     ],
 )

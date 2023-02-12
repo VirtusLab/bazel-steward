@@ -3,14 +3,12 @@ package org.virtuslab.bazelsteward.github
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
-import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
+import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
-import java.nio.file.Path
 
 /**
  * You need to set four env vars to run this test suite:
@@ -35,10 +33,8 @@ class GithubTest {
     )
 
     val env = Environment.system
-    val gitAuthor = GitClient.Companion.GitAuthor("github-actions[bot]", "email@github.com")
-    val config =
-      Config(path = Path.of("."), configPath = Path.of("."), pushToRemote = false, baseBranch = "base", gitAuthor)
-    val gitHostClient = GithubClient.getClient(env, config)
+    val gitAuthor = GitClient.GitAuthor("github-actions[bot]", "email@github.com")
+    val gitHostClient = GithubClient.getClient(env, baseBranch = "base", gitAuthor)
 
     branchToPrStatus.forEach {
       val branch = simpleBranch(it.first)
@@ -49,12 +45,12 @@ class GithubTest {
 
   private fun simpleBranch(branch: String): GitBranch {
     val split = branch.split('/', limit = 3)
-    val lib = object : LibraryId {
+    val lib = object : LibraryId() {
       override fun associatedStrings(): List<String> = emptyList()
       override val name = split[1]
     }
     val ver = SimpleVersion(split[2])
 
-    return GitBranch(lib, ver)
+    return GitBranch(lib.name + ver.value)
   }
 }

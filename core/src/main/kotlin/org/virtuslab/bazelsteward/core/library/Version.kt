@@ -1,6 +1,9 @@
 package org.virtuslab.bazelsteward.core.library
 
-interface Version {
-  val value: String
-  fun toSemVer(versioning: VersioningSchema): SemanticVersion? = SemanticVersion.fromString(value, versioning)
+abstract class Version {
+  abstract val value: String
+
+  open fun toSemVer(versioning: VersioningSchema): SemanticVersion? = SemanticVersion.fromString(value, versioning)
+
+  final override fun toString(): String = value
 }
