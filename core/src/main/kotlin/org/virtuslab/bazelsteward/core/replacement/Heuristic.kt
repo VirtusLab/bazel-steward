@@ -2,17 +2,14 @@ package org.virtuslab.bazelsteward.core.replacement
 
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
-import org.virtuslab.bazelsteward.core.common.UpdateLogic
+import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 
 data class LibraryUpdate(
-  val updateSuggestion: UpdateLogic.UpdateSuggestion,
+  val suggestion: UpdateSuggestion,
   val fileChanges: List<FileChange>
 )
 
 interface Heuristic {
   val name: String
-  fun apply(
-    files: List<TextFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion
-  ): LibraryUpdate?
+  fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate?
 }

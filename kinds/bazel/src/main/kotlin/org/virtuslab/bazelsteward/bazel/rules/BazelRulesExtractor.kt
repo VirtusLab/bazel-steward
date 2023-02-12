@@ -35,7 +35,7 @@ class BazelRulesExtractor(private val appConfig: AppConfig) {
 
   suspend fun extractCurrentRules(workspaceRoot: Path): List<RuleLibrary> =
     withContext(Dispatchers.IO) {
-      val dumpRepositoriesContent = javaClass.classLoader.getResource("bazel/resources/dump_repositories.bzlignore")?.readText()
+      val dumpRepositoriesContent = javaClass.classLoader.getResource("dump_repositories.bzlignore")?.readText()
         ?: throw RuntimeException("Could not find dump_repositories template, which is required for detecting used bazel repositories")
       val tempFileForBzl = createTempFile(directory = appConfig.workspaceRoot, suffix = ".bzl").toFile()
       tempFileForBzl.appendText(dumpRepositoriesContent)
@@ -54,10 +54,10 @@ class BazelRulesExtractor(private val appConfig: AppConfig) {
         |)""".trimMargin()
       )
       // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
-      CommandRunner.run("bazel build @all_external_repositories//:result.json".split(' '), appConfig.workspaceRoot.toFile())
+      CommandRunner.run("bazel build @all_external_repositories//:result.json".split(' '), appConfig.workspaceRoot)
       workspaceFilePath.writeText(originalContent)
       deleteFile(tempFileForBzl)
-      val bazelPath = CommandRunner.run("bazel info output_base".split(' '), appConfig.workspaceRoot.toFile()).removeSuffix("\n")
+      val bazelPath = CommandRunner.run("bazel info output_base".split(' '), appConfig.workspaceRoot).removeSuffix("\n")
       val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
       if (!resultFilePath.exists()) {
         throw RuntimeException("Failed to find a file")

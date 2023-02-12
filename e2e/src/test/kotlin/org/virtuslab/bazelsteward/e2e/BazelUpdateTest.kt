@@ -1,44 +1,42 @@
 package org.virtuslab.bazelsteward.e2e
 
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.virtuslab.bazelsteward.app.Main
-import java.io.File
+import java.nio.file.Path
 
 class BazelUpdateTest : E2EBase() {
 
+  // This may actually fail depending on the version of Bazel on PATH
   @Test
-  fun `Project without Bazel version`(@TempDir tempDir: File) { // This may actually fail depending on the version of Bazel on PATH
-    val testResourcePath = "bazel/trivial"
-    val file = loadTest(tempDir, testResourcePath)
-    Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
-    val expectedBranches = listOf(
+  fun `Project without Bazel version`(@TempDir tempDir: Path) {
+    val project = "bazel/trivial"
+    runBazelSteward(tempDir, project)
+    val expectedBranches = expectedBranches(
       "io.arrow-kt/arrow-core" to "1.1.5",
       "io.arrow-kt/arrow-fx-coroutines" to "1.1.5",
       "rules_jvm_external" to "4.5"
-    ).map { "$branchRef/${it.first}/${it.second}" } + masterRef
-    checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
+    )
+    checkBranchesWithVersions(tempDir, project, expectedBranches)
   }
 
   @Test
-  fun `Project with Bazel version in bazeliskrc file`(@TempDir tempDir: File) {
-    val testResourcePath = "bazel/bazeliskrc"
-    val file = loadTest(tempDir, testResourcePath)
-    Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
-    val expectedBranches =
-      listOf("io.arrow-kt/arrow-core" to "1.1.5", "io.arrow-kt/arrow-fx-coroutines" to "1.1.5", "bazel" to "5.4.0", "rules_jvm_external" to "4.5")
-        .map { "$branchRef/${it.first}/${it.second}" } + masterRef
-    checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
+  fun `Project with Bazel version in bazeliskrc file`(@TempDir tempDir: Path) {
+    val project = "bazel/bazeliskrc"
+    runBazelSteward(tempDir, project)
+    val expectedBranches = expectedBranches(
+      "io.arrow-kt/arrow-core" to "1.1.5",
+      "io.arrow-kt/arrow-fx-coroutines" to "1.1.5",
+      "bazel" to "5.4.0",
+      "rules_jvm_external" to "4.5"
+    )
+    checkBranchesWithVersions(tempDir, project, expectedBranches)
   }
 
-  @Disabled // TODO: Enable this when MavenExtractor exception is handled in the workflow
   @Test
-  fun `Project without dependencies`(@TempDir tempDir: File) {
-    val testResourcePath = "bazel/bazelOnly"
-    val file = loadTest(tempDir, testResourcePath)
-    Main.main(args = arrayOf(file.toString(), "--push-to-remote"))
-    val expectedBranches = listOf("$branchRef/bazel/5.4.0") + masterRef
-    checkBranchesWithVersions(tempDir, testResourcePath, expectedBranches)
+  fun `Project without dependencies`(@TempDir tempDir: Path) {
+    val project = "bazel/bazelOnly"
+    runBazelSteward(tempDir, project)
+    val expectedBranches = expectedBranches("bazel" to "5.4.0")
+    checkBranchesWithVersions(tempDir, project, expectedBranches)
   }
 }

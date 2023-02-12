@@ -12,12 +12,12 @@ import kotlin.io.path.readText
 data class BazelVersion(override val value: String) : Version() {
 
   companion object {
-    private const val bazelVersionFileName = ".bazelversion"
-    private const val bazeliskRcFileName = ".bazeliskrc"
+    const val DOT_BAZEL_VERSION = ".bazelversion"
+    const val DOT_BAZELISK_RC = ".bazeliskrc"
 
     suspend fun extractBazelVersion(project: Path): BazelVersion? = withContext(Dispatchers.IO) {
-      val bazelVersionFile = project.resolve(bazelVersionFileName)
-      val bazeliskRcFile = project.resolve(bazeliskRcFileName)
+      val bazelVersionFile = project.resolve(DOT_BAZEL_VERSION)
+      val bazeliskRcFile = project.resolve(DOT_BAZELISK_RC)
       if (bazelVersionFile.exists()) {
         bazelVersionFile.readText().takeIf { it.isNotBlank() }?.let { BazelVersion(it.trim()) }
       } else if (bazeliskRcFile.exists()) {

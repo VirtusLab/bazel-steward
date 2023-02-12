@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.app
+package org.virtuslab.bazelsteward.bazel.rules
 
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
@@ -6,8 +6,6 @@ import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.BazelRuleHeuristic
 import org.virtuslab.bazelsteward.core.replacement.Heuristic
 import org.virtuslab.bazelsteward.core.rules.RuleLibrary
-import org.virtuslab.bazelsteward.github.GithubRulesResolver
-import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import java.nio.file.Path
 
 class BazelRulesDependencyKind(

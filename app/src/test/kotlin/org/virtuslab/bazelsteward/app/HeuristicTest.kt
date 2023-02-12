@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
-import org.virtuslab.bazelsteward.core.common.UpdateLogic
+import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -22,41 +22,6 @@ class HeuristicTest {
   val correctPositionFor120: Int = 2263
   val correctPositionFor160: Int = 2464
 
-  data class TestTextFile(override val path: Path, override val content: String) : TextFile
-
-  private fun loadTextFileFromResources(fileName: String): TextFile {
-    val url = this::class.java.classLoader.getResource(fileName)!!
-    return TestTextFile(Path(url.path), url.readText())
-  }
-
-  private val files = listOf(loadTextFileFromResources("WORKSPACE.bzlignore"))
-
-  private val suggester = FileChangeSuggester()
-
-  private fun library(group: String, artifact: String, version: String) =
-    MavenCoordinates(
-      MavenLibraryId(group, artifact),
-      version(version),
-      VersioningSchema.SemVer,
-      BumpingStrategy.Default
-    )
-
-  private fun version(version: String) = SemanticVersion.fromString(version)!!
-
-  private val allHeuristics = listOf(WholeLibraryHeuristic, VersionOnlyHeuristic).toTypedArray()
-
-  private fun run(
-    library: MavenCoordinates,
-    version: SemanticVersion,
-    vararg heuristics: Heuristic = allHeuristics
-  ): FileChange? {
-    return suggester.suggestChanges(
-      files,
-      UpdateLogic.UpdateSuggestion(library, version),
-      heuristics.toList()
-    )?.fileChanges?.firstOrNull()
-  }
-
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
   inner class SearchBuildFilesTest {
@@ -66,7 +31,7 @@ class HeuristicTest {
       val library = library("com.7theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion)
+      val result = resolveUpdates(library, suggestedVersion)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -76,7 +41,7 @@ class HeuristicTest {
       val library = library("com.10theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion)
+      val result = resolveUpdates(library, suggestedVersion)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -86,7 +51,7 @@ class HeuristicTest {
       val library = library("", "", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion)
+      val result = resolveUpdates(library, suggestedVersion)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -96,7 +61,7 @@ class HeuristicTest {
       val library = library("io.grpc", "grpc-core", "1.2.0")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion)
+      val result = resolveUpdates(library, suggestedVersion)
 
       result?.offset shouldBe correctPositionFor120
     }
@@ -106,7 +71,7 @@ class HeuristicTest {
       val library = library("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.6.0")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion)
+      val result = resolveUpdates(library, suggestedVersion)
 
       result?.offset shouldBe correctPositionFor160
     }
@@ -121,7 +86,7 @@ class HeuristicTest {
       val library = library("com.7theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, WholeLibraryHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -131,7 +96,7 @@ class HeuristicTest {
       val library = library("com.10theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, WholeLibraryHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
       result shouldBe null
     }
@@ -141,7 +106,7 @@ class HeuristicTest {
       val library = library("", "", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, WholeLibraryHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -151,7 +116,7 @@ class HeuristicTest {
       val library = library("io.grpc", "grpc-core", "1.2.0")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, WholeLibraryHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
       result shouldBe null
     }
@@ -161,7 +126,7 @@ class HeuristicTest {
       val library = library("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.6.0")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, WholeLibraryHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
       result?.offset shouldBe correctPositionFor160
     }
@@ -176,7 +141,7 @@ class HeuristicTest {
       val library = library("com.7theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, VersionOnlyHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -186,7 +151,7 @@ class HeuristicTest {
       val library = library("com.10theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, VersionOnlyHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -196,7 +161,7 @@ class HeuristicTest {
       val library = library("", "", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, VersionOnlyHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result?.offset shouldBe correctPositionFor235
     }
@@ -206,7 +171,7 @@ class HeuristicTest {
       val library = library("io.grpc", "grpc-core", "1.2.0")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, VersionOnlyHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result?.offset shouldBe correctPositionFor120
     }
@@ -216,7 +181,7 @@ class HeuristicTest {
       val library = library("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.6.0")
       val suggestedVersion = version("2.4.0")
 
-      val result = run(library, suggestedVersion, VersionOnlyHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result shouldBe null
     }
@@ -231,8 +196,8 @@ class HeuristicTest {
       val library = library("com.7theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result1 = run(library, suggestedVersion, WholeLibraryHeuristic)
-      val result2 = run(library, suggestedVersion, VersionOnlyHeuristic)
+      val result1 = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
+      val result2 = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result1?.offset shouldBe result2?.offset
     }
@@ -242,11 +207,43 @@ class HeuristicTest {
       val library = library("com.10theta", "utilis", "2.3.5")
       val suggestedVersion = version("2.4.0")
 
-      val result1 = run(library, suggestedVersion, WholeLibraryHeuristic)
-      val result2 = run(library, suggestedVersion, VersionOnlyHeuristic)
+      val result1 = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
+      val result2 = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result1 shouldBe null
       result2?.offset shouldBe correctPositionFor235
     }
   }
+
+  private data class TestTextFile(override val path: Path, override val content: String) : TextFile
+
+  private fun loadTextFileFromResources(fileName: String): TextFile {
+    val url = this::class.java.classLoader.getResource(fileName)!!
+    return TestTextFile(Path(url.path), url.readText())
+  }
+
+  private fun library(group: String, artifact: String, version: String) =
+    MavenCoordinates(
+      MavenLibraryId(group, artifact),
+      version(version),
+      VersioningSchema.SemVer,
+      BumpingStrategy.Default
+    )
+
+  private fun version(version: String) = SemanticVersion.fromString(version)!!
+
+  private val files = listOf(loadTextFileFromResources("WORKSPACE.bzlignore"))
+
+  private val resolver = LibraryUpdateResolver()
+
+  private val allHeuristics = listOf(WholeLibraryHeuristic, VersionOnlyHeuristic).toTypedArray()
+
+  private fun resolveUpdates(
+    library: MavenCoordinates,
+    version: SemanticVersion,
+    vararg heuristics: Heuristic = allHeuristics
+  ): FileChange? {
+    return resolver.resolve(files, UpdateSuggestion(library, version), heuristics.toList())?.fileChanges?.firstOrNull()
+  }
+
 }

@@ -5,8 +5,9 @@ import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 
+data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: Version)
+
 class UpdateLogic {
-  data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: Version)
 
   fun selectUpdate(
     library: Library,
@@ -23,7 +24,8 @@ class UpdateLogic {
     return library.version.toSemVer(library.versioningSchema)
       ?.takeIf { version -> version.prerelease.isBlank() }
       ?.let { version ->
-        val maxPatch = maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
+        val maxPatch =
+          maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
         val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
         val maxMajor = maxAvailableVersion { a -> a.major > version.major }
         val nextVersion = when (library.bumpingStrategy) {

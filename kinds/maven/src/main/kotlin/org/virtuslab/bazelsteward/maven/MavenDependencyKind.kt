@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.app
+package org.virtuslab.bazelsteward.maven
 
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.DependencyKind
@@ -7,16 +7,14 @@ import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.Heuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
-import org.virtuslab.bazelsteward.maven.MavenCoordinates
-import org.virtuslab.bazelsteward.maven.MavenDataExtractor
-import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
+
 class MavenDependencyKind(
-  private val mavenDataExtractor: MavenDataExtractor,
-  private val mavenRepository: MavenRepository
+    private val mavenDataExtractor: MavenDataExtractor,
+    private val mavenRepository: MavenRepository
 ) : DependencyKind<MavenCoordinates> {
 
   override val name: String = "maven"
@@ -29,14 +27,14 @@ class MavenDependencyKind(
   }
 
   override val defaultSearchPatterns: List<PathPattern> = listOf(
-    PathPattern.Glob("**/BUILD{,.bazel}"),
-    PathPattern.Glob("**/*.bzl"),
-    PathPattern.Exact("WORKSPACE.bazel"),
-    PathPattern.Exact("WORKSPACE")
+      PathPattern.Glob("**/BUILD{,.bazel}"),
+      PathPattern.Glob("**/*.bzl"),
+      PathPattern.Exact("WORKSPACE.bazel"),
+      PathPattern.Exact("WORKSPACE")
   )
 
   override val defaultVersionDetectionHeuristics: List<Heuristic> = listOf(
-    WholeLibraryHeuristic,
-    VersionOnlyHeuristic
+      WholeLibraryHeuristic,
+      VersionOnlyHeuristic
   )
 }

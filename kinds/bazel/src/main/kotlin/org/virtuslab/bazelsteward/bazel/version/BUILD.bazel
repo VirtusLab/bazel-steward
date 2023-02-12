@@ -1,5 +1,4 @@
 library(
-    name = "version",
     srcs = glob(["**/*.kt"]),
     resources = glob(
         ["resources/**"],

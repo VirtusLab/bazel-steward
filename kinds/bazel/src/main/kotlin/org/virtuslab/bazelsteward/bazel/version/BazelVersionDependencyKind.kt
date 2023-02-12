@@ -1,7 +1,5 @@
-package org.virtuslab.bazelsteward.app
+package org.virtuslab.bazelsteward.bazel.version
 
-import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
-import org.virtuslab.bazelsteward.bazel.version.BazelVersion
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Version
@@ -13,20 +11,20 @@ import java.nio.file.Path
 
 class BazelVersionDependencyKind(
   private val bazelUpdater: BazelUpdater
-) : DependencyKind<BazelUpdater.BazelLibrary> {
+) : DependencyKind<BazelLibrary> {
 
   override val name: String = "bazel"
 
-  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<BazelUpdater.BazelLibrary, List<Version>> {
+  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<BazelLibrary, List<Version>> {
     val version = BazelVersion.extractBazelVersion(workspaceRoot)
       ?: throw RuntimeException("Could not find bazel version")
-    val library = BazelUpdater.BazelLibrary(version)
+    val library = BazelLibrary(version)
     val versions = bazelUpdater.availableVersions(version)
     return mapOf(library to versions)
   }
 
   override val defaultSearchPatterns: List<PathPattern> =
-    listOf(".bazelversion", ".bazeliskrc").map(PathPattern::Exact)
+    listOf(BazelVersion.DOT_BAZEL_VERSION, BazelVersion.DOT_BAZELISK_RC).map(PathPattern::Exact)
 
   override val defaultVersionDetectionHeuristics: List<Heuristic> =
     listOf(WholeLibraryHeuristic, VersionOnlyHeuristic)

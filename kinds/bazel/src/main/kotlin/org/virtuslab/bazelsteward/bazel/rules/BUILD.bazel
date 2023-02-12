@@ -1,6 +1,7 @@
 library(
     name = "rules",
     srcs = glob(["**/*.kt"]),
+    resource_strip_prefix = "kinds/bazel/resources",
     resources = ["//kinds/bazel/resources:rules_resources"],
     deps = [
         "//core",
@@ -9,5 +10,6 @@ library(
         "@maven//:com_networknt_json_schema_validator",
         "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
         "@maven//:org_json_json_20220924",
+        "@maven//:org_kohsuke_github_api",
     ],
 )

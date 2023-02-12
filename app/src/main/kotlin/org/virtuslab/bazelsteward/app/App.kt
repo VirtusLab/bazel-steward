@@ -5,7 +5,7 @@ import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.FileFinder
 import org.virtuslab.bazelsteward.core.GitHostClient
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus.*
+import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.*
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
@@ -13,28 +13,28 @@ import org.virtuslab.bazelsteward.core.config.ConfigEntry
 import org.virtuslab.bazelsteward.core.config.RepoConfig
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
-import org.virtuslab.bazelsteward.core.replacement.FileChangeSuggester
+import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 private val logger = KotlinLogging.logger {}
 
-class App(
-  private val gitOperations: GitOperations,
-  private val dependencyKinds: List<DependencyKind<*>>,
-  private val updateLogic: UpdateLogic,
-  private val fileFinder: FileFinder,
-  private val fileChangeSuggester: FileChangeSuggester,
-  private val pullRequestSuggester: PullRequestSuggester,
-  private val gitHostClient: GitHostClient,
-  private val appConfig: AppConfig,
-  private val repoConfig: RepoConfig
+data class App(
+  val gitOperations: GitOperations,
+  val dependencyKinds: List<DependencyKind<*>>,
+  val updateLogic: UpdateLogic,
+  val fileFinder: FileFinder,
+  val libraryUpdateResolver: LibraryUpdateResolver,
+  val pullRequestSuggester: PullRequestSuggester,
+  val gitHostClient: GitHostClient,
+  val appConfig: AppConfig,
+  val repoConfig: RepoConfig
 ) {
 
   suspend fun run() {
     val workspaceRoot = appConfig.workspaceRoot
     gitOperations.checkoutBaseBranch()
 
-    val changeSuggestions = dependencyKinds.mapNotNull { kind ->
+    val updates = dependencyKinds.mapNotNull { kind ->
       val currentLibraries = try {
         kind.findAvailableVersions(workspaceRoot)
       } catch (e: Exception) {
@@ -58,19 +58,19 @@ class App(
       val updateSuggestions = currentLibraries.mapNotNull { updateLogic.selectUpdate(it.key, it.value) }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
 
-      val searchPatterns = kind.defaultSearchPatterns // TODO: read from config for given dependency kind
+      val searchPatterns = kind.defaultSearchPatterns // TODO: read overrides from config for given dependency kind
       val files = fileFinder.find(searchPatterns)
 
       val heuristics = kind.defaultVersionDetectionHeuristics // TODO: read from config
 
-      val fileChanges = updateSuggestions.mapNotNull { updateSuggestion ->
-        fileChangeSuggester.suggestChanges(files, updateSuggestion, heuristics)
+      val updates = updateSuggestions.mapNotNull { updateSuggestion ->
+        libraryUpdateResolver.resolve(files, updateSuggestion, heuristics)
       }
 
-      fileChanges
+      updates
     }.flatten()
 
-    val pullRequestSuggestions = pullRequestSuggester.suggestPullRequests(changeSuggestions)
+    val pullRequestSuggestions = pullRequestSuggester.suggestPullRequests(updates)
 
     pullRequestSuggestions.forEach { pr ->
       when (val prStatus = gitHostClient.checkPrStatus(pr.branch)) {
@@ -84,7 +84,7 @@ class App(
                 val oldPrs = gitHostClient.getOpenPRs().filter {
                   it.branch.name.startsWith(pr.branchPrefix) && it.branch != pr.branch
                 }
-                gitHostClient.openNewPR(pr.branch) // TODO pass pr metadata
+                gitHostClient.openNewPR(pr.description)
                 gitHostClient.closePrs(oldPrs)
               }
             }

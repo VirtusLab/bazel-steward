@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.github
+package org.virtuslab.bazelsteward.bazel.rules
 
 import org.kohsuke.github.GHAsset
 import org.kohsuke.github.GHRelease

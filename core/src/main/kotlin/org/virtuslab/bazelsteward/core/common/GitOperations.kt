@@ -13,13 +13,13 @@ data class FileChange(
   val replacement: String
 )
 
-data class CommitSuggestion(
+data class CommitRequest(
   val message: String,
   val changes: List<FileChange>
 )
 
 class GitOperations(private val appConfig: AppConfig) {
-  private val git = GitClient(appConfig.workspaceRoot.toFile())
+  private val git = GitClient(appConfig.workspaceRoot)
 
   suspend fun checkoutBaseBranch() {
     git.checkout(appConfig.baseBranch)
@@ -35,7 +35,7 @@ class GitOperations(private val appConfig: AppConfig) {
     }
   }
 
-  suspend fun createBranchWithChange(branch: GitBranch, commits: List<CommitSuggestion>) {
+  suspend fun createBranchWithChange(branch: GitBranch, commits: List<CommitRequest>) {
     git.checkout(branch.name, newBranch = true)
     commits.forEach { commit ->
       commit.changes.groupBy { it.file }.forEach { (path, changes) ->

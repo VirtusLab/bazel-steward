@@ -2,17 +2,14 @@ package org.virtuslab.bazelsteward.core.replacement
 
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
-import org.virtuslab.bazelsteward.core.common.UpdateLogic
+import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.rules.RuleLibrary
 import org.virtuslab.bazelsteward.core.rules.RuleVersion
 
 object BazelRuleHeuristic : Heuristic {
   override val name: String = "bazel-rule-default"
 
-  override fun apply(
-    files: List<TextFile>,
-    updateSuggestion: UpdateLogic.UpdateSuggestion
-  ): LibraryUpdate? {
+  override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
     if (updateSuggestion.currentLibrary is RuleLibrary && updateSuggestion.suggestedVersion is RuleVersion) {
       val currentUrl = updateSuggestion.currentLibrary.id.downloadUrl
       val currentVersion = updateSuggestion.currentLibrary.version.value

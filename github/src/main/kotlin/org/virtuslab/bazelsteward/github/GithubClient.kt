@@ -6,14 +6,16 @@ import org.kohsuke.github.GHPullRequest
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GitHubBuilder
 import org.virtuslab.bazelsteward.core.*
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
+import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
+import org.virtuslab.bazelsteward.core.common.GitClient
 import java.nio.file.Path
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
 
 class GithubClient private constructor(
-  private val appConfig: AppConfig,
+  private val baseBranch: String,
+  private val gitAuthor: GitClient.GitAuthor,
   repository: String,
   token: String,
   url: String
@@ -32,13 +34,13 @@ class GithubClient private constructor(
     return checkPrStatus(branchToGHPR[branch.name])
   }
 
-  override fun openNewPR(branch: GitBranch) {
-    logger.info { "Creating pull request for ${branch.name}" }
+  override fun openNewPR(pr: NewPullRequest) {
+    logger.info { "Creating pull request for ${pr.branch}" }
     ghRepository.createPullRequest(
-      "Updated ${branch.name}",
-      branch.name,
-      appConfig.baseBranch,
-      ""
+      pr.title,
+      pr.branch.name,
+      baseBranch,
+      pr.body
     )
   }
 
@@ -49,8 +51,8 @@ class GithubClient private constructor(
       .map { PullRequest(GitBranch(it.head.ref)) }
   }
 
-  override fun closePrs(pullRequest: List<PullRequest>) {
-    val names = pullRequest.map { it.branch.name }
+  override fun closePrs(pullRequests: List<PullRequest>) {
+    val names = pullRequests.map { it.branch.name }
     bazelPRs.filter { it.head.ref in names }.forEach { it.close() }
   }
 
@@ -61,7 +63,7 @@ class GithubClient private constructor(
       PrStatus.MERGED
     else if (pr.state == GHIssueState.CLOSED)
       PrStatus.CLOSED
-    else if (pr.listCommits().toList().any { it.commit.author.name != appConfig.gitAuthor.name })
+    else if (pr.listCommits().toList().any { it.commit.author.name != gitAuthor.name })
       PrStatus.OPEN_MODIFIED
     else if (pr.mergeable)
       PrStatus.OPEN_MERGEABLE
@@ -70,11 +72,11 @@ class GithubClient private constructor(
   }
 
   companion object {
-    fun getClient(env: Environment, appConfig: AppConfig): GithubClient {
+    fun getClient(env: Environment, baseBranch: String, gitAuthor: GitClient.GitAuthor): GithubClient {
       val url = env.getOrThrow("GITHUB_API_URL")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
-      return GithubClient(appConfig, repository, token, url)
+      return GithubClient(baseBranch, gitAuthor, repository, token, url)
     }
 
     fun getRepoPath(env: Environment): Path {

@@ -4,17 +4,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import java.io.File
+import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
 class CommandRunner {
 
   companion object {
-    suspend fun run(command: List<String>, directory: File): String {
+    suspend fun run(command: List<String>, directory: Path): String {
       logger.debug { command }
       return withContext(Dispatchers.IO) {
-        val process = ProcessBuilder(command).directory(directory).start()
+        val process = ProcessBuilder(command).directory(directory.toFile()).start()
           .onExit().await()
         val stdout = process.inputStream.bufferedReader().use { it.readText() }
         val stderr = process.errorStream.bufferedReader().use { it.readText() }
