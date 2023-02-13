@@ -5,6 +5,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.virtuslab.bazelsteward.core.common.UpdateData
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
@@ -103,5 +104,29 @@ class UpdateLogicTest {
     Arguments.of("g3", "a1", "2.1.0+beta", "4.0.2", VersioningSchema.Loose, BumpingStrategy.Latest),
     Arguments.of("g3", "a3", "2.3.2+beta", "2.3.3+beta", VersioningSchema.Loose, BumpingStrategy.Default),
     Arguments.of("g3", "a5", "3.0.0+beta", "4.0.2", VersioningSchema.Loose, BumpingStrategy.Latest),
+  )
+
+  @ParameterizedTest
+  @MethodSource("argumentsForSelectUpdatePin")
+  fun `should selectUpdate test with pin version`(version: String, pin: String, suggestion: String?) {
+    val coordinates = MavenCoordinates.of("group", "artifact", version)
+    val updateData = UpdateData(pinVersion = SimpleVersion(pin))
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
+    Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
+  }
+
+  private fun argumentsForSelectUpdatePin(): List<Arguments> = listOf(
+    Arguments.of("2.0.0", "2.", "2.0.2"),
+    Arguments.of("2.0.1+beta", "2.", "2.0.2"),
+    Arguments.of("2.0.0-alpha", "2.", null),
+    Arguments.of("2.0.2+beta", "2.", "2.3.3+beta"),
+    Arguments.of("2.0.2", "2.", "2.3.3+beta"),
+    Arguments.of("2.1.0+beta", "2.", "2.1.6+beta"),
+    Arguments.of("2.3.3", "2.", null),
+    Arguments.of("2.3.2+beta", "2.", "2.3.3+beta"),
+    Arguments.of("3.0.1", "3.", "3.2.1+beta"),
+    Arguments.of("3.0.0+beta", "3.", "3.0.1"),
+    Arguments.of("4.0.0-alpha", "4.", null),
+    Arguments.of("4.0.0", "4.", "4.0.2"),
   )
 }
