@@ -24,15 +24,7 @@ class UpdateLogic {
 
     fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
-        .filter { version ->
-          updateRules.pinVersion?.let {
-            when (it) {
-              is PinningStrategy.Prefix -> version.value.startsWith(it.value)
-              is PinningStrategy.Exact -> version.value == it.value
-              is PinningStrategy.Regex -> Regex(it.value).matches(version.value)
-            }
-          } ?: true
-        }
+        .filter { version -> updateRules.pinVersion?.let { it.test(version) } ?: true }
         .mapNotNull { version -> version.toSemVer(updateRules.versioningSchema)?.let { version to it } }
         .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
         .maxByOrNull { it.second }

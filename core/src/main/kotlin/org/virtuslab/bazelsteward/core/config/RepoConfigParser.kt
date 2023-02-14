@@ -61,14 +61,7 @@ class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(Versioni
 class PinningStrategyDeserializer : StdDeserializer<PinningStrategy?>(PinningStrategy::class.java) {
   override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PinningStrategy? {
     val pinFieldValue = (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString()
-    return when {
-      pinFieldValue.startsWith("prefix") -> PinningStrategy.Prefix(pinFieldValue)
-      pinFieldValue.startsWith("regex") -> PinningStrategy.Regex(pinFieldValue)
-      pinFieldValue.startsWith("exact") -> PinningStrategy.Exact(pinFieldValue)
-      pinFieldValue.endsWith(".") -> PinningStrategy.Prefix(pinFieldValue)
-      !pinFieldValue.endsWith(".") -> PinningStrategy.Exact(pinFieldValue)
-      else -> null
-    }
+    return PinningStrategy.create(pinFieldValue)
   }
 }
 
