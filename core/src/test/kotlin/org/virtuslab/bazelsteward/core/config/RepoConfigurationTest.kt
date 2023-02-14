@@ -5,7 +5,6 @@ import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.io.File
 

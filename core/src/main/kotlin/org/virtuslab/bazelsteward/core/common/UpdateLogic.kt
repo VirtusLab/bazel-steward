@@ -8,9 +8,11 @@ import org.virtuslab.bazelsteward.core.library.VersioningSchema
 
 data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: Version)
 
-data class UpdateData(val versioningSchema: VersioningSchema = VersioningSchema.Loose,
-                       val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
-                       val pinVersion: Version? = null)
+data class UpdateData(
+  val versioningSchema: VersioningSchema = VersioningSchema.Loose,
+  val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
+  val pinVersion: Version? = null
+)
 
 class UpdateLogic {
 
@@ -22,7 +24,7 @@ class UpdateLogic {
 
     fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
-        .filter{ version -> updateData.pinVersion?.let{ version.value.startsWith(it.value) } ?: true }
+        .filter { version -> updateData.pinVersion?.let { version.value.startsWith(it.value) } ?: true }
         .mapNotNull { version -> version.toSemVer(updateData.versioningSchema)?.let { version to it } }
         .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
         .maxByOrNull { it.second }

@@ -14,7 +14,7 @@ class RulesUpdateTest : E2EBase() {
       expectedBranches(
         "io.arrow-kt/arrow-core" to "1.1.5",
         "io.arrow-kt/arrow-fx-coroutines" to "1.1.5",
-        "bazel" to "5.3.2",
+        "bazel" to "5.4.0",
         "rules_jvm_external" to "4.5"
       )
 
