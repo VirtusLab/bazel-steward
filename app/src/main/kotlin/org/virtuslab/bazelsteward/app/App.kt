@@ -12,8 +12,8 @@ import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_MERGEABLE
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_MODIFIED
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_NOT_MERGEABLE
 import org.virtuslab.bazelsteward.core.common.GitOperations
-import org.virtuslab.bazelsteward.core.common.UpdateData
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
+import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.config.RepoConfig
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 
@@ -28,7 +28,8 @@ data class App(
   val pullRequestSuggester: PullRequestSuggester,
   val gitHostClient: GitHostClient,
   val appConfig: AppConfig,
-  val repoConfig: RepoConfig
+  val repoConfig: RepoConfig,
+  val updateDataCreator: UpdateDataCreator
 ) {
 
   suspend fun run() {
@@ -47,13 +48,10 @@ data class App(
         return@mapNotNull null
       }
 
-      val currentLibrariesWithUpdateData = currentLibraries.mapValues {
-        val updateData: UpdateData = UpdateDataCreator.getConfigurableSetupForLibrary(it.key, repoConfig)
-        Pair(it.value, updateData)
+      val updateSuggestions = currentLibraries.mapNotNull {
+        val updateRules: UpdateRules = updateDataCreator.getConfigurableSetupForLibrary(it.key)
+        updateLogic.selectUpdate(it.key, it.value, updateRules)
       }
-
-      val updateSuggestions =
-        currentLibrariesWithUpdateData.mapNotNull { updateLogic.selectUpdate(it.key, it.value.first, it.value.second) }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
 
       val searchPatterns = kind.defaultSearchPatterns // TODO: read overrides from config for given dependency kind

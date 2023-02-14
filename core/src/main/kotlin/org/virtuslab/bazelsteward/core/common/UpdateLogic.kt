@@ -8,10 +8,10 @@ import org.virtuslab.bazelsteward.core.library.VersioningSchema
 
 data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: Version)
 
-data class UpdateData(
+data class UpdateRules(
   val versioningSchema: VersioningSchema = VersioningSchema.Loose,
   val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
-  val pinVersion: Version? = null
+  val pinVersion: PinningStrategy? = null
 )
 
 class UpdateLogic {
@@ -19,25 +19,33 @@ class UpdateLogic {
   fun selectUpdate(
     library: Library,
     availableVersions: List<Version>,
-    updateData: UpdateData
+    updateRules: UpdateRules
   ): UpdateSuggestion? {
 
     fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
-        .filter { version -> updateData.pinVersion?.let { version.value.startsWith(it.value) } ?: true }
-        .mapNotNull { version -> version.toSemVer(updateData.versioningSchema)?.let { version to it } }
+        .filter { version ->
+          updateRules.pinVersion?.let {
+            when (it) {
+              is PinningStrategy.Prefix -> version.value.startsWith(it.value)
+              is PinningStrategy.Exact -> version.value == it.value
+              is PinningStrategy.Regex -> Regex(it.value).matches(version.value)
+            }
+          } ?: true
+        }
+        .mapNotNull { version -> version.toSemVer(updateRules.versioningSchema)?.let { version to it } }
         .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
         .maxByOrNull { it.second }
         ?.first
 
-    return library.version.toSemVer(updateData.versioningSchema)
+    return library.version.toSemVer(updateRules.versioningSchema)
       ?.takeIf { version -> version.prerelease.isBlank() }
       ?.let { version ->
         val maxPatch =
           maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
         val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
         val maxMajor = maxAvailableVersion { a -> a.major > version.major }
-        val nextVersion = when (updateData.bumpingStrategy) {
+        val nextVersion = when (updateRules.bumpingStrategy) {
           BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
           BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
           BumpingStrategy.Minor -> maxMinor ?: maxPatch

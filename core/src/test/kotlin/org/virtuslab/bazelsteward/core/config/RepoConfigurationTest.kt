@@ -65,7 +65,7 @@ class RepoConfigurationTest {
       MavenConfig(
         listOf(
           ConfigEntry("commons-io", "commons-io", "2.", VersioningSchema.Loose, BumpingStrategy.Default),
-          ConfigEntry("io.get-coursier", "interface", "1.0", VersioningSchema.SemVer, BumpingStrategy.Latest),
+          ConfigEntry("io.get-coursier", "interface", "1.0.", VersioningSchema.SemVer, BumpingStrategy.Latest),
           ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", "1.", VersioningSchema.Regex("^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?".toRegex()), null),
           ConfigEntry("org.jetbrains.kotlinx", null, null, VersioningSchema.Loose, null),
           ConfigEntry(null, null, null, VersioningSchema.Loose, null),

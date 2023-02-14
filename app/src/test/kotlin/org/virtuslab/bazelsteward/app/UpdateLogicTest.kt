@@ -5,8 +5,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.virtuslab.bazelsteward.core.common.UpdateData
+import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
+import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -39,8 +40,8 @@ class UpdateLogicTest {
   @MethodSource("argumentsForSelectUpdateDefault")
   fun `should selectUpdate test with default bumping strategy`(version: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateData = UpdateData(bumpingStrategy = BumpingStrategy.Default)
-    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Default)
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
 
@@ -63,8 +64,8 @@ class UpdateLogicTest {
   @MethodSource("argumentsForSelectUpdateLatest")
   fun `should selectUpdate test with latest bumping strategy`(version: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateData = UpdateData(bumpingStrategy = BumpingStrategy.Latest)
-    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest)
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
 
@@ -94,8 +95,8 @@ class UpdateLogicTest {
     bumpingStrategy: BumpingStrategy
   ) {
     val coordinates = MavenCoordinates.of(group, artifact, version)
-    val updateData = UpdateData(versioningSchema, bumpingStrategy)
-    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
+    val updateRules = UpdateRules(versioningSchema, bumpingStrategy)
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
 
@@ -110,26 +111,59 @@ class UpdateLogicTest {
   )
 
   @ParameterizedTest
-  @MethodSource("argumentsForSelectUpdatePin")
-  fun `should selectUpdate test with pin version`(version: String, pin: String, suggestion: String?) {
+  @MethodSource("argumentsForSelectUpdatePrefixPinned")
+  fun `should selectUpdate test with pinned prefix version`(version: String, pin: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateData = UpdateData(bumpingStrategy = BumpingStrategy.Default, pinVersion = SimpleVersion(pin))
-    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinVersion = PinningStrategy.Prefix(pin))
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
 
-  private fun argumentsForSelectUpdatePin(): List<Arguments> = listOf(
-    Arguments.of("2.0.0", "2.", "2.0.2"),
-    Arguments.of("2.0.1+beta", "2.", "2.0.2"),
+  private fun argumentsForSelectUpdatePrefixPinned(): List<Arguments> = listOf(
+    Arguments.of("2.0.0", "2.", "2.3.3+beta"),
+    Arguments.of("2.0.0", "2.2.1", "2.2.1"),
+    Arguments.of("2.0.1+beta", "2.0", "2.0.2"),
     Arguments.of("2.0.0-alpha", "2.", null),
-    Arguments.of("2.0.2+beta", "2.", "2.3.3+beta"),
-    Arguments.of("2.0.2", "2.", "2.3.3+beta"),
-    Arguments.of("2.1.0+beta", "2.", "2.1.6+beta"),
+    Arguments.of("2.0.2+beta", "2.2", "2.2.8+beta"),
+    Arguments.of("2.0.2", "2.3.0", "2.3.0+beta"),
+    Arguments.of("2.1.0+beta", "2.", "2.3.3+beta"),
     Arguments.of("2.3.3", "2.", null),
     Arguments.of("2.3.2+beta", "2.", "2.3.3+beta"),
     Arguments.of("3.0.1", "3.", "3.2.1+beta"),
-    Arguments.of("3.0.0+beta", "3.", "3.0.1"),
+    Arguments.of("3.0.0+beta", "3.0", "3.0.1"),
     Arguments.of("4.0.0-alpha", "4.", null),
-    Arguments.of("4.0.0", "4.", "4.0.2"),
+    Arguments.of("4.0.0", "4.0", "4.0.2"),
+  )
+
+  @ParameterizedTest
+  @MethodSource("argumentsForSelectUpdateExactPinned")
+  fun `should selectUpdate test with pinned exact version`(version: String, pin: String, suggestion: String?) {
+    val coordinates = MavenCoordinates.of("group", "artifact", version)
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinVersion = PinningStrategy.Exact(pin))
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
+    Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
+  }
+
+  private fun argumentsForSelectUpdateExactPinned(): List<Arguments> = listOf(
+    Arguments.of("2.0.0", "2.3.2+beta", "2.3.2+beta"),
+    Arguments.of("2.0.1+beta", "2.0.2", "2.0.2"),
+    Arguments.of("2.0.0-alpha", "5.0.0", null),
+    Arguments.of("2.0.2+beta", "2.2", null)
+  )
+
+  @ParameterizedTest
+  @MethodSource("argumentsForSelectUpdateRegexPinned")
+  fun `should selectUpdate test with pinned regex version`(version: String, pin: String, suggestion: String?) {
+    val coordinates = MavenCoordinates.of("group", "artifact", version)
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinVersion = PinningStrategy.Regex(pin))
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
+    Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
+  }
+
+  private fun argumentsForSelectUpdateRegexPinned(): List<Arguments> = listOf(
+    Arguments.of("2.0.0", "^2\\.\\d?\\.0\$", "2.2.0"),
+    Arguments.of("2.0.0", "^2\\.\\d?.\\d?\$", "2.2.1"),
+    Arguments.of("2.0.1+beta", "2.0", null),
+    Arguments.of("2.0.0-alpha", "2.", null),
   )
 }
