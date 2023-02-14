@@ -9,7 +9,7 @@ maven:
     -
       group: io.get-coursier
       artifact: interface
-      pin: "1.0"
+      pin: "1.0."
       versioning: semver
       bumping: latest
     -
