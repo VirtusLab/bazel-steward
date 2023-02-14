@@ -17,29 +17,25 @@ class UpdateLogic {
   fun selectUpdate(
     library: Library,
     availableVersions: List<Version>,
-    updateLogic: UpdateData? = null
+    updateData: UpdateData
   ): UpdateSuggestion? {
 
     fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
-        .filter{ version -> updateLogic?.pinVersion?.let{ version.value.startsWith(it.value) } ?: true }
-        .let{ it }
-        .mapNotNull { version -> version.toSemVer(library.versioningSchema)?.let { version to it } }
-        .let{ it }
+        .filter{ version -> updateData.pinVersion?.let{ version.value.startsWith(it.value) } ?: true }
+        .mapNotNull { version -> version.toSemVer(updateData.versioningSchema)?.let { version to it } }
         .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
-        .let{ it }
         .maxByOrNull { it.second }
-        .let{ it }
         ?.first
 
-    return library.version.toSemVer(library.versioningSchema)
+    return library.version.toSemVer(updateData.versioningSchema)
       ?.takeIf { version -> version.prerelease.isBlank() }
       ?.let { version ->
         val maxPatch =
           maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
         val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
         val maxMajor = maxAvailableVersion { a -> a.major > version.major }
-        val nextVersion = when (library.bumpingStrategy) {
+        val nextVersion = when (updateData.bumpingStrategy) {
           BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
           BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
           BumpingStrategy.Minor -> maxMinor ?: maxPatch

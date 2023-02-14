@@ -38,8 +38,9 @@ class UpdateLogicTest {
   @ParameterizedTest
   @MethodSource("argumentsForSelectUpdateDefault")
   fun `should selectUpdate test with default bumping strategy`(version: String, suggestion: String?) {
-    val coordinates = MavenCoordinates.of("group", "artifact", version, bumpingStrategy = BumpingStrategy.Default)
-    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions)
+    val coordinates = MavenCoordinates.of("group", "artifact", version)
+    val updateData = UpdateData(bumpingStrategy = BumpingStrategy.Default)
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
 
@@ -61,8 +62,9 @@ class UpdateLogicTest {
   @ParameterizedTest
   @MethodSource("argumentsForSelectUpdateLatest")
   fun `should selectUpdate test with latest bumping strategy`(version: String, suggestion: String?) {
-    val coordinates = MavenCoordinates.of("group", "artifact", version, bumpingStrategy = BumpingStrategy.Latest)
-    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions)
+    val coordinates = MavenCoordinates.of("group", "artifact", version)
+    val updateData = UpdateData(bumpingStrategy = BumpingStrategy.Latest)
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
 
@@ -91,8 +93,9 @@ class UpdateLogicTest {
     versioningSchema: VersioningSchema,
     bumpingStrategy: BumpingStrategy
   ) {
-    val coordinates = MavenCoordinates.of(group, artifact, version, versioningSchema, bumpingStrategy)
-    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions)
+    val coordinates = MavenCoordinates.of(group, artifact, version)
+    val updateData = UpdateData(versioningSchema, bumpingStrategy)
+    val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
 
@@ -110,7 +113,7 @@ class UpdateLogicTest {
   @MethodSource("argumentsForSelectUpdatePin")
   fun `should selectUpdate test with pin version`(version: String, pin: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateData = UpdateData(pinVersion = SimpleVersion(pin))
+    val updateData = UpdateData(bumpingStrategy = BumpingStrategy.Default, pinVersion = SimpleVersion(pin))
     val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateData)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }

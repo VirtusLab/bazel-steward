@@ -1,7 +1,6 @@
 package org.virtuslab.bazelsteward.bazel.version
 
 import mu.KotlinLogging
-import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.LibraryId
 import org.virtuslab.bazelsteward.core.library.Version
@@ -17,19 +16,9 @@ object BazelLibraryId : LibraryId() {
 }
 
 data class BazelLibrary(
-  override val version: Version,
-  override val versioningSchema: VersioningSchema = VersioningSchema.SemVer,
-  override val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
+  override val version: Version
 ) : Library {
   override val id: BazelLibraryId = BazelLibraryId
-
-  override fun withVersioningSchema(schema: VersioningSchema): Library {
-    return copy(versioningSchema = schema)
-  }
-
-  override fun withBumpingStrategy(strategy: BumpingStrategy): Library {
-    return copy(bumpingStrategy = strategy)
-  }
 }
 
 open class BazelUpdater {
