@@ -15,4 +15,3 @@ jobs:
       - uses: ./
         with:
           github-pat-token: ${{ secrets.PAT_GITHUB_TOKEN }}
-          use-release: "false"
