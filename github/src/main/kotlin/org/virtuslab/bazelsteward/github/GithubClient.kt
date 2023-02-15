@@ -22,13 +22,11 @@ class GithubClient private constructor(
   private val url: String,
   private val baseBranch: String,
   private val gitAuthor: GitClient.GitAuthor,
-  repository: String,
+  private val repository: String,
   token: String,
   patToken: String? = null,
 
 ) : GitHostClient {
-  private val github: GitHub = GitHubBuilder().withOAuthToken(token).withEndpoint(url).build()
-
   private val ghRepository = createClient(token)
   private val ghPatRepository = patToken?.let { createClient(it) }
 
@@ -65,8 +63,9 @@ class GithubClient private constructor(
 
   suspend fun reopenPr(branch: GitBranch) {
     ghPatRepository?.let { repository ->
-      val pr = repository.queryPullRequests().state(GHIssueState.OPEN).head(branch.name).list().firstOrNull()
-        ?: throw RuntimeException("PR ${branch.name} not found")
+      val pr =
+        repository.queryPullRequests().state(GHIssueState.OPEN).head(branch.name).list().firstOrNull()
+          ?: throw RuntimeException("PR for branch ${branch.name} not found")
       pr.close()
       delay(1000)
       pr.reopen()
@@ -101,7 +100,7 @@ class GithubClient private constructor(
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
       val patToken = env["GITHUB_PAT_TOKEN"].let { if (it.isNullOrBlank()) null else it }
-      return GithubClient(baseBranch, gitAuthor, repository, token, patToken, url)
+      return GithubClient(url, baseBranch, gitAuthor, repository, token, patToken)
     }
 
     fun getRepoPath(env: Environment): Path {

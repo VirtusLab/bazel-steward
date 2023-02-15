@@ -82,7 +82,7 @@ data class App(
     pullRequestSuggestions.forEach { pr ->
       when (val prStatus = gitHostClient.checkPrStatus(pr.branch)) {
         NONE, OPEN_NOT_MERGEABLE -> {
-          logger.info { "Creating branch ${pr.branch}" }
+          logger.info { "Creating branch ${pr.branch}, PR status: $prStatus" }
           runCatching {
             gitOperations.createBranchWithChange(pr.branch, pr.commits)
             if (appConfig.pushToRemote) {
@@ -95,15 +95,16 @@ data class App(
                 gitHostClient.closePrs(oldPrs)
               }
               if (gitHostClient is GithubClient) {
-                if(prStatus == OPEN_NOT_MERGEABLE)
+                if (prStatus == OPEN_NOT_MERGEABLE)
                   delay(10000)
-                gitHostClient.reopenPr(branch)
+                gitHostClient.reopenPr(pr.branch)
               }
             }
-          }.exceptionOrNull()?.let { logger.error("Failed to create branch {}", pr.branch, it) }
+          }.onFailure { logger.error(it) { "Failed to create branch ${pr.branch}" } }
           gitOperations.checkoutBaseBranch()
         }
-        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${pr.branch}" }
+
+        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${pr.branch}, PR status: $prStatus" }
       }
     }
   }

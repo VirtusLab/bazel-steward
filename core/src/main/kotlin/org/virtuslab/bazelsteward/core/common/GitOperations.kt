@@ -28,11 +28,7 @@ class GitOperations(private val appConfig: AppConfig) {
   suspend fun pushBranchToOrigin(branch: GitBranch, force: Boolean) {
     val branchName = branch.name
     git.checkout(branchName)
-    try {
-      git.push(branchName, force = force)
-    } catch (e: RuntimeException) {
-      git.push(branchName, force = true)
-    }
+    git.push(branchName, force = force)
   }
 
   suspend fun createBranchWithChange(branch: GitBranch, commits: List<CommitRequest>) {
