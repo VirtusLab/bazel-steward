@@ -9,6 +9,7 @@ import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
+import org.virtuslab.bazelsteward.core.replacement.PythonMethodHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
@@ -190,6 +191,61 @@ class VersionReplacementHeuristicTest {
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+  inner class PythonMethodHeuristicTest {
+
+    @Test
+    fun `should return correct position offset maven artifact`() {
+      val library = library("com.google.guava", "guava-testlib", "31.1.0-jre")
+      val suggestedVersion = version("32.0.0-jre")
+
+      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+
+      result?.offset shouldBe 2764
+    }
+
+    @Test
+    fun `should return correct position offset maven artifact named parameters`() {
+      val library = library("com.google.truth", "truth", "1.1.3")
+      val suggestedVersion = version("1.2.0")
+
+      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+
+      result?.offset shouldBe 2935
+    }
+
+    @Test
+    fun `should return correct position offset scala dep`() {
+      val library = library("org.scalactic", "scalactic", "3.2.12")
+      val suggestedVersion = version("4.0.0")
+
+      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+
+      result?.offset shouldBe 3128
+    }
+
+    @Test
+    fun `should return correct position offset scala dep named parameters`() {
+      val library = library("junit", "junit", "4.13.2")
+      val suggestedVersion = version("4.14.0")
+
+      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+
+      result?.offset shouldBe 3058
+    }
+
+    @Test
+    fun `should return correct position offset scala dep with scala version`() {
+      val library = library("com.sksamuel.elastic4s", "elastic4s-client-akka_2.12", "8.5.2")
+      val suggestedVersion = version("8.6.0")
+
+      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+
+      result?.offset shouldBe 3326
+    }
+  }
+
+  @Nested
+  @TestInstance(TestInstance.Lifecycle.PER_CLASS)
   inner class CompareHeuristicTest {
 
     @Test
@@ -235,7 +291,7 @@ class VersionReplacementHeuristicTest {
 
   private val resolver = LibraryUpdateResolver()
 
-  private val allHeuristics = listOf(WholeLibraryHeuristic, VersionOnlyHeuristic).toTypedArray()
+  private val allHeuristics = listOf(WholeLibraryHeuristic, VersionOnlyHeuristic, PythonMethodHeuristic).toTypedArray()
 
   private fun resolveUpdates(
     library: MavenCoordinates,

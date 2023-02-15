@@ -78,6 +78,26 @@ maven_install(
         "io.get-coursier:interface:1.0.11",
         "commons-io:commons-io:2.11.0",
         "io.grpc:grpc-core:%s" % GRPC_VERSION,
+        maven.artifact(
+            "com.google.guava",
+            "guava-testlib",
+            "31.1.0-jre",
+            testonly = True
+        ),
+        maven.artifact(
+            group = "com.google.truth",
+            artifact = "truth",
+            version = "1.1.3",
+        ),
+        _scala_dep(
+            group = "junit",
+            artifact = "junit",
+            version = "4.13.2",
+        ),
+        _scala_dep("org.scalactic", "scalactic", "3.2.12"),
+        _java_dep("org.slf4j", "slf4j-api", "1.7.36"),
+        _java_dep("com.github.luben", "zstd-jni", "1.5.2-5"),
+        _scala_dep("com.sksamuel.elastic4s", "elastic4s-client-akka", "8.5.2"),
     ],
     fetch_sources = False,
     repositories = [

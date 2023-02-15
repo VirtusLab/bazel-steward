@@ -8,7 +8,7 @@ object WholeLibraryHeuristic : VersionReplacementHeuristic {
   override val name: String = "whole-library"
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
-    val markers = updateSuggestion.currentLibrary.id.associatedStrings()
+    val markers = updateSuggestion.currentLibrary.id.associatedStrings().first()
     val currentVersion = updateSuggestion.currentLibrary.version.value
     val regex =
       (markers + currentVersion).map { """(${Regex.escape(it)})""" }.reduce { acc, s -> "$acc.*$s" }.let { Regex(it) }
