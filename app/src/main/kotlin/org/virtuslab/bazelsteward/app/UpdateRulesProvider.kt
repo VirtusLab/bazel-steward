@@ -9,7 +9,7 @@ import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
-class UpdateDataCreator(private val repoConfig: RepoConfig) {
+class UpdateRulesProvider(private val repoConfig: RepoConfig) {
   fun getConfigurableSetupForLibrary(library: Library): UpdateRules {
     return when (val libraryId = library.id) {
       is MavenLibraryId -> {

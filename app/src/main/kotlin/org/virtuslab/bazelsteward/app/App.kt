@@ -29,7 +29,7 @@ data class App(
   val gitHostClient: GitHostClient,
   val appConfig: AppConfig,
   val repoConfig: RepoConfig,
-  val updateDataCreator: UpdateDataCreator
+  val updateRulesProvider: UpdateRulesProvider
 ) {
 
   suspend fun run() {
@@ -49,7 +49,7 @@ data class App(
       }
 
       val updateSuggestions = currentLibraries.mapNotNull {
-        val updateRules: UpdateRules = updateDataCreator.getConfigurableSetupForLibrary(it.key)
+        val updateRules: UpdateRules = updateRulesProvider.getConfigurableSetupForLibrary(it.key)
         updateLogic.selectUpdate(it.key, it.value, updateRules)
       }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
