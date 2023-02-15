@@ -10,11 +10,11 @@ sealed class PinningStrategy {
     override fun test(version: Version): Boolean = version.value.startsWith(this.value)
   }
 
-  data class Regex(override val value: String) : PinningStrategy(){
+  data class Exact(override val value: String) : PinningStrategy() {
     override fun test(version: Version): Boolean = version.value == this.value
   }
 
-  data class Exact(override val value: String) : PinningStrategy(){
+  data class Regex(override val value: String) : PinningStrategy() {
     override fun test(version: Version): Boolean = this.value.toRegex().matches(version.value)
   }
 

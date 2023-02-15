@@ -24,7 +24,7 @@ class UpdateLogic {
 
     fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
-        .filter { version -> updateRules.pinVersion?.let { it.test(version) } ?: true }
+        .filter { version -> updateRules.pinVersion?.test(version) ?: true }
         .mapNotNull { version -> version.toSemVer(updateRules.versioningSchema)?.let { version to it } }
         .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
         .maxByOrNull { it.second }

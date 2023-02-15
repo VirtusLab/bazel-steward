@@ -30,7 +30,7 @@ class PinningStrategyTest {
     Arguments.of("regex: \$|()?^*{}", PinningStrategy.Regex("\$|()?^*{}")),
     Arguments.of("regex:\$|()?^*{}", PinningStrategy.Regex("\$|()?^*{}")),
     Arguments.of("2.0.", PinningStrategy.Prefix("2.0.")),
-    Arguments.of("\$|()?^*{}", PinningStrategy.Regex("\$|()?^*{}")),
+    Arguments.of("\$|()?^*", PinningStrategy.Regex("\$|()?^*")),
     Arguments.of("2.0.", PinningStrategy.Prefix("2.0.")),
     Arguments.of("2.0.0", PinningStrategy.Exact("2.0.0")),
   )
