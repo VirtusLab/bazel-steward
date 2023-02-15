@@ -10,7 +10,7 @@ import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 class UpdateRulesProvider(private val repoConfig: RepoConfig) {
-  fun getConfigurableSetupForLibrary(library: Library): UpdateRules {
+  fun resolveForLibrary(library: Library): UpdateRules {
     return when (val libraryId = library.id) {
       is MavenLibraryId -> {
         val versioningForDependency = getConfigEntryFromConfigs(libraryId, repoConfig.maven.configs.filter { it.versioning != null })

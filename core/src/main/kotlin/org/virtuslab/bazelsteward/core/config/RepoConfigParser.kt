@@ -61,7 +61,7 @@ class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(Versioni
 class PinningStrategyDeserializer : StdDeserializer<PinningStrategy?>(PinningStrategy::class.java) {
   override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PinningStrategy? {
     val pinFieldValue = (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString()
-    return PinningStrategy.create(pinFieldValue)
+    return PinningStrategy.parse(pinFieldValue)
   }
 }
 

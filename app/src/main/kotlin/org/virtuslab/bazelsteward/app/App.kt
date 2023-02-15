@@ -13,7 +13,6 @@ import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_MODIFIED
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_NOT_MERGEABLE
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.config.RepoConfig
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 
@@ -49,7 +48,7 @@ data class App(
       }
 
       val updateSuggestions = currentLibraries.mapNotNull {
-        val updateRules: UpdateRules = updateRulesProvider.getConfigurableSetupForLibrary(it.key)
+        val updateRules = updateRulesProvider.resolveForLibrary(it.key)
         updateLogic.selectUpdate(it.key, it.value, updateRules)
       }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
