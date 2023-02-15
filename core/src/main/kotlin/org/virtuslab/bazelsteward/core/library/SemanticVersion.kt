@@ -6,7 +6,7 @@ data class SemanticVersion(
   val patch: Int,
   val prerelease: String,
   val buildmetadata: String,
-) : Version, Comparable<SemanticVersion> {
+) : Version(), Comparable<SemanticVersion> {
 
   override val value: String =
     StringBuilder("$major.$minor.$patch").apply {

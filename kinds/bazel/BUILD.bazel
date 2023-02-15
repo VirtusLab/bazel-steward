@@ -1,0 +1,11 @@
+alias(
+    name = "rules",
+    actual = "//kinds/bazel/src/main/kotlin/org/virtuslab/bazelsteward/bazel/rules",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "version",
+    actual = "//kinds/bazel/src/main/kotlin/org/virtuslab/bazelsteward/bazel/version",
+    visibility = ["//visibility:public"],
+)

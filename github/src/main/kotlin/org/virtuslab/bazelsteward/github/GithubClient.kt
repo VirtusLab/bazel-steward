@@ -6,56 +6,61 @@ import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHPullRequest
 import org.kohsuke.github.GHRepository
 import org.kohsuke.github.GitHubBuilder
-import org.virtuslab.bazelsteward.core.Config
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
-import org.virtuslab.bazelsteward.core.GitHostClient.Companion.PrStatus
-import org.virtuslab.bazelsteward.core.library.LibraryId
-import org.virtuslab.bazelsteward.core.library.Version
-import java.lang.RuntimeException
+import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
+import org.virtuslab.bazelsteward.core.NewPullRequest
+import org.virtuslab.bazelsteward.core.PullRequest
+import org.virtuslab.bazelsteward.core.common.GitClient
 import java.nio.file.Path
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
 
 class GithubClient private constructor(
-  private val config: Config,
   private val url: String,
-  private val repository: String,
+  private val baseBranch: String,
+  private val gitAuthor: GitClient.GitAuthor,
+  repository: String,
   token: String,
-  patToken: String? = null
+  patToken: String? = null,
+
 ) : GitHostClient {
+  private val github: GitHub = GitHubBuilder().withOAuthToken(token).withEndpoint(url).build()
 
   private val ghRepository = createClient(token)
   private val ghPatRepository = patToken?.let { createClient(it) }
 
   private val bazelPRs: List<GHPullRequest> =
     ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
-      .filter { it.head.ref.startsWith(GitBranch.bazelPrefix) }
+
   private val branchToGHPR: Map<String, GHPullRequest> = bazelPRs.associateBy { it.head.ref }
 
   override fun checkPrStatus(branch: GitBranch): PrStatus {
     return checkPrStatus(branchToGHPR[branch.name])
   }
 
-  override fun openNewPR(branch: GitBranch) {
-    logger.info { "Creating pull request for ${branch.name}" }
+  override fun openNewPR(pr: NewPullRequest) {
+    logger.info { "Creating pull request for ${pr.branch}" }
     ghRepository.createPullRequest(
-      "Updated ${branch.libraryId.name} to ${branch.version.value}",
-      branch.name,
-      config.baseBranch,
-      ""
+      pr.title,
+      pr.branch.name,
+      baseBranch,
+      pr.body
     )
   }
 
-  override fun closePrs(library: LibraryId, filterNotVersion: Version?) {
-    val statusesToClose = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
-    val oldPrs = bazelPRs
-      .filter { it.head.ref.startsWith("${GitBranch.bazelPrefix}/${library.name}") }
-      .filterNot { filterNotVersion?.let { version -> it.head.ref.endsWith(version.value) } ?: true }
-      .filter { checkPrStatus(it) in statusesToClose }
-    oldPrs.forEach { it.close() }
+  override fun getOpenPRs(): List<PullRequest> {
+    val openStatuses = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
+    return bazelPRs
+      .filter { checkPrStatus(it) in openStatuses }
+      .map { PullRequest(GitBranch(it.head.ref)) }
+  }
+
+  override fun closePrs(pullRequests: List<PullRequest>) {
+    val names = pullRequests.map { it.branch.name }
+    bazelPRs.filter { it.head.ref in names }.forEach { it.close() }
   }
 
   suspend fun reopenPr(branch: GitBranch) {
@@ -75,7 +80,7 @@ class GithubClient private constructor(
       PrStatus.MERGED
     else if (pr.state == GHIssueState.CLOSED)
       PrStatus.CLOSED
-    else if (pr.listCommits().toList().any { it.commit.author.name != config.gitAuthor.name })
+    else if (pr.listCommits().toList().any { it.commit.author.name != gitAuthor.name })
       PrStatus.OPEN_MODIFIED
     else
       when (pr.mergeable) {
@@ -91,13 +96,12 @@ class GithubClient private constructor(
   }
 
   companion object {
-
-    fun getClient(env: Environment, config: Config): GitHostClient {
+    fun getClient(env: Environment, baseBranch: String, gitAuthor: GitClient.GitAuthor): GithubClient {
       val url = env.getOrThrow("GITHUB_API_URL")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
       val patToken = env["GITHUB_PAT_TOKEN"].let { if (it.isNullOrBlank()) null else it }
-      return GithubClient(config, url, repository, token, patToken)
+      return GithubClient(baseBranch, gitAuthor, repository, token, patToken, url)
     }
 
     fun getRepoPath(env: Environment): Path {

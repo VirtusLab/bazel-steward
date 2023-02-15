@@ -1,8 +1,0 @@
-library(
-    srcs = glob(["**/*.kt"]),
-    deps = [
-        "//core",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_module_jackson_module_kotlin",
-    ],
-)

@@ -10,14 +10,9 @@ class Main {
   companion object {
     @JvmStatic
     fun main(args: Array<String>) {
-      logger.info { args }
-      mainMapContext(args)
-    }
-
-    fun mainMapContext(args: Array<String>, f: (Context) -> Context = { x -> x }) {
-      val ctx = f(Context.fromArgs(args, Environment.system))
+      logger.info { args.toList() }
       runBlocking {
-        App(ctx).run()
+        AppBuilder.fromArgs(args, Environment.system).run()
       }
     }
   }

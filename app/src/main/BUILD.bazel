@@ -4,10 +4,11 @@ library(
         ["resources/**"],
     ),
     deps = [
-        "//bazel",
         "//core",
         "//github",
-        "//maven",
+        "//kinds/bazel:rules",
+        "//kinds/bazel:version",
+        "//kinds/maven",
         "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
         "@maven//:org_slf4j_slf4j_simple",
     ],

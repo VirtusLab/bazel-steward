@@ -1,5 +1,7 @@
 filegroup(
     name = "resources",
-    srcs = glob([".*.yaml"]),
+    srcs = glob([
+        ".*.yaml",
+    ]),
     visibility = ["//visibility:public"],
 )

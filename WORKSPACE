@@ -81,18 +81,19 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4",
         "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0",
-        "io.get-coursier:interface:1.0.11",
+        "io.get-coursier:interface:1.0.13",
         "commons-io:commons-io:2.11.0",
-        "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.2",
+        "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.4",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1",
-        "com.fasterxml.jackson.core:jackson-core:2.14.1",
+        "com.fasterxml.jackson.core:jackson-core:2.14.2",
         "com.networknt:json-schema-validator:1.0.76",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
         "org.kohsuke:github-api:1.313",
         "io.github.microutils:kotlin-logging-jvm:3.0.4",
         "org.slf4j:slf4j-simple:2.0.6",
+        "org.json:json:20220924",
     ],
     fetch_sources = True,
     repositories = [

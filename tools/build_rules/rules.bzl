@@ -13,7 +13,7 @@ def library(**kwargs):
         kwargs["visibility"] = ["//visibility:public"]
 
     kt_jvm_library(**kwargs)
-    lint(kwargs["srcs"])
+    lint(kwargs["srcs"], kwargs["name"])
 
 def unit_tests(**kwargs):
     if "name" not in kwargs:
@@ -23,7 +23,7 @@ def unit_tests(**kwargs):
     kwargs["tags"].append("unit")
 
     kt_junit5_test(size = "small", **kwargs)
-    lint(kwargs["srcs"])
+    lint(kwargs["srcs"], kwargs["name"])
 
 def integration_tests(**kwargs):
     if "name" not in kwargs:
@@ -33,4 +33,4 @@ def integration_tests(**kwargs):
     kwargs["tags"].append("integration")
 
     kt_junit5_test(size = "medium", **kwargs)
-    lint(kwargs["srcs"])
+    lint(kwargs["srcs"], kwargs["name"])
