@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.github
 
+import kotlinx.coroutines.delay
 import mu.KotlinLogging
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHPullRequest
@@ -57,12 +58,12 @@ class GithubClient private constructor(
     oldPrs.forEach { it.close() }
   }
 
-  fun reopenPr(branch: GitBranch) {
+  suspend fun reopenPr(branch: GitBranch) {
     ghPatRepository?.let { repository ->
       val pr = repository.queryPullRequests().state(GHIssueState.OPEN).head(branch.name).list().firstOrNull()
         ?: throw RuntimeException("PR ${branch.name} not found")
       pr.close()
-      Thread.sleep(1000)
+      delay(1000)
       pr.reopen()
     }
   }

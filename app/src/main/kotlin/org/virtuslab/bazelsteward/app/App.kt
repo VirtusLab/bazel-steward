@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.app
 
+import kotlinx.coroutines.delay
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.bazel.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.BazelVersion
@@ -69,6 +70,8 @@ class App(private val ctx: Context) {
                 ctx.gitHostClient.closePrs(change.library.id, filterNotVersion = change.library.version)
               }
               if (ctx.gitHostClient is GithubClient) {
+                if(prStatus == OPEN_NOT_MERGEABLE)
+                  delay(10000)
                 ctx.gitHostClient.reopenPr(branch)
               }
             }
