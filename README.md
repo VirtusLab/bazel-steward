@@ -20,7 +20,7 @@ on:
             fetch-depth: 0
         - uses: VirtusLab/bazel-steward@v0.1.0 # or latest
           with:
-            github-pat-token: '' # used for triggering workflows, read below
+            github-personal-token: '' # used for triggering workflows, read below
 ```
 
 After every run, it creates a new branch and a pull request with a bumped version for every library it detects to be outdated.
@@ -31,7 +31,7 @@ Once a PR is opened, it will never open another one for the same version, regard
 
 By design, workflows don't trigger on pull requests when it is created by GitHub Actions.
 To trigger workflows automatically, do one of the following:
-* set `github-pat-token` to your personal token (recommended, your token will be used only for closing/reopening pull requests)
+* set `github-personal-token` to your personal token (recommended, your token will be used only for closing/reopening pull requests)
 * set `github-token` to your personal token (every operation will be made in your name)
 * create GitHub app and use its token for `github-token` (the best option, requires a bit of setup)
 
@@ -53,7 +53,7 @@ Read more about triggering workflows using personal tokens and setting up GitHub
     additional-args: ''
 
     # An optional token for closing and reopening pull requests
-    github-pat-token: ''
+    github-personal-token: ''
 ```
 
 ## Contributing

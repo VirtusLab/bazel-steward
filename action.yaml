@@ -8,8 +8,8 @@ inputs:
   github-token:
     description: "A token for the Github repository"
     default: ${{ github.token }}
-  github-pat-token:
-    description: "A token for triggering the workflows by closing and reopening pull requests"
+  github-personal-token:
+    description: "A personal token for triggering the workflows by closing and reopening pull requests"
     required: false
   use-release:
     description: "Whether to use prebuild jar from release, instead of compiling code"
