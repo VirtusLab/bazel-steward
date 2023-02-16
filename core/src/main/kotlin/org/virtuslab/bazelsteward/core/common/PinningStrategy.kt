@@ -23,11 +23,11 @@ sealed class PinningStrategy {
     fun parse(pin: String?): PinningStrategy? {
       return when {
         pin == null || pin == "" -> null
-        pin.startsWith("prefix:") -> Prefix(pin.replace("prefix:", "").trim())
-        pin.startsWith("regex:") -> Regex(pin.replace("regex:", "").trim())
-        pin.startsWith("exact:") -> Exact(pin.replace("exact:", "").trim())
+        pin.startsWith("prefix:") -> Prefix(pin.removePrefix("prefix:").trim())
+        pin.startsWith("regex:") -> Regex(pin.removePrefix("regex:").trim())
+        pin.startsWith("exact:") -> Exact(pin.removePrefix("exact:").trim())
         "(?:\\d+\\.){1,2}".toRegex().matches(pin) -> Prefix(pin)
-        "\$|()?^*{}".any { it in pin } -> Regex(pin)
+        "\$|()?^*{}+".any { it in pin } && runCatching { pin.toRegex() }.isSuccess -> Regex(pin)
         pin.endsWith(".") -> Prefix(pin)
         else -> Exact(pin)
       }
