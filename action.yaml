@@ -48,7 +48,7 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
-        GITHUB_PAT_TOKEN: ${{ inputs.github-pat-token }}
+        PERSONAL_TOKEN: ${{ inputs.github-personal-token }}
         PUSH_TO_REMOTE: ${{ inputs.push-to-remote == 'true' && '--push-to-remote' || '' }}
 
 branding:

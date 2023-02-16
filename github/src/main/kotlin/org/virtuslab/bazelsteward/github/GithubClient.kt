@@ -99,7 +99,7 @@ class GithubClient private constructor(
       val url = env.getOrThrow("GITHUB_API_URL")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
-      val patToken = env["GITHUB_PAT_TOKEN"].let { if (it.isNullOrBlank()) null else it }
+      val patToken = env["PERSONAL_TOKEN"].let { if (it.isNullOrBlank()) null else it }
       return GithubClient(url, baseBranch, gitAuthor, repository, token, patToken)
     }
 
