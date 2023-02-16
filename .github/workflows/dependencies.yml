@@ -14,4 +14,4 @@ jobs:
           fetch-depth: 0
       - uses: ./
         with:
-          github-pat-token: ${{ secrets.PAT_GITHUB_TOKEN }}
+          github-personal-token: ${{ secrets.PAT_GITHUB_TOKEN }}
