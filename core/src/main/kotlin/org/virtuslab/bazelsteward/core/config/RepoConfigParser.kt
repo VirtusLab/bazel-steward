@@ -34,7 +34,7 @@ data class MavenConfig(
 data class ConfigEntry(
   val group: String?,
   val artifact: String?,
-  val pin: String?,
+  val pin: PinningStrategy?,
   val versioning: VersioningSchema?,
   val bumping: BumpingStrategy?,
 )
@@ -84,6 +84,7 @@ class RepoConfigParser(private val configFilePath: Path) {
         val yamlReader = ObjectMapper(YAMLFactory())
         val kotlinModule = KotlinModule()
         kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
+        kotlinModule.addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
         yamlReader.registerModule(kotlinModule)
         val validationResult = schema.validate(yamlReader.readTree(configContent))
         if (validationResult.isNotEmpty()) {

@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.io.File
 
@@ -64,9 +65,9 @@ class RepoConfigurationTest {
     val expectedConfiguration = RepoConfig(
       MavenConfig(
         listOf(
-          ConfigEntry("commons-io", "commons-io", "2.", VersioningSchema.Loose, BumpingStrategy.Default),
-          ConfigEntry("io.get-coursier", "interface", "1.0.", VersioningSchema.SemVer, BumpingStrategy.Latest),
-          ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", "1.", VersioningSchema.Regex("^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?".toRegex()), null),
+          ConfigEntry("commons-io", "commons-io", PinningStrategy.Prefix("2."), VersioningSchema.Loose, BumpingStrategy.Default),
+          ConfigEntry("io.get-coursier", "interface", PinningStrategy.Prefix("1.0."), VersioningSchema.SemVer, BumpingStrategy.Latest),
+          ConfigEntry("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8", PinningStrategy.Prefix("1."), VersioningSchema.Regex("^(?<major>\\d*)(?:[.-](?<minor>(\\d*)))?(?:[.-]?(?<patch>(\\d*)))?(?:[-.]?(?<preRelease>(\\d*)))(?<buildMetaData>)?".toRegex()), null),
           ConfigEntry("org.jetbrains.kotlinx", null, null, VersioningSchema.Loose, null),
           ConfigEntry(null, null, null, VersioningSchema.Loose, null),
         ),

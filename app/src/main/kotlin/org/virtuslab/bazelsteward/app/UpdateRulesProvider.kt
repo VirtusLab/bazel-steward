@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.app
 
-import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.config.ConfigEntry
@@ -19,7 +18,7 @@ class UpdateRulesProvider(private val repoConfig: RepoConfig) {
         UpdateRules(
           versioningForDependency?.versioning ?: VersioningSchema.Loose,
           bumpingForDependency?.bumping ?: BumpingStrategy.Default,
-          pinForDependency?.pin?.let { PinningStrategy.Prefix(it) }
+          pinForDependency?.pin
         )
       }
       else -> UpdateRules(VersioningSchema.Loose, BumpingStrategy.Minor)
