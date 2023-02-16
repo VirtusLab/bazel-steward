@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.app
 
-import kotlinx.coroutines.delay
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
@@ -12,6 +11,7 @@ import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.NONE
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_MERGEABLE
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_MODIFIED
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_NOT_MERGEABLE
+import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.BumpingStrategy
@@ -20,7 +20,6 @@ import org.virtuslab.bazelsteward.core.config.RepoConfig
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
-import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 private val logger = KotlinLogging.logger {}
@@ -87,18 +86,16 @@ data class App(
             gitOperations.createBranchWithChange(pr.branch, pr.commits)
             if (appConfig.pushToRemote) {
               gitOperations.pushBranchToOrigin(pr.branch, force = prStatus == OPEN_NOT_MERGEABLE)
-              if (prStatus == NONE) {
-                val oldPrs = gitHostClient.getOpenPRs().filter {
+              val openPr = if (prStatus == NONE) {
+                val oldPrs = gitHostClient.getOpenPrs().filter {
                   it.branch.name.startsWith(pr.branchPrefix) && it.branch != pr.branch
                 }
-                gitHostClient.openNewPR(pr.description)
                 gitHostClient.closePrs(oldPrs)
+                gitHostClient.openNewPr(pr.description)
+              } else {
+                PullRequest(pr.branch)
               }
-              if (gitHostClient is GithubClient) {
-                if (prStatus == OPEN_NOT_MERGEABLE)
-                  delay(10000)
-                gitHostClient.reopenPr(pr.branch)
-              }
+              gitHostClient.onPrChange(openPr, prStatus)
             }
           }.onFailure { logger.error(it) { "Failed to create branch ${pr.branch}" } }
           gitOperations.checkoutBaseBranch()
@@ -112,8 +109,10 @@ data class App(
   private fun getConfigurableSetupForLibrary(library: Library): Pair<VersioningSchema, BumpingStrategy> {
     return when (val libraryId = library.id) {
       is MavenLibraryId -> {
-        val versioningForDependency = getConfigEntryFromConfigs(libraryId, repoConfig.maven.configs.filter { it.versioning != null })
-        val bumpingForDependency = getConfigEntryFromConfigs(libraryId, repoConfig.maven.configs.filter { it.bumping != null })
+        val versioningForDependency =
+          getConfigEntryFromConfigs(libraryId, repoConfig.maven.configs.filter { it.versioning != null })
+        val bumpingForDependency =
+          getConfigEntryFromConfigs(libraryId, repoConfig.maven.configs.filter { it.bumping != null })
         Pair(
           versioningForDependency?.versioning ?: VersioningSchema.Loose,
           bumpingForDependency?.bumping ?: BumpingStrategy.Default

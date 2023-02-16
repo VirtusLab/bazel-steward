@@ -39,7 +39,7 @@ class GithubClient private constructor(
     return checkPrStatus(branchToGHPR[branch.name])
   }
 
-  override fun openNewPR(pr: NewPullRequest) {
+  override fun openNewPr(pr: NewPullRequest): PullRequest {
     logger.info { "Creating pull request for ${pr.branch}" }
     ghRepository.createPullRequest(
       pr.title,
@@ -47,9 +47,10 @@ class GithubClient private constructor(
       baseBranch,
       pr.body
     )
+    return PullRequest(pr.branch)
   }
 
-  override fun getOpenPRs(): List<PullRequest> {
+  override fun getOpenPrs(): List<PullRequest> {
     val openStatuses = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
     return bazelPRs
       .filter { checkPrStatus(it) in openStatuses }
@@ -61,14 +62,16 @@ class GithubClient private constructor(
     bazelPRs.filter { it.head.ref in names }.forEach { it.close() }
   }
 
-  suspend fun reopenPr(branch: GitBranch) {
+  override suspend fun onPrChange(pr: PullRequest, prStatusBefore: PrStatus) {
     ghPatRepository?.let { repository ->
-      val pr =
-        repository.queryPullRequests().state(GHIssueState.OPEN).head(branch.name).list().firstOrNull()
-          ?: throw RuntimeException("PR for branch ${branch.name} not found")
-      pr.close()
+      if (prStatusBefore != PrStatus.NONE)
+        delay(10000)
+      val ghPr =
+        repository.queryPullRequests().state(GHIssueState.OPEN).head(pr.branch.name).list().firstOrNull()
+          ?: throw RuntimeException("PR for branch ${pr.branch.name} not found")
+      ghPr.close()
       delay(1000)
-      pr.reopen()
+      ghPr.reopen()
     }
   }
 
