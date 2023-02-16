@@ -90,6 +90,8 @@ object AppBuilder {
     val libraryUpdateResolver = LibraryUpdateResolver()
     val pullRequestSuggester = PullRequestSuggester()
 
+    val updateRulesProvider = UpdateRulesProvider(repoConfig)
+
     return App(
       gitOperations,
       dependencyKinds,
@@ -99,7 +101,8 @@ object AppBuilder {
       pullRequestSuggester,
       gitHostClient,
       appConfig,
-      repoConfig
+      repoConfig,
+      updateRulesProvider
     )
   }
 }

@@ -16,6 +16,7 @@ import com.networknt.schema.SpecVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -33,6 +34,7 @@ data class MavenConfig(
 data class ConfigEntry(
   val group: String?,
   val artifact: String?,
+  val pin: PinningStrategy?,
   val versioning: VersioningSchema?,
   val bumping: BumpingStrategy?,
 )
@@ -56,6 +58,13 @@ class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(Versioni
   }
 }
 
+class PinningStrategyDeserializer : StdDeserializer<PinningStrategy?>(PinningStrategy::class.java) {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PinningStrategy? {
+    val pinFieldValue = (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString()
+    return PinningStrategy.parse(pinFieldValue)
+  }
+}
+
 class RepoConfigParser(private val configFilePath: Path) {
 
   suspend fun get(): RepoConfig {
@@ -75,6 +84,7 @@ class RepoConfigParser(private val configFilePath: Path) {
         val yamlReader = ObjectMapper(YAMLFactory())
         val kotlinModule = KotlinModule()
         kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
+        kotlinModule.addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
         yamlReader.registerModule(kotlinModule)
         val validationResult = schema.validate(yamlReader.readTree(configContent))
         if (validationResult.isNotEmpty()) {

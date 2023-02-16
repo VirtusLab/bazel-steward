@@ -14,13 +14,8 @@ import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_NOT_MERGEABLE
 import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.config.BumpingStrategy
-import org.virtuslab.bazelsteward.core.config.ConfigEntry
 import org.virtuslab.bazelsteward.core.config.RepoConfig
-import org.virtuslab.bazelsteward.core.library.Library
-import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
-import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 private val logger = KotlinLogging.logger {}
 
@@ -33,7 +28,8 @@ data class App(
   val pullRequestSuggester: PullRequestSuggester,
   val gitHostClient: GitHostClient,
   val appConfig: AppConfig,
-  val repoConfig: RepoConfig
+  val repoConfig: RepoConfig,
+  val updateRulesProvider: UpdateRulesProvider
 ) {
 
   suspend fun run() {
@@ -52,16 +48,10 @@ data class App(
         return@mapNotNull null
       }
 
-      currentLibraries.mapKeys {
-        val (versioning, bumping) = getConfigurableSetupForLibrary(it.key)
-        if (versioning != it.key.versioningSchema || bumping != it.key.bumpingStrategy) {
-          it.key.withVersioningSchema(versioning).withBumpingStrategy(bumping)
-        } else {
-          it.key
-        }
+      val updateSuggestions = currentLibraries.mapNotNull {
+        val updateRules = updateRulesProvider.resolveForLibrary(it.key)
+        updateLogic.selectUpdate(it.key, it.value, updateRules)
       }
-
-      val updateSuggestions = currentLibraries.mapNotNull { updateLogic.selectUpdate(it.key, it.value) }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
 
       val searchPatterns = kind.defaultSearchPatterns // TODO: read overrides from config for given dependency kind
@@ -105,26 +95,4 @@ data class App(
       }
     }
   }
-
-  private fun getConfigurableSetupForLibrary(library: Library): Pair<VersioningSchema, BumpingStrategy> {
-    return when (val libraryId = library.id) {
-      is MavenLibraryId -> {
-        val versioningForDependency =
-          getConfigEntryFromConfigs(libraryId, repoConfig.maven.configs.filter { it.versioning != null })
-        val bumpingForDependency =
-          getConfigEntryFromConfigs(libraryId, repoConfig.maven.configs.filter { it.bumping != null })
-        Pair(
-          versioningForDependency?.versioning ?: VersioningSchema.Loose,
-          bumpingForDependency?.bumping ?: BumpingStrategy.Default
-        )
-      }
-
-      else -> Pair(VersioningSchema.Loose, BumpingStrategy.Minor)
-    }
-  }
-
-  private fun getConfigEntryFromConfigs(libraryId: MavenLibraryId, configs: List<ConfigEntry>): ConfigEntry? =
-    configs.firstOrNull { it.group == libraryId.group && it.artifact == libraryId.artifact }
-      ?: configs.firstOrNull { it.group == libraryId.group && it.artifact == null }
-      ?: configs.firstOrNull { it.group == null && it.artifact == null }
 }

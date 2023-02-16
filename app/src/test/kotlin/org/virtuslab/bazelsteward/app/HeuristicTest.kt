@@ -7,9 +7,7 @@ import org.junit.jupiter.api.TestInstance
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
-import org.virtuslab.bazelsteward.core.config.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
-import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.core.replacement.Heuristic
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
@@ -228,9 +226,7 @@ class HeuristicTest {
   private fun library(group: String, artifact: String, version: String) =
     MavenCoordinates(
       MavenLibraryId(group, artifact),
-      version(version),
-      VersioningSchema.SemVer,
-      BumpingStrategy.Default
+      version(version)
     )
 
   private fun version(version: String) = SemanticVersion.fromString(version)!!
