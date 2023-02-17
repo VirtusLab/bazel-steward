@@ -26,7 +26,7 @@ class GithubClient private constructor(
   token: String,
   personalToken: String? = null,
 
-  ) : GitHostClient {
+) : GitHostClient {
   private val ghRepository = createClient(token)
   private val ghPatRepository = personalToken?.let { createClient(it) }
 
