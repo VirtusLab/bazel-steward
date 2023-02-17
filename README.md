@@ -31,11 +31,14 @@ Once a PR is opened, it will never open another one for the same version, regard
 
 By design, workflows don't trigger on pull requests when it is created by GitHub Actions.
 To trigger workflows automatically, do one of the following:
-* set `github-personal-token` to your personal token (recommended, your token will be used only for closing/reopening pull requests)
+* set `github-personal-token` to your personal token (recommended, your token will be used only for closing/reopening pull requests). 
+Required permissions: read and write on pull requests.
 * set `github-token` to your personal token (every operation will be made in your name)
 * create GitHub app and use its token for `github-token` (the best option, requires a bit of setup)
 
 Read more about triggering workflows using personal tokens and setting up GitHub app [here](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs). 
+
+Read more about personal tokens [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
 ### Detailed usage
 ```yaml

@@ -24,11 +24,11 @@ class GithubClient private constructor(
   private val gitAuthor: GitClient.GitAuthor,
   private val repository: String,
   token: String,
-  patToken: String? = null,
+  personalToken: String? = null,
 
-) : GitHostClient {
+  ) : GitHostClient {
   private val ghRepository = createClient(token)
-  private val ghPatRepository = patToken?.let { createClient(it) }
+  private val ghPatRepository = personalToken?.let { createClient(it) }
 
   private val bazelPRs: List<GHPullRequest> =
     ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
