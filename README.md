@@ -1,8 +1,25 @@
-# Bazel-Steward
+# Bazel Steward
 
-Bazel-Steward is a bot that helps you keep your library dependencies up-to-date.
+Bazel Steward is a bot that helps you keep your library dependencies, Bazel and Bazel rules up-to-date.
 
-## Using with GitHub
+### How it works
+
+Bazel Steward scans your repository looking for outside dependencies.
+Then, it compares a version of the found dependency against a remote repository.
+If a newer version is available on the remote repository, then it opens a pull request with change for that newer version.
+
+Pull request created by bazel steward are managed by it until they are merged or closed, but there is an exception to that.
+If you push any changes to a branch created by bazel steward, it will stop managing the associated pull request.
+Otherwise, Bazel Steward will do the following things:
+* When an even newer version of library appears, it will open a new pull request for newer version and close pull request for older versions
+* When pull request is no longer mergeable, it will force push the branch with the same version
+* When pull request is closed/merged, it will never create a new pull request for the same version
+
+# Installation
+
+We are planing to support multiple installation methods, but right not we only support GitHub.
+
+## GitHub Actions
 Create file at  `.github/workflows/` with this content:
 ```yaml
 name: Update dependencies
@@ -59,6 +76,6 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
     github-personal-token: ''
 ```
 
-## Contributing
+# Contributing
 
 Want to contribute? Look [here](CONTRIBUTING.md)!
