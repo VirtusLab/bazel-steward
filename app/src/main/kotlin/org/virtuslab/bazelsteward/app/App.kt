@@ -11,6 +11,7 @@ import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.NONE
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_MERGEABLE
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_MODIFIED
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_NOT_MERGEABLE
+import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.config.RepoConfig
@@ -70,24 +71,27 @@ data class App(
     pullRequestSuggestions.forEach { pr ->
       when (val prStatus = gitHostClient.checkPrStatus(pr.branch)) {
         NONE, OPEN_NOT_MERGEABLE -> {
-          logger.info { "Creating branch ${pr.branch}" }
+          logger.info { "Creating branch ${pr.branch}, PR status: $prStatus" }
           runCatching {
             gitOperations.createBranchWithChange(pr.branch, pr.commits)
             if (appConfig.pushToRemote) {
               gitOperations.pushBranchToOrigin(pr.branch, force = prStatus == OPEN_NOT_MERGEABLE)
-              if (prStatus == NONE) {
-                val oldPrs = gitHostClient.getOpenPRs().filter {
+              val openPr = if (prStatus == NONE) {
+                val oldPrs = gitHostClient.getOpenPrs().filter {
                   it.branch.name.startsWith(pr.branchPrefix) && it.branch != pr.branch
                 }
-                gitHostClient.openNewPR(pr.description)
                 gitHostClient.closePrs(oldPrs)
+                gitHostClient.openNewPr(pr.description)
+              } else {
+                PullRequest(pr.branch)
               }
+              gitHostClient.onPrChange(openPr, prStatus)
             }
-          }.exceptionOrNull()?.let { logger.error("Failed to create branch {}", pr.branch, it) }
+          }.onFailure { logger.error(it) { "Failed to create branch ${pr.branch}" } }
           gitOperations.checkoutBaseBranch()
         }
 
-        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${pr.branch}" }
+        CLOSED, MERGED, OPEN_MERGEABLE, OPEN_MODIFIED -> logger.info { "Skipping ${pr.branch}, PR status: $prStatus" }
       }
     }
   }

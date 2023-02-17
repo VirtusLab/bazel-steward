@@ -1,9 +1,10 @@
 package org.virtuslab.bazelsteward.github
 
+import kotlinx.coroutines.delay
 import mu.KotlinLogging
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHPullRequest
-import org.kohsuke.github.GitHub
+import org.kohsuke.github.GHRepository
 import org.kohsuke.github.GitHubBuilder
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
@@ -18,16 +19,16 @@ import kotlin.io.path.Path
 private val logger = KotlinLogging.logger {}
 
 class GithubClient private constructor(
+  private val url: String,
   private val baseBranch: String,
   private val gitAuthor: GitClient.GitAuthor,
-  repository: String,
+  private val repository: String,
   token: String,
-  url: String
-) : GitHostClient {
-  private val github: GitHub = GitHubBuilder().withOAuthToken(token).withEndpoint(url).build()
+  personalToken: String? = null,
 
-  private val ghRepository =
-    github.getRepository(repository) ?: throw IllegalStateException("Github repository must exist")
+) : GitHostClient {
+  private val ghRepository = createClient(token)
+  private val ghPatRepository = personalToken?.let { createClient(it) }
 
   private val bazelPRs: List<GHPullRequest> =
     ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
@@ -38,7 +39,7 @@ class GithubClient private constructor(
     return checkPrStatus(branchToGHPR[branch.name])
   }
 
-  override fun openNewPR(pr: NewPullRequest) {
+  override fun openNewPr(pr: NewPullRequest): PullRequest {
     logger.info { "Creating pull request for ${pr.branch}" }
     ghRepository.createPullRequest(
       pr.title,
@@ -46,9 +47,10 @@ class GithubClient private constructor(
       baseBranch,
       pr.body
     )
+    return PullRequest(pr.branch)
   }
 
-  override fun getOpenPRs(): List<PullRequest> {
+  override fun getOpenPrs(): List<PullRequest> {
     val openStatuses = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
     return bazelPRs
       .filter { checkPrStatus(it) in openStatuses }
@@ -60,6 +62,19 @@ class GithubClient private constructor(
     bazelPRs.filter { it.head.ref in names }.forEach { it.close() }
   }
 
+  override suspend fun onPrChange(pr: PullRequest, prStatusBefore: PrStatus) {
+    ghPatRepository?.let { repository ->
+      if (prStatusBefore != PrStatus.NONE)
+        delay(10000)
+      val ghPr =
+        repository.queryPullRequests().state(GHIssueState.OPEN).head(pr.branch.name).list().firstOrNull()
+          ?: throw RuntimeException("PR for branch ${pr.branch.name} not found")
+      ghPr.close()
+      delay(1000)
+      ghPr.reopen()
+    }
+  }
+
   private fun checkPrStatus(pr: GHPullRequest?): PrStatus {
     return if (pr == null)
       PrStatus.NONE
@@ -69,10 +84,17 @@ class GithubClient private constructor(
       PrStatus.CLOSED
     else if (pr.listCommits().toList().any { it.commit.author.name != gitAuthor.name })
       PrStatus.OPEN_MODIFIED
-    else if (pr.mergeable)
-      PrStatus.OPEN_MERGEABLE
     else
-      PrStatus.OPEN_NOT_MERGEABLE
+      when (pr.mergeable) {
+        null -> PrStatus.OPEN_MODIFIED
+        true -> PrStatus.OPEN_MERGEABLE
+        false -> PrStatus.OPEN_NOT_MERGEABLE
+      }
+  }
+
+  private fun createClient(token: String): GHRepository {
+    return GitHubBuilder().withOAuthToken(token).withEndpoint(url).build().getRepository(repository)
+      ?: throw IllegalStateException("Github repository must exist")
   }
 
   companion object {
@@ -80,7 +102,8 @@ class GithubClient private constructor(
       val url = env.getOrThrow("GITHUB_API_URL")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
-      return GithubClient(baseBranch, gitAuthor, repository, token, url)
+      val personalToken = env["PERSONAL_TOKEN"].let { if (it.isNullOrBlank()) null else it }
+      return GithubClient(url, baseBranch, gitAuthor, repository, token, personalToken)
     }
 
     fun getRepoPath(env: Environment): Path {

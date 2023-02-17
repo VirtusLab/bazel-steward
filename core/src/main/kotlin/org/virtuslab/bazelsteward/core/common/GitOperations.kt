@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.core.common
 
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.GitBranch
+import java.lang.RuntimeException
 import java.nio.file.Path
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -30,8 +31,10 @@ class GitOperations(private val appConfig: AppConfig) {
     git.checkout(branchName)
     try {
       git.push(branchName, force = force)
-    } catch (e: RuntimeException) {
-      git.push(branchName, force = true)
+    } catch (ex: RuntimeException) {
+      if (ex.message?.contains("non-fast-forward") == true)
+        git.push(branchName, force = true)
+      else throw ex
     }
   }
 
