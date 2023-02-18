@@ -3,6 +3,7 @@ package org.virtuslab.bazelsteward.maven
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
@@ -17,6 +18,8 @@ class MavenDependencyKind(
 ) : DependencyKind<MavenCoordinates> {
 
   override val name: String = "maven"
+
+  override fun acceptsLibrary(library: Library): Boolean = library is MavenCoordinates
 
   override suspend fun findAvailableVersions(workspaceRoot: Path): Map<MavenCoordinates, List<Version>> {
     val data = mavenDataExtractor.extract()

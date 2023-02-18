@@ -114,7 +114,7 @@ class UpdateLogicTest {
   @MethodSource("argumentsForSelectUpdatePrefixPinned")
   fun `should selectUpdate test with pinned prefix version`(version: String, pin: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinVersion = PinningStrategy.Prefix(pin))
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinningStrategy = PinningStrategy.Prefix(pin))
     val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
@@ -139,7 +139,7 @@ class UpdateLogicTest {
   @MethodSource("argumentsForSelectUpdateExactPinned")
   fun `should selectUpdate test with pinned exact version`(version: String, pin: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinVersion = PinningStrategy.Exact(pin))
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinningStrategy = PinningStrategy.Exact(pin))
     val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
@@ -155,7 +155,7 @@ class UpdateLogicTest {
   @MethodSource("argumentsForSelectUpdateRegexPinned")
   fun `should selectUpdate test with pinned regex version`(version: String, pin: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinVersion = PinningStrategy.Regex(pin))
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Latest, pinningStrategy = PinningStrategy.Regex(pin))
     val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }

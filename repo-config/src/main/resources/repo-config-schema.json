@@ -1,37 +1,38 @@
 {
   "type": "object",
   "properties": {
-    "maven": {
-      "properties": {
-        "configs": {
-          "type": ["array", "null"],
-          "items": {
-            "type": "object",
-            "properties": {
-              "group": {
-                "type": "string"
-              },
-              "artifact": {
-                "type": "string"
-              },
-              "pin": {
-                "type": "string"
-              },
-              "versioning": {
-                "type": "string",
-                "anyOf": [{ "enum": ["loose", "semver"] }, { "pattern": "^regex:" }]
-              },
-              "bumping": {
-                "type": ["string", "null"],
-                "enum": ["default", "latest"]
-              }
-            },
-            "anyOf": ["versioning", "bumping", "group", "artifact"],
-            "additionalProperties": false
+    "update-rules": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "pin": {
+            "type": "string"
+          },
+          "versioning": {
+            "type": "string",
+            "anyOf": [{ "enum": ["loose", "semver"] }, { "pattern": "^regex:" }]
+          },
+          "bumping": {
+            "type": ["string", "null"],
+            "enum": ["default", "latest"]
           }
-        }
-      },
-      "required": ["configs"]
+        },
+        "anyOf": ["versioning", "bumping", "pin", "kinds", "dependencies"],
+        "additionalProperties": false
+      }
     }
   }
 }

@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.bazel.version
 
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
@@ -13,6 +14,8 @@ class BazelVersionDependencyKind(
 ) : DependencyKind<BazelLibrary> {
 
   override val name: String = "bazel"
+
+  override fun acceptsLibrary(library: Library): Boolean = library is BazelLibrary
 
   override suspend fun findAvailableVersions(workspaceRoot: Path): Map<BazelLibrary, List<Version>> {
     val version = BazelVersion.extractBazelVersion(workspaceRoot)
