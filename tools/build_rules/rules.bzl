@@ -32,5 +32,5 @@ def integration_tests(**kwargs):
         kwargs["tags"] = []
     kwargs["tags"].append("integration")
 
-    kt_junit5_test(size = "medium", **kwargs)
+    kt_junit5_test(size = "large", **kwargs)
     lint(kwargs["srcs"], kwargs["name"])
