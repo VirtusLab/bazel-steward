@@ -1,7 +1,6 @@
-package org.virtuslab.bazelsteward.core.config
+package org.virtuslab.bazelsteward.config.repo
 
 import com.fasterxml.jackson.annotation.JsonSetter
-import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.annotation.Nulls
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
@@ -17,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
+import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -39,13 +39,6 @@ data class ConfigEntry(
   val bumping: BumpingStrategy?,
 )
 
-enum class BumpingStrategy {
-  Default, Latest, Minor;
-
-  @JsonValue
-  val lowercaseName = this.toString().lowercase()
-}
-
 private val logger = KotlinLogging.logger { }
 
 class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(VersioningSchema::class.java) {
@@ -65,12 +58,22 @@ class PinningStrategyDeserializer : StdDeserializer<PinningStrategy?>(PinningStr
   }
 }
 
+class BumpingStrategyDeserializer : StdDeserializer<BumpingStrategy?>(BumpingStrategy::class.java) {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): BumpingStrategy? {
+    return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
+      val str = fieldValue.lowercase()
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+      BumpingStrategy.valueOf(str)
+    }
+  }
+}
+
 class RepoConfigParser(private val configFilePath: Path) {
 
   suspend fun get(): RepoConfig {
 
     return withContext(Dispatchers.IO) {
-      val schemaContent = javaClass.classLoader.getResource("bazel-steward-schema.json")?.readText()
+      val schemaContent = javaClass.classLoader.getResource("repo-config-schema.json")?.readText()
         ?: throw Exception("Could not find schema to validate configuration file")
       val schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaContent)
 
@@ -85,6 +88,7 @@ class RepoConfigParser(private val configFilePath: Path) {
         val kotlinModule = KotlinModule()
         kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
         kotlinModule.addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
+        kotlinModule.addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
         yamlReader.registerModule(kotlinModule)
         val validationResult = schema.validate(yamlReader.readTree(configContent))
         if (validationResult.isNotEmpty()) {

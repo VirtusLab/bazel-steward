@@ -1,7 +1,5 @@
 unit_tests(
     srcs = glob(["**/*.kt"]),
-    resource_strip_prefix = "core/src/test/kotlin/org/virtuslab/bazelsteward/resources",
-    resources = ["//core/src/test/kotlin/org/virtuslab/bazelsteward/resources"],
     test_package = "org.virtuslab.bazelsteward.core",
     deps = [
         "//core",

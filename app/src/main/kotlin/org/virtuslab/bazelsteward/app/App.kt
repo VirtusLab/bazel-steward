@@ -1,6 +1,7 @@
 package org.virtuslab.bazelsteward.app
 
 import mu.KotlinLogging
+import org.virtuslab.bazelsteward.config.repo.RepoConfig
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.FileFinder
@@ -14,7 +15,6 @@ import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus.OPEN_NOT_MERGEABLE
 import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.config.RepoConfig
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 
 private val logger = KotlinLogging.logger {}

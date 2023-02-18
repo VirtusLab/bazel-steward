@@ -1,0 +1,5 @@
+alias(
+    name = "repo-config",
+    actual = "//repo-config/src/main/kotlin/org/virtuslab/bazelsteward/config/repo",
+    visibility = ["//visibility:public"],
+)

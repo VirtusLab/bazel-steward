@@ -12,6 +12,7 @@ import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
 import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
+import org.virtuslab.bazelsteward.config.repo.RepoConfigParser
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.FileFinder
@@ -19,7 +20,6 @@ import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.config.RepoConfigParser
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor

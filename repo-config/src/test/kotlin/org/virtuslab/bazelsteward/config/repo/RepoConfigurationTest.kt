@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.core.config
+package org.virtuslab.bazelsteward.config.repo
 
 import io.kotest.common.runBlocking
 import org.apache.commons.io.FileUtils
@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
+import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.io.File
 

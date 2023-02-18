@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.common.UpdateRules
-import org.virtuslab.bazelsteward.core.config.BumpingStrategy
+import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
