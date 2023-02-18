@@ -11,8 +11,6 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.common.CommandRunner
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
-import org.virtuslab.bazelsteward.core.rules.RuleLibrary
-import org.virtuslab.bazelsteward.core.rules.RuleLibraryId
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.Path

@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.core.rules
+package org.virtuslab.bazelsteward.bazel.rules
 
 import org.virtuslab.bazelsteward.core.library.Version
 

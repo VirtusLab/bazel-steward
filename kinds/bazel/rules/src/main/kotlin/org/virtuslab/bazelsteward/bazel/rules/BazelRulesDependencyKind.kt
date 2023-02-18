@@ -3,9 +3,7 @@ package org.virtuslab.bazelsteward.bazel.rules
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Version
-import org.virtuslab.bazelsteward.core.replacement.BazelRuleHeuristic
-import org.virtuslab.bazelsteward.core.replacement.Heuristic
-import org.virtuslab.bazelsteward.core.rules.RuleLibrary
+import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import java.nio.file.Path
 
 class BazelRulesDependencyKind(
@@ -27,5 +25,5 @@ class BazelRulesDependencyKind(
     PathPattern.Exact("WORKSPACE")
   )
 
-  override val defaultVersionDetectionHeuristics: List<Heuristic> = listOf(BazelRuleHeuristic)
+  override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(BazelRuleHeuristic)
 }

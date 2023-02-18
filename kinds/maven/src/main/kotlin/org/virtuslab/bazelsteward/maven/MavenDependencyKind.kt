@@ -4,8 +4,8 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Version
-import org.virtuslab.bazelsteward.core.replacement.Heuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
+import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import java.nio.file.Path
 
@@ -32,7 +32,7 @@ class MavenDependencyKind(
     PathPattern.Exact("WORKSPACE")
   )
 
-  override val defaultVersionDetectionHeuristics: List<Heuristic> = listOf(
+  override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(
     WholeLibraryHeuristic,
     VersionOnlyHeuristic
   )

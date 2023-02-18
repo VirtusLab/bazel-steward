@@ -3,10 +3,9 @@ package org.virtuslab.bazelsteward.bazel.version
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Version
-import org.virtuslab.bazelsteward.core.replacement.Heuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
+import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
-import java.lang.RuntimeException
 import java.nio.file.Path
 
 class BazelVersionDependencyKind(
@@ -26,6 +25,6 @@ class BazelVersionDependencyKind(
   override val defaultSearchPatterns: List<PathPattern> =
     listOf(BazelVersion.DOT_BAZEL_VERSION, BazelVersion.DOT_BAZELISK_RC).map(PathPattern::Exact)
 
-  override val defaultVersionDetectionHeuristics: List<Heuristic> =
+  override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> =
     listOf(WholeLibraryHeuristic, VersionOnlyHeuristic)
 }

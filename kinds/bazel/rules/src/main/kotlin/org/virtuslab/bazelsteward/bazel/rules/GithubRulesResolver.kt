@@ -3,9 +3,6 @@ package org.virtuslab.bazelsteward.bazel.rules
 import org.kohsuke.github.GHAsset
 import org.kohsuke.github.GHRelease
 import org.kohsuke.github.GitHub
-import org.virtuslab.bazelsteward.core.rules.RuleLibraryId
-import org.virtuslab.bazelsteward.core.rules.RuleVersion
-import org.virtuslab.bazelsteward.core.rules.RulesResolver
 import java.net.URL
 import java.security.DigestInputStream
 import java.security.MessageDigest

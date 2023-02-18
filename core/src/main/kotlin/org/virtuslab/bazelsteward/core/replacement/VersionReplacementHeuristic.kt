@@ -9,7 +9,7 @@ data class LibraryUpdate(
   val fileChanges: List<FileChange>
 )
 
-interface Heuristic {
+interface VersionReplacementHeuristic {
   val name: String
   fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate?
 }

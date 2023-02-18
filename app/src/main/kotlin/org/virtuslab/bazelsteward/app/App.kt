@@ -57,7 +57,7 @@ data class App(
       val searchPatterns = kind.defaultSearchPatterns // TODO: read overrides from config for given dependency kind
       val files = fileFinder.find(searchPatterns)
 
-      val heuristics = kind.defaultVersionDetectionHeuristics // TODO: read from config
+      val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
 
       val updates = updateSuggestions.mapNotNull { updateSuggestion ->
         libraryUpdateResolver.resolve(files, updateSuggestion, heuristics)
