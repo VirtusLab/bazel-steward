@@ -1,5 +1,5 @@
 filegroup(
-    name = "rules_resources",
+    name = "resources",
     srcs = glob(["*.bzlignore"]),
     visibility = ["//visibility:public"],
 )

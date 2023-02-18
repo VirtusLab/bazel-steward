@@ -1,8 +1,8 @@
 library(
     name = "rules",
     srcs = glob(["**/*.kt"]),
-    resource_strip_prefix = "kinds/bazel/resources",
-    resources = ["//kinds/bazel/resources:rules_resources"],
+    resource_strip_prefix = "kinds/bazel/rules/src/main/resources",
+    resources = ["//kinds/bazel/rules/src/main/resources"],
     deps = [
         "//core",
         "@maven//:com_fasterxml_jackson_dataformat_jackson_dataformat_yaml",
