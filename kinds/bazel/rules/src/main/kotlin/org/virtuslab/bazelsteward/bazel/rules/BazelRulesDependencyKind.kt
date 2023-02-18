@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.bazel.rules
 
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import java.nio.file.Path
@@ -11,6 +12,8 @@ class BazelRulesDependencyKind(
   private val githubRulesResolver: GithubRulesResolver
 ) : DependencyKind<RuleLibrary> {
   override val name: String = "bazel-rules"
+
+  override fun acceptsLibrary(library: Library): Boolean = library is RuleLibrary
 
   override suspend fun findAvailableVersions(workspaceRoot: Path): Map<RuleLibrary, List<Version>> {
     val usedBazelRules = bazelRulesExtractor.extractCurrentRules(workspaceRoot)

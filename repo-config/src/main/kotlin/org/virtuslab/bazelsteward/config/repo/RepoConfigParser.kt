@@ -1,11 +1,10 @@
 package org.virtuslab.bazelsteward.config.repo
 
-import com.fasterxml.jackson.annotation.JsonSetter
-import com.fasterxml.jackson.annotation.Nulls
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
@@ -20,24 +19,6 @@ import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Path
 import kotlin.io.path.exists
-
-data class RepoConfig(
-  @JsonSetter(nulls = Nulls.AS_EMPTY)
-  val maven: MavenConfig = MavenConfig()
-)
-
-data class MavenConfig(
-  @JsonSetter(nulls = Nulls.AS_EMPTY)
-  val configs: List<ConfigEntry> = emptyList(),
-)
-
-data class ConfigEntry(
-  val group: String?,
-  val artifact: String?,
-  val pin: PinningStrategy?,
-  val versioning: VersioningSchema?,
-  val bumping: BumpingStrategy?,
-)
 
 private val logger = KotlinLogging.logger { }
 
@@ -68,6 +49,14 @@ class BumpingStrategyDeserializer : StdDeserializer<BumpingStrategy?>(BumpingStr
   }
 }
 
+class DependencyNameFilterDeserializer : StdDeserializer<DependencyNameFilter?>(DependencyNameFilter::class.java) {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): DependencyNameFilter? {
+    return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
+      DependencyNameFilter.parse(fieldValue)
+    }
+  }
+}
+
 class RepoConfigParser(private val configFilePath: Path) {
 
   suspend fun get(): RepoConfig {
@@ -86,9 +75,11 @@ class RepoConfigParser(private val configFilePath: Path) {
           .ifEmpty { return@withContext RepoConfig() }
         val yamlReader = ObjectMapper(YAMLFactory())
         val kotlinModule = KotlinModule()
+        yamlReader.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
         kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
         kotlinModule.addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
         kotlinModule.addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
+        kotlinModule.addDeserializer(DependencyNameFilter::class.java, DependencyNameFilterDeserializer())
         yamlReader.registerModule(kotlinModule)
         val validationResult = schema.validate(yamlReader.readTree(configContent))
         if (validationResult.isNotEmpty()) {

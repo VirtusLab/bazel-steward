@@ -17,7 +17,7 @@ import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.nio.file.Path
 import kotlin.io.path.Path
 
-class HeuristicTest {
+class VersionReplacementHeuristicTest {
 
   val correctPositionFor235: Int = 2401
   val correctPositionFor120: Int = 2263
