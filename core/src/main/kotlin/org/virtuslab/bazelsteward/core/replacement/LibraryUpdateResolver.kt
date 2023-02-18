@@ -7,7 +7,7 @@ class LibraryUpdateResolver {
   fun resolve(
     files: List<TextFile>,
     updateSuggestion: UpdateSuggestion,
-    heuristics: List<Heuristic>
+    heuristics: List<VersionReplacementHeuristic>
   ): LibraryUpdate? {
     return heuristics.firstNotNullOfOrNull { heuristic ->
       heuristic.apply(files, updateSuggestion)

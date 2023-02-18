@@ -1,9 +1,9 @@
 package org.virtuslab.bazelsteward.app
 
+import org.virtuslab.bazelsteward.config.repo.ConfigEntry
+import org.virtuslab.bazelsteward.config.repo.RepoConfig
 import org.virtuslab.bazelsteward.core.common.UpdateRules
-import org.virtuslab.bazelsteward.core.config.BumpingStrategy
-import org.virtuslab.bazelsteward.core.config.ConfigEntry
-import org.virtuslab.bazelsteward.core.config.RepoConfig
+import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
