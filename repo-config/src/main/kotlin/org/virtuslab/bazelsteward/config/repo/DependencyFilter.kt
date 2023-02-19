@@ -16,7 +16,7 @@ sealed interface DependencyNameFilter {
 
     private fun toRegex(value: String): kotlin.text.Regex {
       return "((?=\\*)|(?<=\\*))".toRegex().split(value)
-        .joinToString { if (it == "*") ".*" else kotlin.text.Regex.escape(it) }
+        .joinToString("") { if (it == "*") ".*" else kotlin.text.Regex.escape(it) }
         .toRegex()
     }
   }
