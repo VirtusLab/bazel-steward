@@ -2,7 +2,6 @@ package org.virtuslab.bazelsteward.app
 
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.config.repo.RepoConfig
-import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.FileFinder
 import org.virtuslab.bazelsteward.core.GitHostClient

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.networknt.schema.JsonSchema
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Path
 import kotlin.io.path.exists
+import kotlin.io.path.readText
 
 private val logger = KotlinLogging.logger { }
 
@@ -57,40 +59,47 @@ class DependencyNameFilterDeserializer : StdDeserializer<DependencyNameFilter?>(
   }
 }
 
-class RepoConfigParser(private val configFilePath: Path) {
+class RepoConfigParser {
 
-  suspend fun get(): RepoConfig {
+  private val schema = loadSchema()
 
+  suspend fun load(path: Path): RepoConfig {
     return withContext(Dispatchers.IO) {
-      val schemaContent = javaClass.classLoader.getResource("repo-config-schema.json")?.readText()
-        ?: throw Exception("Could not find schema to validate configuration file")
-      val schema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaContent)
-
       runCatching {
-        if (!configFilePath.exists()) return@withContext RepoConfig()
-        val configContent = configFilePath.toFile()
-          .readLines()
-          .filterNot { it.startsWith("#") }
-          .joinToString("\n")
-          .ifEmpty { return@withContext RepoConfig() }
-        val yamlReader = ObjectMapper(YAMLFactory())
-        val kotlinModule = KotlinModule()
-        yamlReader.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
-        kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
-        kotlinModule.addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
-        kotlinModule.addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
-        kotlinModule.addDeserializer(DependencyNameFilter::class.java, DependencyNameFilterDeserializer())
-        yamlReader.registerModule(kotlinModule)
-        val validationResult = schema.validate(yamlReader.readTree(configContent))
-        if (validationResult.isNotEmpty()) {
-          throw Exception(validationResult.joinToString(System.lineSeparator()) { it.message.removePrefix("$.") })
-        } else {
-          yamlReader.readValue(configContent, RepoConfig::class.java)
-        }
+        if (!path.exists()) return@withContext RepoConfig()
+        return@withContext parse(path.readText())
       }.getOrElse {
-        logger.error { "Could not parse $configFilePath file!" }
+        logger.error { "Could not parse $path file!" }
         throw it
       }
     }
+  }
+
+  fun parse(text: String): RepoConfig {
+    val configContent = text
+      .lines()
+      .filterNot { it.startsWith("#") }
+      .joinToString("\n")
+      .ifEmpty { return RepoConfig() }
+    val yamlReader = ObjectMapper(YAMLFactory())
+    val kotlinModule = KotlinModule()
+    yamlReader.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
+    kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
+    kotlinModule.addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
+    kotlinModule.addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
+    kotlinModule.addDeserializer(DependencyNameFilter::class.java, DependencyNameFilterDeserializer())
+    yamlReader.registerModule(kotlinModule)
+    val validationResult = schema.validate(yamlReader.readTree(configContent))
+    if (validationResult.isNotEmpty()) {
+      throw Exception(validationResult.joinToString(System.lineSeparator()) { it.message.removePrefix("$.") })
+    } else {
+      return yamlReader.readValue(configContent, RepoConfig::class.java)
+    }
+  }
+
+  private fun loadSchema(): JsonSchema {
+    val schemaText = javaClass.classLoader.getResource("repo-config-schema.json")?.readText()
+      ?: throw Exception("Could not find schema to validate configuration file")
+    return JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaText)
   }
 }

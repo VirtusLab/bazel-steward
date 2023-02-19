@@ -15,7 +15,7 @@ class RepoConfigurationTest {
   @Test
   fun `should throw an exception when maven object in config file is not correct`(@TempDir tempDir: Path) {
     copyConfigFileToTempLocation(tempDir, ".bazel-steward-fail.yaml")
-    Assertions.assertThatThrownBy { runBlocking { RepoConfigParser(tempDir.resolve(".bazel-steward.yaml")).get() } }
+    Assertions.assertThatThrownBy { loadConfig(tempDir) }
       .hasMessage(
         listOf(
           "update-rules[0].dependenciess: is not defined in the schema and the schema does not allow additional properties",
@@ -30,20 +30,20 @@ class RepoConfigurationTest {
   @Test
   fun `should throw an exception when versioning regex does not contain all required named groups`(@TempDir tempDir: Path) {
     copyConfigFileToTempLocation(tempDir, ".bazel-steward-fail2.yaml")
-    Assertions.assertThatThrownBy { runBlocking { RepoConfigParser(tempDir.resolve(".bazel-steward.yaml")).get() } }
+    Assertions.assertThatThrownBy { loadConfig(tempDir) }
       .hasMessageContaining("does not contain all required groups: <major>, <minor>, <patch>, <preRelease>, <buildMetaData>")
   }
 
   @Test
   fun `should create default configuration when config file is not declared`(@TempDir tempDir: Path) {
-    val configuration = runBlocking { RepoConfigParser(tempDir.resolve(".bazel-steward.yaml")).get() }
+    val configuration = loadConfig(tempDir)
     Assertions.assertThat(configuration).usingRecursiveComparison().isEqualTo(RepoConfig())
   }
 
   @Test
   fun `should create configuration when config file is correct`(@TempDir tempDir: Path) {
     copyConfigFileToTempLocation(tempDir, ".bazel-steward-correct.yaml")
-    val configuration = runBlocking { RepoConfigParser(tempDir.resolve(".bazel-steward.yaml")).get() }
+    val configuration = loadConfig(tempDir)
     val expectedConfiguration = RepoConfig(
       listOf(
         UpdateRulesConfig(
@@ -71,6 +71,10 @@ class RepoConfigurationTest {
       ),
     )
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)
+  }
+
+  private fun loadConfig(tempDir: Path): RepoConfig {
+    return runBlocking { RepoConfigParser().load(tempDir.resolve(".bazel-steward.yaml")) }
   }
 
   private fun copyConfigFileToTempLocation(tempDir: Path, configFileName: String) {

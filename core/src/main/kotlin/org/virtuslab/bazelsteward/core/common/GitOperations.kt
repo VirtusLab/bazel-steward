@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.core.common
 
-import org.virtuslab.bazelsteward.core.AppConfig
 import org.virtuslab.bazelsteward.core.GitBranch
 import java.lang.RuntimeException
 import java.nio.file.Path
@@ -19,11 +18,11 @@ data class CommitRequest(
   val changes: List<FileChange>
 )
 
-class GitOperations(private val appConfig: AppConfig) {
-  private val git = GitClient(appConfig.workspaceRoot)
+class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
+  private val git = GitClient(workspaceRoot)
 
   suspend fun checkoutBaseBranch() {
-    git.checkout(appConfig.baseBranch)
+    git.checkout(baseBranch)
   }
 
   suspend fun pushBranchToOrigin(branch: GitBranch, force: Boolean) {

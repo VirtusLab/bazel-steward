@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.core
+package org.virtuslab.bazelsteward.app
 
 import org.virtuslab.bazelsteward.core.common.GitClient.GitAuthor
 import java.nio.file.Path

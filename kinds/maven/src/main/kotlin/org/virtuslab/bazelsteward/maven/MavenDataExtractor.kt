@@ -3,10 +3,9 @@ package org.virtuslab.bazelsteward.maven
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
-import org.virtuslab.bazelsteward.core.AppConfig
 import java.nio.file.Path
 
-class MavenDataExtractor(private val appConfig: AppConfig) {
+class MavenDataExtractor(private val workspaceRoot: Path) {
   private val bazelQuery = "bazel query @maven//:%s --output xml --noshow_progress"
   private val regexPattern = """<source-file location="(.*):1:1" name="@maven//:%s">"""
 
@@ -21,7 +20,7 @@ class MavenDataExtractor(private val appConfig: AppConfig) {
 
   private suspend fun extractFromFile(fileName: String): List<String> = withContext(Dispatchers.IO) {
     val process =
-      ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(appConfig.workspaceRoot.toFile()).start().onExit().await()
+      ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(workspaceRoot.toFile()).start().onExit().await()
     val xml = process.inputStream.bufferedReader().use { it.readText() }
     val fileLocation = Regex(regexPattern.format(fileName)).find(xml)?.let { it.groups[1]?.value }
       ?: throw RuntimeException("Failed to find file")
