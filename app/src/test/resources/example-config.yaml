@@ -7,7 +7,7 @@ update-rules:
     pin: "prefix:1.2."
     bumping: latest
   -
-    kinds: [maven]
+    kinds: maven
     versioning: semver
   -
     bumping: default

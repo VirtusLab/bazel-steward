@@ -7,13 +7,13 @@
         "type": "object",
         "properties": {
           "kinds": {
-            "type": ["array", "null"],
+            "type": ["array", "string", "null"],
             "items": {
               "type": "string"
             }
           },
           "dependencies": {
-            "type": ["array", "null"],
+            "type": ["array", "string", "null"],
             "items": {
               "type": "string"
             }
