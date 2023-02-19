@@ -47,6 +47,7 @@ class RepoConfigurationTest {
     val expectedConfiguration = RepoConfig(
       listOf(
         UpdateRulesConfig(
+          kinds = listOf("maven"),
           dependencies = listOf(DependencyNameFilter.Default("commons-io:commons-io")),
           versioning = VersioningSchema.Loose,
           bumping = BumpingStrategy.Default,

@@ -1,10 +1,15 @@
 package org.virtuslab.bazelsteward.config.repo
 
 import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.JsonToken
+import com.fasterxml.jackson.databind.BeanProperty
 import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JavaType
+import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
@@ -23,6 +28,25 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 
 private val logger = KotlinLogging.logger { }
+
+class ListOrItemDeserializer : StdDeserializer<List<*>>(List::class.java), ContextualDeserializer {
+  private lateinit var type: JavaType
+
+  override fun createContextual(ctxt: DeserializationContext?, property: BeanProperty): JsonDeserializer<*> {
+    type = property.type.containedType(0)
+    return this
+  }
+
+  override fun deserialize(jp: JsonParser?, ctxt: DeserializationContext?): List<*> {
+    return if (jp?.currentToken == JsonToken.START_ARRAY) {
+      val listType = ctxt!!.typeFactory.constructCollectionType(List::class.java, type)
+      val deserializer = ctxt.findRootValueDeserializer(listType)
+      deserializer.deserialize(jp, ctxt) as List<*>
+    } else {
+      listOf<Any>(ctxt!!.readValue(jp, type))
+    }
+  }
+}
 
 class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(VersioningSchema::class.java) {
   override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): VersioningSchema? {
