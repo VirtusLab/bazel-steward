@@ -1,17 +1,7 @@
 package org.virtuslab.bazelsteward.config.repo
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonToken
-import com.fasterxml.jackson.databind.BeanProperty
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.deser.ContextualDeserializer
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.networknt.schema.JsonSchema
@@ -29,60 +19,6 @@ import kotlin.io.path.readText
 
 private val logger = KotlinLogging.logger { }
 
-class ListOrItemDeserializer : StdDeserializer<List<*>>(List::class.java), ContextualDeserializer {
-  private lateinit var type: JavaType
-
-  override fun createContextual(ctxt: DeserializationContext?, property: BeanProperty): JsonDeserializer<*> {
-    type = property.type.containedType(0)
-    return this
-  }
-
-  override fun deserialize(jp: JsonParser?, ctxt: DeserializationContext?): List<*> {
-    return if (jp?.currentToken == JsonToken.START_ARRAY) {
-      val listType = ctxt!!.typeFactory.constructCollectionType(List::class.java, type)
-      val deserializer = ctxt.findRootValueDeserializer(listType)
-      deserializer.deserialize(jp, ctxt) as List<*>
-    } else {
-      listOf<Any>(ctxt!!.readValue(jp, type))
-    }
-  }
-}
-
-class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(VersioningSchema::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): VersioningSchema? {
-    val versioningFieldValue = (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString()
-    if (versioningFieldValue.startsWith("regex:")) {
-      return VersioningSchema.Regex(versioningFieldValue.removePrefix("regex:").toRegex())
-    }
-    return VersioningSchema::class.sealedSubclasses.firstOrNull { it.simpleName?.lowercase() == versioningFieldValue }?.objectInstance
-  }
-}
-
-class PinningStrategyDeserializer : StdDeserializer<PinningStrategy?>(PinningStrategy::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PinningStrategy? {
-    val pinFieldValue = (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString()
-    return PinningStrategy.parse(pinFieldValue)
-  }
-}
-
-class BumpingStrategyDeserializer : StdDeserializer<BumpingStrategy?>(BumpingStrategy::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): BumpingStrategy? {
-    return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
-      val str = fieldValue.lowercase()
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-      BumpingStrategy.valueOf(str)
-    }
-  }
-}
-
-class DependencyNameFilterDeserializer : StdDeserializer<DependencyNameFilter?>(DependencyNameFilter::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): DependencyNameFilter? {
-    return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
-      DependencyNameFilter.parse(fieldValue)
-    }
-  }
-}
-
 class RepoConfigParser {
 
   private val schema = loadSchema()
@@ -93,31 +29,20 @@ class RepoConfigParser {
         if (!path.exists()) return@withContext RepoConfig()
         return@withContext parse(path.readText())
       }.getOrElse {
-        logger.error { "Could not parse $path file!" }
+        logger.error { "Could not parse $path file." }
         throw it
       }
     }
   }
 
   fun parse(text: String): RepoConfig {
-    val configContent = text
-      .lines()
-      .filterNot { it.startsWith("#") }
-      .joinToString("\n")
-      .ifEmpty { return RepoConfig() }
-    val yamlReader = ObjectMapper(YAMLFactory())
-    val kotlinModule = KotlinModule()
-    yamlReader.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
-    kotlinModule.addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
-    kotlinModule.addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
-    kotlinModule.addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
-    kotlinModule.addDeserializer(DependencyNameFilter::class.java, DependencyNameFilterDeserializer())
-    yamlReader.registerModule(kotlinModule)
-    val validationResult = schema.validate(yamlReader.readTree(configContent))
-    if (validationResult.isNotEmpty()) {
-      throw Exception(validationResult.joinToString(System.lineSeparator()) { it.message.removePrefix("$.") })
+    val configContent = removeComments(text).ifEmpty { return RepoConfig() }
+    val yamlMapper = configureObjectMapper()
+    val validationResult = schema.validate(yamlMapper.readTree(configContent))
+    if (validationResult.isEmpty()) {
+      return yamlMapper.readValue(configContent, RepoConfig::class.java)
     } else {
-      return yamlReader.readValue(configContent, RepoConfig::class.java)
+      throw Exception(validationResult.joinToString(System.lineSeparator()) { it.message.removePrefix("$.") })
     }
   }
 
@@ -125,5 +50,24 @@ class RepoConfigParser {
     val schemaText = javaClass.classLoader.getResource("repo-config-schema.json")?.readText()
       ?: throw Exception("Could not find schema to validate configuration file")
     return JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaText)
+  }
+
+  private fun removeComments(text: String) = text
+    .lines()
+    .filterNot { it.trim().startsWith("#") }
+    .joinToString(System.lineSeparator())
+    .trim()
+
+  private fun configureObjectMapper(): ObjectMapper {
+    val kotlinModule = KotlinModule().apply {
+      addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
+      addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
+      addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
+      addDeserializer(DependencyNameFilter::class.java, DependencyNameFilterDeserializer())
+    }
+    return ObjectMapper(YAMLFactory()).apply {
+      propertyNamingStrategy = PropertyNamingStrategies.KEBAB_CASE
+      registerModule(kotlinModule)
+    }
   }
 }
