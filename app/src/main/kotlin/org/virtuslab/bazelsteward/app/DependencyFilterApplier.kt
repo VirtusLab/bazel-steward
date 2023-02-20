@@ -22,5 +22,9 @@ class DependencyFilterApplier<T : DependencyFilter>(
       return filteredConfigs.firstOrNull { it.dependencies.any { f -> f.test(libraryId) } }
         ?: filteredConfigs.firstOrNull { it.dependencies.isEmpty() }
     }
+
+    fun findNotNull(getter: (T) -> Any?): T? {
+      return find { getter(it) != null }
+    }
   }
 }
