@@ -5,18 +5,18 @@ import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import java.nio.file.Path
 
-object PythonMethodHeuristic : VersionReplacementHeuristic {
-  override val name: String = "python-method"
+object PythonFunctionCallHeuristic : VersionReplacementHeuristic {
+  override val name: String = "python-function-call"
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
-    val pythonMethodMatchResult = getPythonMethods(files)
+    val pythonFunctionMatchResult = getPythonFunctions(files)
 
-    if (pythonMethodMatchResult.isNotEmpty()) {
+    if (pythonFunctionMatchResult.isNotEmpty()) {
       val libraryMatchResult = updateSuggestion.currentLibrary.id.associatedStrings().let { libAssociatedStrings ->
         (libAssociatedStrings.size - 1).let { associatedIndex ->
           findRegexInListOfMatchResults(
             libAssociatedStrings[associatedIndex][1],
-            findRegexInListOfMatchResults(libAssociatedStrings[associatedIndex][0], pythonMethodMatchResult)
+            findRegexInListOfMatchResults(libAssociatedStrings[associatedIndex][0], pythonFunctionMatchResult)
           )
         }
       }
@@ -44,7 +44,7 @@ object PythonMethodHeuristic : VersionReplacementHeuristic {
     return null
   }
 
-  private fun getPythonMethods(files: List<TextFile>): List<Pair<MatchResult, Path>?> {
+  private fun getPythonFunctions(files: List<TextFile>): List<Pair<MatchResult, Path>?> {
     val pythonMethodRegex = Regex("\\w+.\\w+\\([a-zA-Z0-1\\n\\s\".,-=]+\\)")
     return files
       .map { textFile -> pythonMethodRegex.findAll(textFile.content).map { it to textFile.path }.toList() }

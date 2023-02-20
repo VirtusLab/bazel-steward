@@ -5,7 +5,7 @@ import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
-import org.virtuslab.bazelsteward.core.replacement.PythonMethodHeuristic
+import org.virtuslab.bazelsteward.core.replacement.PythonFunctionCallHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
@@ -39,6 +39,6 @@ class MavenDependencyKind(
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(
     WholeLibraryHeuristic,
     VersionOnlyHeuristic,
-    PythonMethodHeuristic
+    PythonFunctionCallHeuristic
   )
 }

@@ -9,7 +9,7 @@ import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
-import org.virtuslab.bazelsteward.core.replacement.PythonMethodHeuristic
+import org.virtuslab.bazelsteward.core.replacement.PythonFunctionCallHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
@@ -23,6 +23,11 @@ class VersionReplacementHeuristicTest {
   val correctPositionFor235: Int = 2401
   val correctPositionFor120: Int = 2263
   val correctPositionFor160: Int = 2464
+  val correctPositionFor3200jre: Int = 2764
+  val correctPositionFor113: Int = 2935
+  val correctPositionFor3212: Int = 3128
+  val correctPositionFor4132: Int = 3058
+  val correctPositionFor852: Int = 3326
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -191,16 +196,16 @@ class VersionReplacementHeuristicTest {
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-  inner class PythonMethodHeuristicTest {
+  inner class PythonFunctionCallHeuristicTest {
 
     @Test
     fun `should return correct position offset maven artifact`() {
       val library = library("com.google.guava", "guava-testlib", "31.1.0-jre")
       val suggestedVersion = version("32.0.0-jre")
 
-      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe 2764
+      result?.offset shouldBe correctPositionFor3200jre
     }
 
     @Test
@@ -208,9 +213,9 @@ class VersionReplacementHeuristicTest {
       val library = library("com.google.truth", "truth", "1.1.3")
       val suggestedVersion = version("1.2.0")
 
-      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe 2935
+      result?.offset shouldBe correctPositionFor113
     }
 
     @Test
@@ -218,9 +223,9 @@ class VersionReplacementHeuristicTest {
       val library = library("org.scalactic", "scalactic", "3.2.12")
       val suggestedVersion = version("4.0.0")
 
-      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe 3128
+      result?.offset shouldBe correctPositionFor3212
     }
 
     @Test
@@ -228,9 +233,9 @@ class VersionReplacementHeuristicTest {
       val library = library("junit", "junit", "4.13.2")
       val suggestedVersion = version("4.14.0")
 
-      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe 3058
+      result?.offset shouldBe correctPositionFor4132
     }
 
     @Test
@@ -238,9 +243,9 @@ class VersionReplacementHeuristicTest {
       val library = library("com.sksamuel.elastic4s", "elastic4s-client-akka_2.12", "8.5.2")
       val suggestedVersion = version("8.6.0")
 
-      val result = resolveUpdates(library, suggestedVersion, PythonMethodHeuristic)
+      val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe 3326
+      result?.offset shouldBe correctPositionFor852
     }
   }
 
@@ -291,7 +296,7 @@ class VersionReplacementHeuristicTest {
 
   private val resolver = LibraryUpdateResolver()
 
-  private val allHeuristics = listOf(WholeLibraryHeuristic, VersionOnlyHeuristic, PythonMethodHeuristic).toTypedArray()
+  private val allHeuristics = listOf(WholeLibraryHeuristic, VersionOnlyHeuristic, PythonFunctionCallHeuristic).toTypedArray()
 
   private fun resolveUpdates(
     library: MavenCoordinates,
