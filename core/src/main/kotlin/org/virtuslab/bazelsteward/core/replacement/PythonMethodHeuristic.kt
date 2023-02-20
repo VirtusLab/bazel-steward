@@ -26,8 +26,7 @@ object PythonMethodHeuristic : VersionReplacementHeuristic {
       if (versionMatchResult.isEmpty()) return null
 
       val versionOffset = libraryMatchResult.first()?.first?.range?.let {
-        versionMatchResult.first()?.first?.range?.first?.plus(
-          it.first) ?: return null
+        versionMatchResult.first()?.first?.range?.first?.plus(it.first) ?: return null
       } ?: return null
 
       return LibraryUpdate(
@@ -56,7 +55,7 @@ object PythonMethodHeuristic : VersionReplacementHeuristic {
     regexString: String,
     listToLookFor: List<Pair<MatchResult, Path>?>,
     returnOriginal: Boolean = true
-  ) : List<Pair<MatchResult, Path>?> =
+  ): List<Pair<MatchResult, Path>?> =
     listToLookFor.mapNotNull {
       it?.let {
         Regex(Regex.escape(regexString)).find(it.first.value)?.let { found ->
