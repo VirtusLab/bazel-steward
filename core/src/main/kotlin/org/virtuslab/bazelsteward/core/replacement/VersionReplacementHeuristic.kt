@@ -10,14 +10,19 @@ data class LibraryUpdate(
   val fileChanges: List<FileChange>
 )
 
-data class MatchResultPath(
-  val matchResult: MatchResult,
-  val path: Path
+data class MatchedText(
+  val match: MatchResult,
+  val origin: Path
 ) {
-  fun getRangeStart(): Int = matchResult.range.start
-  fun getGroup(index: Int): MatchGroup? = matchResult.groups[index]
+  val offset: Int
+    get() = match.range.start
 
-  fun getValue(): String = matchResult.value
+  val offsetLastMatchGroup: Int?
+    get() = match.groups.last()?.range?.start
+  val matchedText: String
+    get() = match.value
+
+  fun subMatch(other: MatchResult): Pair<MatchedText, MatchedText> = this to MatchedText(other, origin)
 }
 
 interface VersionReplacementHeuristic {

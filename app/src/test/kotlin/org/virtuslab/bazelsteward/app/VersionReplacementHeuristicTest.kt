@@ -229,6 +229,16 @@ class VersionReplacementHeuristicTest {
     }
 
     @Test
+    fun `should return null for wrong scala dep`() {
+      val library = library("org.scalactic", "scalactic", "3.2.90")
+      val suggestedVersion = version("4.0.0")
+
+      val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
+
+      result shouldBe null
+    }
+
+    @Test
     fun `should return correct position offset scala dep named parameters`() {
       val library = library("junit", "junit", "4.13.2")
       val suggestedVersion = version("4.14.0")
