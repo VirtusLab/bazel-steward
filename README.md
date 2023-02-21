@@ -1,4 +1,4 @@
-# Bazel-Steward
+# Bazel Steward
 
 Bazel-Steward is a bot that helps you keep your library dependencies up-to-date.
 
