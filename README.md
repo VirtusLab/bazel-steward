@@ -95,7 +95,7 @@ on:
         - uses: actions/checkout@v2
           with:
             fetch-depth: 0
-        - uses: VirtusLab/bazel-steward@v0.1.0 # or latest
+        - uses: VirtusLab/bazel-steward@v0 # or latest
           with:
             github-personal-token: '' # used for triggering workflows, read below
 ```
@@ -122,7 +122,7 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
 - uses: VirtusLab/bazel-steward@latest
   with:
     # The path to bazel steward configuration
-    # Default: ".github/bazel-steward.yaml"
+    # Default: "./bazel-steward.yaml"
     configuration-path: ''
     
     # A token for the GitHub repository
