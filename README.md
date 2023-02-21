@@ -1,6 +1,8 @@
-# Bazel Steward
+<p align="center">
+  <img src="https://github.com/VirtusLab/bazel-steward/blob/main/docs/images/logo.png?raw=true" height="250px">
+</p>
 
-Bazel-Steward is a bot that helps you keep your library dependencies up-to-date.
+Bazel Steward is a bot that helps you keep your library dependencies up-to-date.
 
 ## Using with GitHub
 Create file at  `.github/workflows/` with this content:
