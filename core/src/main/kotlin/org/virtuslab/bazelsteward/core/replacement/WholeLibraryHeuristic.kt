@@ -11,21 +11,24 @@ object WholeLibraryHeuristic : VersionReplacementHeuristic {
     val markers = updateSuggestion.currentLibrary.id.associatedStrings()
     val currentVersion = updateSuggestion.currentLibrary.version.value
     val regexes = markers.map { marker ->
-      (marker + currentVersion).map { """(${Regex.escape(it)})""" }.reduce { acc, s -> "$acc.*$s" }.let { Regex(it) }
+      (marker + currentVersion).map { """(${Regex.escape(it)})""" }.reduce { acc, s -> "$acc.*$s" }.toRegex()
     }
-    val matchResult = regexes.map { regex ->
-      files.firstNotNullOfOrNull {
-        regex.find(it.content)?.to(it.path)
-      } ?: return null
+    val matchResultsList = regexes.mapNotNull { regex ->
+      files.firstNotNullOfOrNull { textFile ->
+        regex.find(textFile.content)?.let {
+          MatchResultPath(it, textFile.path)
+        }
+      }
     }
-    val versionGroup = matchResult.first().first.groups[3] ?: return null
+    if (matchResultsList.isEmpty()) return null
+    val versionGroup = matchResultsList.first().getGroup(3) ?: return null
 
     return LibraryUpdate(
       updateSuggestion,
       listOf(
         FileChange(
-          matchResult.first().second,
-          versionGroup.range.first,
+          matchResultsList.first().path,
+          versionGroup.range.start,
           updateSuggestion.currentLibrary.version.value.length,
           updateSuggestion.suggestedVersion.value
         )
