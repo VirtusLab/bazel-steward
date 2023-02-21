@@ -14,7 +14,7 @@ data class MatchResultPath(
   val matchResult: MatchResult,
   val path: Path
 ) {
-  fun getRangeStart(): Int = matchResult.range.first
+  fun getRangeStart(): Int = matchResult.range.start
   fun getGroup(index: Int): MatchGroup? = matchResult.groups[index]
 
   fun getValue(): String = matchResult.value
