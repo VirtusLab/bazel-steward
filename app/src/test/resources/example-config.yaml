@@ -1,0 +1,13 @@
+update-rules:
+  -
+    dependencies:
+      - "org.virtuslab:dep-a"
+      - "org.virtuslab:dep-b"
+      - "com.google:*"
+    pin: "prefix:1.2."
+    bumping: latest
+  -
+    kinds: maven
+    versioning: semver
+  -
+    bumping: default

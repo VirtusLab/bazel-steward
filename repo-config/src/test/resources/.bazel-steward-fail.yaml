@@ -1,0 +1,12 @@
+update-rules:
+  -
+    dependenciess: [commons-io:commons-io]
+    versioning: loose
+  -
+    dependencies: [io.get-coursier:interface]
+    versioning: semverr
+    bumping: lates
+  -
+    dependencies: ["*:kotlinx-coroutines-jdk8"]
+    kinds: [2]
+    versioning: regex:(?<major>\\d+)(?<minor>\\.\\d+)?(?<patch>\\.\\d+)?$

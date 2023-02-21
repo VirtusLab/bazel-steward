@@ -1,0 +1,11 @@
+unit_tests(
+    srcs = glob(["**/*.kt"]),
+    resource_strip_prefix = "repo-config/src/test/resources",
+    resources = ["//repo-config/src/test/resources"],
+    test_package = "org.virtuslab.bazelsteward.config.repo",
+    deps = [
+        "//core",
+        "//repo-config",
+        "@maven//:commons_io_commons_io",
+    ],
+)

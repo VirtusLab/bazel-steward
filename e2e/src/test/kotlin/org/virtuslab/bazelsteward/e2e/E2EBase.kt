@@ -161,7 +161,7 @@ open class E2EBase {
     return this.copy(
       dependencyKinds = listOf(
         MavenDependencyKind(
-          MavenDataExtractor(this.appConfig),
+          MavenDataExtractor(this.appConfig.workspaceRoot),
           mockMavenRepositoryWithVersion(*versions.toTypedArray())
         )
       )

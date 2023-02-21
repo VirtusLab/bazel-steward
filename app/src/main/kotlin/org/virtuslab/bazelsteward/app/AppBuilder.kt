@@ -12,14 +12,13 @@ import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
 import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
-import org.virtuslab.bazelsteward.core.AppConfig
+import org.virtuslab.bazelsteward.config.repo.RepoConfigParser
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.FileFinder
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
-import org.virtuslab.bazelsteward.core.config.RepoConfigParser
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
@@ -65,14 +64,14 @@ object AppBuilder {
     val appConfig = AppConfig(repositoryRoot, configResolvedPath, pushToRemote, baseBranchName, gitAuthor)
     logger.info { appConfig }
 
-    val repoConfig = runBlocking { RepoConfigParser(appConfig.configPath).get() }
-    val mavenDataExtractor = MavenDataExtractor(appConfig)
+    val repoConfig = runBlocking { RepoConfigParser().load(appConfig.configPath) }
+    val mavenDataExtractor = MavenDataExtractor(appConfig.workspaceRoot)
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()
-    val gitOperations = GitOperations(appConfig)
+    val gitOperations = GitOperations(appConfig.workspaceRoot, appConfig.baseBranch)
     val gitHostClient =
       if (github) GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor) else GitHostClient.stub
-    val bazelRulesExtractor = BazelRulesExtractor(appConfig)
+    val bazelRulesExtractor = BazelRulesExtractor(appConfig.workspaceRoot)
     val bazelUpdater = BazelUpdater()
     val githubRulesResolver = GithubRulesResolver(
       env["GITHUB_TOKEN"]
@@ -90,7 +89,7 @@ object AppBuilder {
     val libraryUpdateResolver = LibraryUpdateResolver()
     val pullRequestSuggester = PullRequestSuggester()
 
-    val updateRulesProvider = UpdateRulesProvider(repoConfig)
+    val updateRulesProvider = UpdateRulesProvider(repoConfig.updateRules, dependencyKinds)
 
     return App(
       gitOperations,

@@ -13,13 +13,13 @@ class PinningStrategyTest {
   @Test
   fun `should return null argument null`() {
     val result = PinningStrategy.parse(null)
-    result shouldBe null
+    result shouldBe PinningStrategy.None
   }
 
   @Test
   fun `should return null argument empty`() {
     val result = PinningStrategy.parse("")
-    result shouldBe null
+    result shouldBe PinningStrategy.None
   }
 
   private fun argumentsForCorrectPinningStrategy(): List<Arguments> = listOf(

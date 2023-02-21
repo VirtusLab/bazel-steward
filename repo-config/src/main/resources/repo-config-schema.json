@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "properties": {
+    "update-rules": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "pin": {
+            "type": "string"
+          },
+          "versioning": {
+            "type": "string",
+            "anyOf": [{ "enum": ["loose", "semver"] }, { "pattern": "^regex:" }]
+          },
+          "bumping": {
+            "type": ["string", "null"],
+            "enum": ["default", "latest"]
+          }
+        },
+        "anyOf": ["versioning", "bumping", "pin", "kinds", "dependencies"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 
-object VersionOnlyHeuristic : Heuristic {
+object VersionOnlyHeuristic : VersionReplacementHeuristic {
   override val name: String = "version-only"
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {

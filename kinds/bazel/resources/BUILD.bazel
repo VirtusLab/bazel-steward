@@ -1,5 +1,0 @@
-filegroup(
-    name = "rules_resources",
-    srcs = glob(["*.bzlignore"]),
-    visibility = ["//visibility:public"],
-)

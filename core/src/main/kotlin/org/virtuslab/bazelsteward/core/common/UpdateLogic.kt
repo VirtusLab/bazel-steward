@@ -1,6 +1,6 @@
 package org.virtuslab.bazelsteward.core.common
 
-import org.virtuslab.bazelsteward.core.config.BumpingStrategy
+import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
@@ -10,8 +10,8 @@ data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: V
 
 data class UpdateRules(
   val versioningSchema: VersioningSchema = VersioningSchema.Loose,
-  val bumpingStrategy: BumpingStrategy = BumpingStrategy.Default,
-  val pinVersion: PinningStrategy? = null
+  val bumpingStrategy: BumpingStrategy = BumpingStrategy.Minor,
+  val pinningStrategy: PinningStrategy = PinningStrategy.None
 )
 
 class UpdateLogic {
@@ -24,7 +24,7 @@ class UpdateLogic {
 
     fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
-        .filter { version -> updateRules.pinVersion?.test(version) ?: true }
+        .filter { version -> updateRules.pinningStrategy?.test(version) ?: true }
         .mapNotNull { version -> version.toSemVer(updateRules.versioningSchema)?.let { version to it } }
         .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
         .maxByOrNull { it.second }

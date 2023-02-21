@@ -12,5 +12,6 @@ test --java_language_version=17
 test --java_runtime_version=17
 test --tool_java_runtime_version=17
 test --tool_java_language_version=17
+test --test_output=errors
 
 build --@rules_jvm_external//settings:stamp_manifest=false
