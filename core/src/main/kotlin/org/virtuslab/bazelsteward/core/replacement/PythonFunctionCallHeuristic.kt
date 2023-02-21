@@ -9,31 +9,31 @@ object PythonFunctionCallHeuristic : VersionReplacementHeuristic {
   override val name: String = "python-function-call"
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
-    val pythonFunctionMatchResult = getPythonFunctions(files)
+    val pythonFunctionMatchResult = getPythonFunctionCalls(files)
 
     if (pythonFunctionMatchResult.isNotEmpty()) {
-      val libraryMatchResult = updateSuggestion.currentLibrary.id.associatedStrings().let { libAssociatedStrings ->
-        (libAssociatedStrings.size - 1).let { associatedIndex ->
-          findRegexInListOfMatchResults(
-            libAssociatedStrings[associatedIndex][1],
-            findRegexInListOfMatchResults(libAssociatedStrings[associatedIndex][0], pythonFunctionMatchResult)
-          )
-        }
+      val groupIndex = 0
+      val artifactIndex = 1
+
+      val libAssociatedStrings = updateSuggestion.currentLibrary.id.associatedStrings()
+      val libraryMatchResult = libAssociatedStrings.flatMap {
+        val groupMatchResult = findRegexInListOfMatchResults(it[groupIndex], pythonFunctionMatchResult)
+        findRegexInListOfMatchResults(it[artifactIndex], groupMatchResult)
       }
 
       val currentVersion = updateSuggestion.currentLibrary.version.value
       val versionMatchResult = findRegexInListOfMatchResults(currentVersion, libraryMatchResult, false)
       if (versionMatchResult.isEmpty()) return null
 
-      val versionOffset = libraryMatchResult.first()?.first?.range?.let {
-        versionMatchResult.first()?.first?.range?.first?.plus(it.first) ?: return null
-      } ?: return null
+      val versionOffset = libraryMatchResult.first().first.range.let {
+        versionMatchResult.first().first.range.first.plus(it.first)
+      }
 
       return LibraryUpdate(
         updateSuggestion,
         listOf(
           FileChange(
-            versionMatchResult.first()!!.second,
+            versionMatchResult.first().second,
             versionOffset,
             updateSuggestion.currentLibrary.version.value.length,
             updateSuggestion.suggestedVersion.value
@@ -44,23 +44,21 @@ object PythonFunctionCallHeuristic : VersionReplacementHeuristic {
     return null
   }
 
-  private fun getPythonFunctions(files: List<TextFile>): List<Pair<MatchResult, Path>?> {
-    val pythonMethodRegex = Regex("\\w+.\\w+\\([a-zA-Z0-1\\n\\s\".,-=]+\\)")
-    return files
-      .map { textFile -> pythonMethodRegex.findAll(textFile.content).map { it to textFile.path }.toList() }
-      .flatten()
+  private fun getPythonFunctionCalls(files: List<TextFile>): List<Pair<MatchResult, Path>> {
+    val pythonMethodRegex = Regex("""\w+\([\w\n\s".\-,=]+\)""")
+    return files.flatMap { textFile ->
+      pythonMethodRegex.findAll(textFile.content).map { it to textFile.path }
+    }
   }
 
   private fun findRegexInListOfMatchResults(
     regexString: String,
-    listToLookFor: List<Pair<MatchResult, Path>?>,
+    listToLookFor: List<Pair<MatchResult, Path>>,
     returnOriginal: Boolean = true
-  ): List<Pair<MatchResult, Path>?> =
+  ): List<Pair<MatchResult, Path>> =
     listToLookFor.mapNotNull {
-      it?.let {
-        Regex(Regex.escape(regexString)).find(it.first.value)?.let { found ->
-          if (returnOriginal) it else found to it.second
-        }
+      Regex(Regex.escape(regexString)).find(it.first.value)?.let { found ->
+        if (returnOriginal) it else found to it.second
       }
     }
 }
