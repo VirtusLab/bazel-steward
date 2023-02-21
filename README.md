@@ -86,7 +86,7 @@ name: Update dependencies
 
 on:
   schedule:
-    - cron: '30 5 * * 6' # runs every saturday at 5:30 am
+    - cron: '30 5 * * 6' # runs every Saturday at 5:30 am
 
   jobs:
     bazel-steward:
@@ -111,7 +111,7 @@ To trigger workflows automatically, do one of the following:
 * set `github-personal-token` to your personal token (recommended, your token will be used only for closing/reopening pull requests).
   Required permissions: read and write on pull requests.
 * set `github-token` to your personal token (every operation will be made in your name)
-* create GitHub app and use its token for `github-token` (the best option, requires a bit of setup)
+* create GitHub app and use its token for `github-token` (the best option, but requires a bit of setup)
 
 Read more about triggering workflows using personal tokens and setting up the GitHub app [here](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs).
 
@@ -124,11 +124,11 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
     # The path to bazel steward configuration
     # Default: "./bazel-steward.yaml"
     configuration-path: ''
-    
+
     # A token for the GitHub repository
     # Default: ${{ github.token }}
     github-token: ''
-    
+
     # Additional arguments to bazel steward jar
     additional-args: ''
 
