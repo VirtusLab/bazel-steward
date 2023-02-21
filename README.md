@@ -15,9 +15,63 @@ Otherwise, Bazel Steward will do the following things:
 * When pull request is no longer mergeable, it will force push the branch with the same version
 * When pull request is closed/merged, it will never create a new pull request for the same version
 
+### Future plans
+For know, Bazel Steward support maven dependencies addet though `maven_install` rule bazel rules added by `http_archive`.
+We plan to extend the support over more rules that use other archives.
+
+We are also planing to support more git hosting methods, but for now, we only support GitHub.
+
+## Configuration
+You can configure how to handle specific dependencies. Config is stored in a root of a repository.
+
+Example config:
+```yaml
+maven:
+  configs:
+    -
+      group: commons-io
+      artifact: commons-io
+      pin: "2."
+      versioning: loose
+      bumping: default
+    -
+      group: io.get-coursier
+      artifact: interface
+      versioning: semver
+      bumping: latest
+    -
+      group: org.jetbrains.kotlinx
+      artifact: kotlinx-coroutines-jdk8
+      versioning: regex:^(?<major>\d*)(?:[.-](?<minor>(\d*)))?(?:[.-]?(?<patch>(\d*)))?(?:[-.]?(?<preRelease>(\d*)))(?<buildMetaData>)?
+    -
+      group: org.jetbrains.kotlinx
+      versioning: loose
+    -
+      versioning: loose
+```
+
+When resolving which rule to use, Bazel Steward first tries to find exact match of group and artefact.
+Then it tries to find exact group and no artifact. Lastly, it tries to find rule with no group and no artifact.
+
+When the rule is found, it can configure for a dependency the following things:
+* `versioning` (string) <br/>
+Overrides what kind of versioning schema is used for the dependency.
+Default: `semver`. Allowed values: `loose`, `semver`, `regex:...`.
+* `pin` (string) <br/>
+Filters versions that are allowed for the dependency.
+It can be an exact version, prefix or regular expression
+Bazel steward will try to automaticly determine what kind of input it is.
+You can override this by prepending the value with `prefix:`, `exact:` or `regex:`.
+* `bumping` (string) <br/>
+Sets the strategy for bumping this dependency.
+  1. `latest` - Bump to the latest version
+  2. `default` - First bump to the latest patch, then to the latest minor, then finally to the latest major.
+  3. `minor` - Bump to the latest minor
+
+
 # Installation
 
-We are planing to support multiple installation methods, but right not we only support GitHub.
+You can download Bazel Steward jar and run it locally or use the GitHub Action bellow.
 
 ## GitHub Actions
 Create file at  `.github/workflows/` with this content:
@@ -75,6 +129,8 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
     # An optional token for closing and reopening pull requests
     github-personal-token: ''
 ```
+
+
 
 # Contributing
 
