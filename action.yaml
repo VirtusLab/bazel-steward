@@ -31,10 +31,12 @@ runs:
     - name: Download release
       if: ${{ inputs.use-release == 'true' }}
       run: |
-        TAG_NAME=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
-        gh release download $TAG_NAME --pattern bazel-steward.jar --repo VirtusLab/bazel-steward
+        TAG_PATTERN=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
+        TAG_NAME=$(gh release list -L 100 --repo $REPOSITORY | grep -Eo '^'"$TAG_PATTERN"'[\.0-9]*' | sort -Vr | head -n 1)
+        gh release download $TAG_NAME --pattern bazel-steward.jar --repo $REPOSITORY
       env:
         GH_TOKEN: ${{ github.token }}
+        REPOSITORY: VirtusLab/bazel-steward
       shell: bash
     - name: Build jar file
       if: ${{ inputs.use-release != 'true' }}

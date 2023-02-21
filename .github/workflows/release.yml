@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
     branches: [ main ]
 
 jobs:
@@ -24,3 +24,13 @@ jobs:
           title: ${{ github.ref_type != 'tag' && 'Development Build' || null }}
           automatic_release_tag: ${{ github.ref_type != 'tag' && 'latest' || null }}
           files: bazel-steward.jar
+  prefix-version-tag:
+    runs-on: "ubuntu-latest"
+    if: github.ref_type == 'tag'
+    needs: tagged-release
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          GIT_TAG=$(${{ github.event.ref }} | grep -Eo 'v[\.0-9]*')
+          MAJOR=$()
+          MINOR=$()
