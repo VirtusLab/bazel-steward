@@ -14,16 +14,20 @@ Bazel Steward scans your repository looking for outside dependencies.
 Then, it compares a version of the found dependency against a remote repository.
 If a newer version is available on the remote repository, then it opens a pull request with a change for that newer version.
 
-Pull requests created by bazel steward are managed by it until they are merged or closed, but there is an exception to that.
-If you push any changes to a branch created by bazel steward, it will stop managing the associated pull request.
+Pull requests created by Bazel Steward are managed by it until they are merged or closed, but there is an exception to that.
+If you push any changes to a branch created by Bazel Steward, it will stop managing the associated pull request.
 Otherwise, Bazel Steward will do the following things:
 * When an even newer version of the library appears, it will open a new pull request for the newer version and close pull requests for older versions
 * When a pull request is no longer mergeable, it will force push the branch with the same version
 * When a pull request is closed/merged, it will never create a new pull request for the same version
 
 ### Plans for the future
-For now, Bazel Steward supports maven dependencies added through the `maven_install` rule bazel rules added by `http_archive`.
-We plan to extend the support over more rules that use other archives.
+For now, Bazel Steward supports:
+* Bazel version - defined in .bazelversion or .bazeliskrc file.
+* Maven dependencies added through the rules_jvm_external
+* Some of Bazel rules
+
+We plan to extend the support to update all bazel rules, bazel modules, http_archives and languages like Go, Python or JavaScript.
 
 We are also planning to support more git hosting methods, but for now, we only support GitHub.
 
@@ -32,28 +36,26 @@ You can configure how to handle specific dependencies. Config is stored in a roo
 
 Example config:
 ```yaml
-maven:
-  configs:
-    -
-      group: commons-io
-      artifact: commons-io
-      pin: "2."
-      versioning: loose
-      bumping: default
-    -
-      group: io.get-coursier
-      artifact: interface
-      versioning: semver
-      bumping: latest
-    -
-      group: org.jetbrains.kotlinx
-      artifact: kotlinx-coroutines-jdk8
-      versioning: regex:^(?<major>\d*)(?:[.-](?<minor>(\d*)))?(?:[.-]?(?<patch>(\d*)))?(?:[-.]?(?<preRelease>(\d*)))(?<buildMetaData>)?
-    -
-      group: org.jetbrains.kotlinx
-      versioning: loose
-    -
-      versioning: loose
+update-rules:
+  -
+    kinds: maven
+    dependencies: commons-io:commons-io
+    versioning: loose
+    bumping: default
+    pin: "2.0."
+  -
+    dependencies: io.get-coursier:interface
+    versioning: semver
+    bumping: latest
+  -
+    dependencies: org.jetbrains.kotlinx:kotlinx-coroutines-jdk8
+    versioning: regex:^(?<major>\d*)(?:[.-](?<minor>(\d*)))?(?:[.-]?(?<patch>(\d*)))?(?:[-.]?(?<preRelease>(\d*)))(?<buildMetaData>)?
+  -
+    dependencies:
+      - org.jetbrains.kotlinx:*
+    versioning: loose
+  -
+    versioning: loose
 ```
 
 When resolving which rule to use, Bazel Steward first tries to find an exact match of the group and artifact.
@@ -71,7 +73,7 @@ When the rule is found, it can configure for a dependency the following things:
 * `bumping` (string) <br/>
   Sets the strategy for bumping this dependency.
   1. `latest` - Bump to the latest version
-  2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
+  2. `default` - First bump to the latest minor, and then to the latest major.
   3. `minor` - Bump to the latest minor
 
 
@@ -86,7 +88,7 @@ name: Update dependencies
 
 on:
   schedule:
-    - cron: '30 5 * * 6' # runs every Saturday at 5:30 am
+    - cron: '30 5 * * *' # runs every day at 5:30 am
 
   jobs:
     bazel-steward:
@@ -121,7 +123,7 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
 ```yaml
 - uses: VirtusLab/bazel-steward@latest
   with:
-    # The path to bazel steward configuration
+    # The path to Bazel Steward configuration
     # Default: "./bazel-steward.yaml"
     configuration-path: ''
 
@@ -129,7 +131,7 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
     # Default: ${{ github.token }}
     github-token: ''
 
-    # Additional arguments to bazel steward jar
+    # Additional arguments to Bazel Steward jar
     additional-args: ''
 
     # An optional token for closing and reopening pull requests
