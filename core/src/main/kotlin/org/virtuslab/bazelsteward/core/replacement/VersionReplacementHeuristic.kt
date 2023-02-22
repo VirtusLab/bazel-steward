@@ -12,17 +12,18 @@ data class LibraryUpdate(
 
 data class MatchedText(
   val match: MatchResult,
-  val origin: Path
+  val origin: Path,
+  val baseOffset: Int = 0
 ) {
   val offset: Int
-    get() = match.range.start
+    get() = match.range.start + baseOffset
 
   val offsetLastMatchGroup: Int?
     get() = match.groups.last()?.range?.start
   val matchedText: String
     get() = match.value
 
-  fun subMatch(other: MatchResult): Pair<MatchedText, MatchedText> = this to MatchedText(other, origin)
+  fun subMatch(subMatch: MatchResult): MatchedText = MatchedText(subMatch, origin, baseOffset = offset)
 }
 
 interface VersionReplacementHeuristic {

@@ -19,7 +19,7 @@ object PythonFunctionCallHeuristic : VersionReplacementHeuristic {
       }
 
       val currentVersion = updateSuggestion.currentLibrary.version.value
-      val (parentMatch, matchedVersion) = functionCallsWithAssociatedStrings.firstNotNullOfOrNull { call ->
+      val matchedVersion = functionCallsWithAssociatedStrings.firstNotNullOfOrNull { call ->
         Regex.fromLiteral(currentVersion).find(call.matchedText)?.let { call.subMatch(it) }
       } ?: return null
 
@@ -28,7 +28,7 @@ object PythonFunctionCallHeuristic : VersionReplacementHeuristic {
         listOf(
           FileChange(
             matchedVersion.origin,
-            parentMatch.offset + matchedVersion.offset,
+            matchedVersion.offset,
             updateSuggestion.currentLibrary.version.value.length,
             updateSuggestion.suggestedVersion.value
           )
