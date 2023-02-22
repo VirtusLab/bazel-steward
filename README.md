@@ -64,7 +64,7 @@ Then it tries to find an exact group and no artifact. Lastly, it tries to find a
 When the rule is found, it can configure for a dependency the following things:
 * `versioning` (string) <br/>
   Overrides what kind of versioning schema is used for the dependency.
-  Default: `semver`. Allowed values: `loose`, `semver`, `regex:...`.
+  Default: `loose`. Allowed values: `loose`, `semver`, `regex:...`.
 * `pin` (string) <br/>
   Filters versions that are allowed for the dependency.
   It can be an exact version, prefix or regular expression
