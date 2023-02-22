@@ -30,7 +30,14 @@ jobs:
     needs: tagged-release
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - run: |
           GIT_TAG=$(${{ github.event.ref }} | grep -Eo 'v[\.0-9]*')
-          MAJOR=$()
-          MINOR=$()
+          MINOR_TAG=$(echo $GIT_TAG | grep -Eo 'v[0-9]+\.[0-9]+')
+          MAJOR_TAG=$(echo $GIT_TAG | grep -Eo 'v[0-9]+')
+          for TAG in $MINOR_TAG $MAJOR_TAG
+          do
+            git tag -f $TAG $GIT_TAG
+            git push -f origin $TAG
+          done
