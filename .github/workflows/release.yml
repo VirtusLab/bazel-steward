@@ -33,11 +33,15 @@ jobs:
         with:
           fetch-depth: 0
       - run: |
+          set -x
           GIT_TAG=$(echo "${{ github.event.ref }}" | grep -Eo 'v[\.0-9]*')
           MINOR_TAG=$(echo "$GIT_TAG" | grep -Eo 'v[0-9]+\.[0-9]+')
           MAJOR_TAG=$(echo "$GIT_TAG" | grep -Eo 'v[0-9]+')
           for TAG in "$MINOR_TAG" "$MAJOR_TAG"
           do
+            TAG_LATEST=$(git ls-remote --tags | grep -Eo "v[0-9]+\.[0-9]+\.[0-9]+" | grep -E "$TAG" | sort -Vr | head -n 1)
+          if [ "GIT_TAG" == "$TAG_LATEST" ]; then
             git tag -f "$TAG" "$GIT_TAG"
             git push -f origin "$TAG"
+          fi
           done
