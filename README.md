@@ -58,8 +58,7 @@ update-rules:
     versioning: loose
 ```
 
-When resolving which rule to use, Bazel Steward first tries to find an exact match of the group and artifact.
-Then it tries to find an exact group and no artifact. Lastly, it tries to find a rule with no group and no artifact.
+When resolving which rule to use, Bazel Steward first checks rules with the dependencies key defined (in order they are declared) and then other rules (also in declaration order).
 
 When the rule is found, it can configure for a dependency the following things:
 * `versioning` (string) <br/>
