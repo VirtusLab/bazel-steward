@@ -1,6 +1,6 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <p align="center">
-  <img src="https://github.com/VirtusLab/bazel-steward/blob/main/docs/images/logo.png?raw=true" height="250px" alt="Basel Steward logo">
+  <img src="https://github.com/VirtusLab/bazel-steward/blob/main/docs/images/logo.png?raw=true" style="max-height:250px" alt="Basel Steward logo">
 </p>
 
 # Bazel Steward

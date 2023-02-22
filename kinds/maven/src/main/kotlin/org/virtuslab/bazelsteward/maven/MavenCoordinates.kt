@@ -6,7 +6,11 @@ import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
 
 data class MavenLibraryId(val group: String, val artifact: String) : LibraryId() {
-  override fun associatedStrings(): List<String> = listOf(group, artifact)
+  override fun associatedStrings(): List<List<String>> {
+    return Regex("""_[\d.]+$""").find(artifact)?.let {
+      listOf(listOf(group, artifact), listOf(group, artifact.removeRange(it.range)))
+    } ?: listOf(listOf(group, artifact))
+  }
 
   override val name: String
     get() = "$group:$artifact"
