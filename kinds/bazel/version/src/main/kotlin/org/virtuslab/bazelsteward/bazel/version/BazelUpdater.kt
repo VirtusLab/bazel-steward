@@ -9,7 +9,7 @@ import org.virtuslab.bazelsteward.core.library.VersioningSchema
 private val logger = KotlinLogging.logger {}
 
 object BazelLibraryId : LibraryId() {
-  override fun associatedStrings(): List<String> = listOf("", "USE_BAZEL_VERSION")
+  override fun associatedStrings(): List<List<String>> = listOf(listOf("USE_BAZEL_VERSION"))
 
   override val name: String
     get() = "bazel"
