@@ -28,6 +28,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.ref_type == 'tag'
     needs: tagged-release
+    permissions: write-all
     steps:
       - uses: actions/checkout@v2
         with:
