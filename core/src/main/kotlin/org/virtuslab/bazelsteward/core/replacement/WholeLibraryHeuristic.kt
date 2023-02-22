@@ -10,16 +10,24 @@ object WholeLibraryHeuristic : VersionReplacementHeuristic {
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
     val markers = updateSuggestion.currentLibrary.id.associatedStrings()
     val currentVersion = updateSuggestion.currentLibrary.version.value
-    val regex =
-      (markers + currentVersion).map { """(${Regex.escape(it)})""" }.reduce { acc, s -> "$acc.*$s" }.let { Regex(it) }
-    val matchResult = files.firstNotNullOfOrNull { regex.find(it.content)?.to(it.path) } ?: return null
-    val versionGroup = matchResult.first.groups[3] ?: return null
+    val regexes = markers.map { marker ->
+      (marker + currentVersion).map { """(${Regex.escape(it)})""" }.reduce { acc, s -> "$acc.*$s" }.toRegex()
+    }
+    val matchResult = regexes.firstNotNullOfOrNull { regex ->
+      files.firstNotNullOfOrNull { textFile ->
+        regex.find(textFile.content)?.let {
+          MatchedText(it, textFile.path)
+        }
+      }
+    } ?: return null
+    val versionOffset = matchResult.offsetLastMatchGroup ?: return null
+
     return LibraryUpdate(
       updateSuggestion,
       listOf(
         FileChange(
-          matchResult.second,
-          versionGroup.range.first,
+          matchResult.origin,
+          versionOffset,
           updateSuggestion.currentLibrary.version.value.length,
           updateSuggestion.suggestedVersion.value
         )

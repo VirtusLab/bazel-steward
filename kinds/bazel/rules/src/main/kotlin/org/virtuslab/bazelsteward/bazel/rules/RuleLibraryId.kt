@@ -12,7 +12,7 @@ sealed class RuleLibraryId : LibraryId() {
   override val name: String
     get() = ruleName
 
-  override fun associatedStrings(): List<String> = listOf(downloadUrl, sha256)
+  override fun associatedStrings(): List<List<String>> = listOf(listOf(downloadUrl, sha256))
 
   data class ReleaseArtifact(
     override val sha256: String,
