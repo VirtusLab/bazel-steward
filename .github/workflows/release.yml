@@ -40,8 +40,8 @@ jobs:
           for TAG in "$MINOR_TAG" "$MAJOR_TAG"
           do
             TAG_LATEST=$(git ls-remote --tags | grep -Eo "v[0-9]+\.[0-9]+\.[0-9]+" | grep -E "$TAG" | sort -Vr | head -n 1)
-          if [ "GIT_TAG" == "$TAG_LATEST" ]; then
-            git tag -f "$TAG" "$GIT_TAG"
-            git push -f origin "$TAG"
-          fi
+            if [ "$GIT_TAG" == "$TAG_LATEST" ]; then
+              git tag -f "$TAG" "$GIT_TAG"
+              git push -f origin "$TAG"
+            fi
           done
