@@ -72,8 +72,8 @@ When the rule is found, it can configure for a dependency the following things:
 * `bumping` (string) <br/>
   Sets the strategy for bumping this dependency.
   1. `latest` - Bump to the latest version
-  2. `default` - First bump to the latest minor, and then to the latest major.
-  3. `minor` - Bump to the latest minor
+  2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
+  3. `minor` - First bump to the latest minor, and then to the latest major.
 
 
 # Installation
