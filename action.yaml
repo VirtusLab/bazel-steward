@@ -4,7 +4,7 @@ author: ""
 inputs:
   configuration-path:
     description: "The path to bazel steward configuration"
-    default: ".github/bazel-steward.yaml"
+    default: "./bazel-steward.yaml"
   github-token:
     description: "A token for the Github repository"
     default: ${{ github.token }}
