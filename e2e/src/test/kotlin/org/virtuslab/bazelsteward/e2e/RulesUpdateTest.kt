@@ -15,7 +15,8 @@ class RulesUpdateTest : E2EBase() {
         "io.arrow-kt/arrow-core" to "1.1.5",
         "io.arrow-kt/arrow-fx-coroutines" to "1.1.5",
         "bazel" to "5.4.0",
-        "rules_jvm_external" to "4.5"
+        "rules_jvm_external" to "4.5",
+        "rules_kotlin" to "v1.7.1",
       )
 
     checkBranchesWithVersions(tempDir, project, expectedBranches)
