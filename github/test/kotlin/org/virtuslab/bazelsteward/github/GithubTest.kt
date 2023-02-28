@@ -40,5 +40,4 @@ class GithubTest {
       Assertions.assertEquals(status, it.second)
     }
   }
-
 }
