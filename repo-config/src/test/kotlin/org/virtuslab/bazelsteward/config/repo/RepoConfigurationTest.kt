@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -51,7 +52,11 @@ class RepoConfigurationTest {
           dependencies = listOf(DependencyNameFilter.Default("commons-io:commons-io")),
           versioning = VersioningSchema.Loose,
           bumping = BumpingStrategy.Default,
-          pin = PinningStrategy.Prefix("2.0.")
+          pin = PinningStrategy.Prefix("2.0."),
+          searchPattern = listOf(
+            PathPattern.Regex(value = """WORKSPACE[.\w]*"""),
+            PathPattern.Glob(value = "**/BUILD{,.bazel}")
+          )
         ),
         UpdateRulesConfig(
           dependencies = listOf(DependencyNameFilter.Default("io.get-coursier:interface")),
@@ -70,6 +75,15 @@ class RepoConfigurationTest {
           versioning = VersioningSchema.Loose,
         ),
       ),
+      listOf(
+        SearchPatternConfig(
+          kinds = listOf("maven"),
+          searchPattern = listOf(
+            PathPattern.Regex(value = """WORKSPACE[.\w]*"""),
+            PathPattern.Glob(value = "**/*.bzl")
+          )
+        )
+      )
     )
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)
   }

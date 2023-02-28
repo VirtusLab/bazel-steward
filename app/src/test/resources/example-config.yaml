@@ -6,8 +6,21 @@ update-rules:
       - "com.google:*"
     pin: "prefix:1.2."
     bumping: latest
+    search-pattern:
+      - regex:.*\/WORKSPACE[.\w]*
   -
     kinds: maven
     versioning: semver
   -
     bumping: default
+search-paths:
+  - kinds:
+      - maven
+      - bazel
+    search-pattern:
+      - regex:.*\/WORKSPACE[.\w]*
+      - "**/*.bzl"
+  - kinds:
+      - bazel
+      - bazel-rules
+    search-pattern: regex:.*\/BUILD[,\.bazel]*

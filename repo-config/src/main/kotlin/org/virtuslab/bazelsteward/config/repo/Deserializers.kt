@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.TextNode
+import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -65,5 +66,11 @@ class DependencyNameFilterDeserializer : StdDeserializer<DependencyNameFilter?>(
     return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
       DependencyNameFilter.parse(fieldValue)
     }
+  }
+}
+
+class PathPatternDeserializer : StdDeserializer<PathPattern?>(PathPattern::class.java) {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PathPattern? {
+    return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString().let { PathPattern.parse(it) }
   }
 }

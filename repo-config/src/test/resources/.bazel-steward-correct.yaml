@@ -4,7 +4,10 @@ update-rules:
     dependencies: commons-io:commons-io
     versioning: loose
     bumping: default
-    pin: "2.0."
+    pin: 2.0.
+    search-pattern:
+      - regex:WORKSPACE[.\w]*
+      - "**/BUILD{,.bazel}"
   -
     dependencies: io.get-coursier:interface
     versioning: semver
@@ -18,3 +21,9 @@ update-rules:
     versioning: loose
   -
     versioning: loose
+search-paths:
+  -
+    kinds: maven
+    search-pattern:
+      - regex:WORKSPACE[.\w]*
+      - "**/*.bzl"

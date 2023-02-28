@@ -90,6 +90,7 @@ object AppBuilder {
     val pullRequestSuggester = PullRequestSuggester()
 
     val updateRulesProvider = UpdateRulesProvider(repoConfig.updateRules, dependencyKinds)
+    val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, repoConfig.updateRules, dependencyKinds)
 
     return App(
       gitOperations,
@@ -101,7 +102,8 @@ object AppBuilder {
       gitHostClient,
       appConfig,
       repoConfig,
-      updateRulesProvider
+      updateRulesProvider,
+      searchPatternProvider
     )
   }
 }
