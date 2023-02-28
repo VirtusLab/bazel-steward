@@ -94,7 +94,7 @@ maven_install(
         "io.github.microutils:kotlin-logging-jvm:3.0.4",
         "org.slf4j:slf4j-simple:2.0.6",
         "org.json:json:20220924",
-        "org.springframework.boot:spring-boot:2.4.0",
+        "org.springframework.boot:spring-boot:2.7.9",
     ],
     fetch_sources = True,
     repositories = [
