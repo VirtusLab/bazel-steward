@@ -28,15 +28,9 @@
           "bumping": {
             "type": ["string", "null"],
             "enum": ["default", "latest"]
-          },
-          "search-pattern": {
-            "type": ["array", "string", "null"],
-            "items": {
-              "type": "string"
-            }
           }
         },
-        "anyOf": ["versioning", "bumping", "pin", "kinds", "dependencies", "searchPattern"],
+        "anyOf": ["versioning", "bumping", "pin", "kinds", "dependencies"],
         "additionalProperties": false
       }
     },
@@ -51,7 +45,13 @@
               "type": "string"
             }
           },
-          "search-pattern": {
+          "dependencies": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "path-patterns": {
             "type": ["array", "string", "null"],
             "items": {
               "type": "string"

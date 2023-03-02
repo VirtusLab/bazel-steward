@@ -25,9 +25,6 @@ data class UpdateRulesConfig(
   val pin: PinningStrategy? = null,
   val versioning: VersioningSchema? = null,
   val bumping: BumpingStrategy? = null,
-  @JsonSetter(nulls = Nulls.AS_EMPTY)
-  @JsonDeserialize(using = ListOrItemDeserializer::class)
-  val searchPattern: List<PathPattern> = emptyList(),
 ) : DependencyFilter
 
 data class SearchPatternConfig(
@@ -39,5 +36,5 @@ data class SearchPatternConfig(
   override val dependencies: List<DependencyNameFilter> = emptyList(),
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   @JsonDeserialize(using = ListOrItemDeserializer::class)
-  val searchPattern: List<PathPattern> = emptyList(),
+  val pathPatterns: List<PathPattern> = emptyList(),
 ) : DependencyFilter

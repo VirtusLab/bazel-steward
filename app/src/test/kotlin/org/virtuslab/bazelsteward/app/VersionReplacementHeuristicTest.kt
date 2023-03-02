@@ -4,8 +4,8 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.virtuslab.bazelsteward.common.CommonProvider
 import org.virtuslab.bazelsteward.core.common.FileChange
-import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
@@ -15,8 +15,6 @@ import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
-import java.nio.file.Path
-import kotlin.io.path.Path
 
 class VersionReplacementHeuristicTest {
 
@@ -287,13 +285,6 @@ class VersionReplacementHeuristicTest {
     }
   }
 
-  private data class TestTextFile(override val path: Path, override val content: String) : TextFile
-
-  private fun loadTextFileFromResources(fileName: String): TextFile {
-    val url = this::class.java.classLoader.getResource(fileName)!!
-    return TestTextFile(Path(url.path), url.readText())
-  }
-
   private fun library(group: String, artifact: String, version: String) =
     MavenCoordinates(
       MavenLibraryId(group, artifact),
@@ -302,7 +293,7 @@ class VersionReplacementHeuristicTest {
 
   private fun version(version: String) = SemanticVersion.fromString(version)!!
 
-  private val files = listOf(loadTextFileFromResources("WORKSPACE.bzlignore"))
+  private val files = listOf(CommonProvider.loadTextFileFromResources(this::class.java.classLoader, "WORKSPACE.bzlignore"))
 
   private val resolver = LibraryUpdateResolver()
 

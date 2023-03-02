@@ -1,11 +1,11 @@
 package org.virtuslab.bazelsteward.e2e
 
 import io.kotest.common.runBlocking
-import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
+import org.virtuslab.bazelsteward.common.CommonProvider
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -17,11 +17,7 @@ import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenRepository
-import java.io.File
 import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.jar.JarFile
-import kotlin.io.path.createDirectories
 
 open class E2EBase {
   protected val heads = "refs/heads/"
@@ -70,33 +66,8 @@ open class E2EBase {
   }
 
   protected fun prepareWorkspace(tempDir: Path, testResourcePath: String): Path {
-    val localRepo = tempDir.resolve("local")
-    val finalFile = localRepo.resolve(testResourcePath)
-    val names = JarFile(File(javaClass.protectionDomain.codeSource.location.toURI())).use { jar ->
-      val entries = jar.entries().asIterator().asSequence()
-      entries.filterNot { it.isDirectory }.map { it.name }.filter { it.startsWith(testResourcePath) }.toList()
-    }
-    names.forEach { name ->
-      FileUtils.copyURLToFile(
-        javaClass.classLoader.getResource(name),
-        localRepo.resolve(name.removeSuffix(".bzlignore")).toFile()
-      )
-    }
-
-    runBlocking {
-      val remoteRepo = tempDir.resolve("remote")
-      remoteRepo.createDirectories()
-      GitClient(remoteRepo).init(bare = true)
-
-      val git = GitClient(finalFile)
-      git.init(initialBranch = master)
-      git.configureAuthor("bazel-steward@virtuslab.org", "Bazel Steward")
-      git.add(Paths.get("."))
-      git.commit("Maven test $testResourcePath")
-      git.remoteAdd("origin", remoteRepo.toString())
-      git.push(master)
-    }
-    return finalFile
+    return CommonProvider.prepareLocalWorkspace(javaClass, tempDir, testResourcePath)
+      .also { CommonProvider.prepareRemoteWorkspace(tempDir, testResourcePath, it, master) }
   }
 
   protected fun checkBranchesWithVersions(

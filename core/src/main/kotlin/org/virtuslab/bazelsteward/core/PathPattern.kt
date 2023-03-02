@@ -22,7 +22,7 @@ sealed interface PathPattern {
         pattern.startsWith("glob:") -> Glob(pattern.removePrefix("glob:").trim())
         pattern.startsWith("regex:") -> Regex(pattern.removePrefix("regex:").trim())
         pattern.startsWith("exact:") -> Exact(pattern.removePrefix("exact:").trim())
-        pattern.startsWith("**/") -> Glob(pattern)
+        "{}*,".any { it in pattern } && runCatching { Glob(pattern) }.isSuccess -> Glob(pattern)
         "\$|()?^*{}+".any { it in pattern } && runCatching { pattern.toRegex() }.isSuccess -> Regex(pattern)
         else -> Exact(pattern)
       }

@@ -7,30 +7,19 @@ import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 
 class UpdateSuggestionsMapper(
   private val searchPatternProvider: SearchPatternProvider,
-  private val fileFinder: FileFinder,
-  private val kindFiles: List<TextFile>
+  private val fileFinder: FileFinder
 ) {
 
-  data class CacheEntry(val patterns: List<PathPattern>, val files: List<TextFile>)
-
-  private val cache: MutableList<CacheEntry> = mutableListOf()
+  private val cache: MutableMap<Set<PathPattern>, List<TextFile>> = mutableMapOf()
 
   fun map(updateSuggestion: UpdateSuggestion): List<TextFile> {
     val librarySearchPattern = searchPatternProvider.resolveForLibrary(updateSuggestion.currentLibrary)
 
-    return librarySearchPattern?.let {
-      findPatternInCache(it)?.files
-        ?: fileFinder.find(it).let { fileList ->
-          cache.add(CacheEntry(librarySearchPattern, fileList))
-          fileList
+    return librarySearchPattern.let {
+      cache[it.toSet()]
+        ?: fileFinder.find(it).also { fileList ->
+          cache[librarySearchPattern.toSet()] = fileList
         }
-    } ?: kindFiles
+    }
   }
-
-  private fun findPatternInCache(patterns: List<PathPattern>): CacheEntry? {
-    return cache.firstOrNull { it.patterns equalsIgnoreOrder patterns }
-  }
-
-  private infix fun <T> List<T>.equalsIgnoreOrder(other: List<T>) =
-    this.size == other.size && this.toSet() == other.toSet()
 }

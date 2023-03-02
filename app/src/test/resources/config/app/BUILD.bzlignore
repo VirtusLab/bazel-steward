@@ -1,0 +1,12 @@
+unit_tests(
+    srcs = glob(["kotlin/**/*.kt"]),
+    resources = glob(
+        ["resources/**"],
+    ),
+    test_package = "org.virtuslab.bazelsteward.app",
+    deps = [
+        "//app/src/main",
+        "//core",
+        "@maven//:commons_io_commons_io",
+    ],
+)

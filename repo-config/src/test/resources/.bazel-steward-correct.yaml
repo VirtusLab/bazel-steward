@@ -5,9 +5,6 @@ update-rules:
     versioning: loose
     bumping: default
     pin: 2.0.
-    search-pattern:
-      - regex:WORKSPACE[.\w]*
-      - "**/BUILD{,.bazel}"
   -
     dependencies: io.get-coursier:interface
     versioning: semver
@@ -22,8 +19,11 @@ update-rules:
   -
     versioning: loose
 search-paths:
-  -
-    kinds: maven
-    search-pattern:
-      - regex:WORKSPACE[.\w]*
-      - "**/*.bzl"
+  - dependencies: "com.google:*"
+    path-patterns: [ "bazel/google-deps.bzl" ]
+  - kinds: maven
+    path-patterns:
+      - "regex:.*/bazel/deps.bzl"
+  - kinds: bazel-rules
+    path-patterns:
+      - "glob:WORKSPACE{,.bazel}"

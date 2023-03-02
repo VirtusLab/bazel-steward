@@ -26,14 +26,13 @@ class PathPatternTest {
   private fun argumentsForCorrectPathPattern(): List<Arguments> = listOf(
     Arguments.of("glob: **/*.bzl", PathPattern.Glob("**/*.bzl")),
     Arguments.of("glob:**/*.bzl", PathPattern.Glob("**/*.bzl")),
-    Arguments.of("exact: WORKSPACE.bazel", PathPattern.Exact("WORKSPACE.bazel")),
-    Arguments.of("exact:WORKSPACE.bazel", PathPattern.Exact("WORKSPACE.bazel")),
-    Arguments.of("regex: BUILD[,\\.bazel]*", PathPattern.Regex("""BUILD[,\.bazel]*""")),
-    Arguments.of("regex:BUILD[,\\.bazel]*", PathPattern.Regex("""BUILD[,\.bazel]*""")),
+    Arguments.of("exact: WORKSPACE", PathPattern.Exact("WORKSPACE")),
+    Arguments.of("exact:WORKSPACE", PathPattern.Exact("WORKSPACE")),
+    Arguments.of("regex: BUILD[\\.bzl]*", PathPattern.Regex("""BUILD[\.bzl]*""")),
+    Arguments.of("regex:BUILD[\\.bzl]*", PathPattern.Regex("""BUILD[\.bzl]*""")),
     Arguments.of("**/*.bzl", PathPattern.Glob("**/*.bzl")),
-    Arguments.of("""BUILD[,\.bazel]*""", PathPattern.Regex("""BUILD[,\.bazel]*""")),
-    Arguments.of("(BUILD[,\\.bazel]*", PathPattern.Exact("(BUILD[,\\.bazel]*")),
-    Arguments.of("WORKSPACE.bazel", PathPattern.Exact("WORKSPACE.bazel")),
+    Arguments.of("(BUILD[\\.bzl]*", PathPattern.Glob("(BUILD[\\.bzl]*")),
+    Arguments.of("WORKSPACE", PathPattern.Exact("WORKSPACE")),
   )
 
   @ParameterizedTest

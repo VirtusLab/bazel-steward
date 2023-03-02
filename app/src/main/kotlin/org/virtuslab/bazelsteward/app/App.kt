@@ -54,15 +54,14 @@ data class App(
       }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
 
-      val searchPatterns = searchPatternProvider.resolveForKind(kind)
-      val files = fileFinder.find(searchPatterns)
+//      val searchPatterns = searchPatternProvider.resolveForKind(kind)
+//      val files = fileFinder.find(searchPatterns)
 
       val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
 
       val updateSuggestionsMapper = UpdateSuggestionsMapper(
         searchPatternProvider,
-        fileFinder,
-        files
+        fileFinder
       )
 
       val updates = updateSuggestions.mapNotNull { updateSuggestion ->

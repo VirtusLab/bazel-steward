@@ -53,10 +53,6 @@ class RepoConfigurationTest {
           versioning = VersioningSchema.Loose,
           bumping = BumpingStrategy.Default,
           pin = PinningStrategy.Prefix("2.0."),
-          searchPattern = listOf(
-            PathPattern.Regex(value = """WORKSPACE[.\w]*"""),
-            PathPattern.Glob(value = "**/BUILD{,.bazel}")
-          )
         ),
         UpdateRulesConfig(
           dependencies = listOf(DependencyNameFilter.Default("io.get-coursier:interface")),
@@ -77,10 +73,21 @@ class RepoConfigurationTest {
       ),
       listOf(
         SearchPatternConfig(
+          dependencies = listOf(DependencyNameFilter.Default("com.google:*")),
+          pathPatterns = listOf(
+            PathPattern.Exact(value = "bazel/google-deps.bzl")
+          )
+        ),
+        SearchPatternConfig(
           kinds = listOf("maven"),
-          searchPattern = listOf(
-            PathPattern.Regex(value = """WORKSPACE[.\w]*"""),
-            PathPattern.Glob(value = "**/*.bzl")
+          pathPatterns = listOf(
+            PathPattern.Regex(value = """.*/bazel/deps.bzl""")
+          )
+        ),
+        SearchPatternConfig(
+          kinds = listOf("bazel-rules"),
+          pathPatterns = listOf(
+            PathPattern.Glob(value = "WORKSPACE{,.bazel}")
           )
         )
       )
