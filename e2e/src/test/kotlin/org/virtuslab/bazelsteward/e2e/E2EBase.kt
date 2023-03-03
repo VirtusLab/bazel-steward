@@ -5,7 +5,8 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
-import org.virtuslab.bazelsteward.common.CommonProvider
+import org.virtuslab.bazelsteward.common.prepareLocalWorkspace
+import org.virtuslab.bazelsteward.common.prepareRemoteWorkspace
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -66,8 +67,8 @@ open class E2EBase {
   }
 
   protected fun prepareWorkspace(tempDir: Path, testResourcePath: String): Path {
-    return CommonProvider.prepareLocalWorkspace(javaClass, tempDir, testResourcePath)
-      .also { CommonProvider.prepareRemoteWorkspace(tempDir, testResourcePath, it, master) }
+    return prepareLocalWorkspace(javaClass, tempDir, testResourcePath)
+      .also { prepareRemoteWorkspace(tempDir, testResourcePath, it, master) }
   }
 
   protected fun checkBranchesWithVersions(

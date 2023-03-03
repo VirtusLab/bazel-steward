@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.virtuslab.bazelsteward.common.CommonProvider
+import org.virtuslab.bazelsteward.common.loadTextFileFromResources
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
@@ -293,7 +293,7 @@ class VersionReplacementHeuristicTest {
 
   private fun version(version: String) = SemanticVersion.fromString(version)!!
 
-  private val files = listOf(CommonProvider.loadTextFileFromResources(this::class.java.classLoader, "WORKSPACE.bzlignore"))
+  private val files = listOf(loadTextFileFromResources(javaClass, "WORKSPACE.bzlignore"))
 
   private val resolver = LibraryUpdateResolver()
 

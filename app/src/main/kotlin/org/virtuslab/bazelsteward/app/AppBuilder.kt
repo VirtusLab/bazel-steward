@@ -92,6 +92,11 @@ object AppBuilder {
     val updateRulesProvider = UpdateRulesProvider(repoConfig.updateRules, dependencyKinds)
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds)
 
+    val updateSuggestionsMapper = UpdateSuggestionsMapper(
+      searchPatternProvider,
+      fileFinder
+    )
+
     return App(
       gitOperations,
       dependencyKinds,
@@ -103,7 +108,8 @@ object AppBuilder {
       appConfig,
       repoConfig,
       updateRulesProvider,
-      searchPatternProvider
+      searchPatternProvider,
+      updateSuggestionsMapper
     )
   }
 }

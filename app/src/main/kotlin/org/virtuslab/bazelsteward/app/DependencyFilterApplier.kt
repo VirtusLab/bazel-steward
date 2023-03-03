@@ -16,15 +16,10 @@ class DependencyFilterApplier<T : DependencyFilter>(
     return FilteredByKind(configsForKinds, library.id, kind)
   }
 
-  fun forKind(kind: DependencyKind<*>): FilteredByKind<T> {
-    val configsForKinds = configs.filter { conf -> conf.kinds.isEmpty() || conf.kinds.contains(kind.name) }
-    return FilteredByKind(configsForKinds, null, kind)
-  }
-
   class FilteredByKind<T : DependencyFilter>(
     private val configs: List<T>,
     private val libraryId: LibraryId?,
-    private val kind: DependencyKind<*>?
+    val kind: DependencyKind<*>?
   ) {
     private fun find(predicate: (T) -> Boolean): T? {
       val filteredConfigs = configs.filter { predicate(it) }
@@ -35,17 +30,6 @@ class DependencyFilterApplier<T : DependencyFilter>(
 
     fun findNotNull(getter: (T) -> Any?): T? {
       return find { getter(it) != null }
-    }
-
-    private fun findAll(predicate: (T) -> Boolean): List<T> {
-      val filteredConfigs = configs.filter { predicate(it) }
-      return libraryId?.let { filteredConfigs.filter { it.dependencies.any { f -> f.test(libraryId) } } }
-        ?: kind?.let { filteredConfigs.filter { it.kinds.any { f -> f == kind.name } } }
-        ?: filteredConfigs.filter { it.dependencies.isEmpty() }
-    }
-
-    fun findAllNotNull(getter: (T) -> Any?): List<T> {
-      return findAll { getter(it) != null }
     }
   }
 }

@@ -30,6 +30,7 @@ data class App(
   val repoConfig: RepoConfig,
   val updateRulesProvider: UpdateRulesProvider,
   val searchPatternProvider: SearchPatternProvider,
+  val updateSuggestionsMapper: UpdateSuggestionsMapper,
 ) {
 
   suspend fun run() {
@@ -54,18 +55,10 @@ data class App(
       }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
 
-//      val searchPatterns = searchPatternProvider.resolveForKind(kind)
-//      val files = fileFinder.find(searchPatterns)
-
       val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
 
-      val updateSuggestionsMapper = UpdateSuggestionsMapper(
-        searchPatternProvider,
-        fileFinder
-      )
-
       val updates = updateSuggestions.mapNotNull { updateSuggestion ->
-        val libraryFiles = updateSuggestionsMapper.map(updateSuggestion)
+        val libraryFiles = updateSuggestionsMapper.map(updateSuggestion.currentLibrary)
         libraryUpdateResolver.resolve(libraryFiles, updateSuggestion, heuristics)
       }
 

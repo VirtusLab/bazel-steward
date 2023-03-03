@@ -31,7 +31,8 @@ class PathPatternTest {
     Arguments.of("regex: BUILD[\\.bzl]*", PathPattern.Regex("""BUILD[\.bzl]*""")),
     Arguments.of("regex:BUILD[\\.bzl]*", PathPattern.Regex("""BUILD[\.bzl]*""")),
     Arguments.of("**/*.bzl", PathPattern.Glob("**/*.bzl")),
-    Arguments.of("(BUILD[\\.bzl]*", PathPattern.Glob("(BUILD[\\.bzl]*")),
+    Arguments.of("BUILD[\\.bzl]?", PathPattern.Regex("BUILD[\\.bzl]?")),
+    Arguments.of("(BUILD[\\.bzl]*", PathPattern.Exact("(BUILD[\\.bzl]*")),
     Arguments.of("WORKSPACE", PathPattern.Exact("WORKSPACE")),
   )
 

@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.app
 
+import mu.KotlinLogging
 import org.virtuslab.bazelsteward.config.repo.SearchPatternConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
@@ -7,26 +8,17 @@ import org.virtuslab.bazelsteward.core.library.Library
 
 class SearchPatternProvider(
   configs: List<SearchPatternConfig>,
-  private val dependencyKinds: List<DependencyKind<*>>
+  dependencyKinds: List<DependencyKind<*>>
 ) {
 
+  private val logger = KotlinLogging.logger {}
   private val applier = DependencyFilterApplier(configs, dependencyKinds)
-
-  private fun resolveForKind(kind: DependencyKind<*>): List<PathPattern> {
-    val filter = applier.forKind(kind)
-    val patternSearch = filter.findAllNotNull { kind }
-    return patternSearch
-      .flatMap { it.pathPatterns }
-      .takeIf { it.isNotEmpty() }
-      ?: kind.defaultSearchPatterns
-  }
 
   fun resolveForLibrary(library: Library): List<PathPattern> {
     val filter = applier.forLibrary(library)
-    val patternSearch = filter.findAllNotNull { library }
-    return patternSearch
-      .flatMap { it.pathPatterns }
-      .takeIf { it.isNotEmpty() }
-      ?: resolveForKind(dependencyKinds.first { it.acceptsLibrary(library) })
+    return filter.findNotNull { library }
+      .let { it?.pathPatterns }
+      ?: filter.kind?.defaultSearchPatterns
+      ?: emptyList<PathPattern>().also { logger.warn { "No search patterns for $library" } }
   }
 }

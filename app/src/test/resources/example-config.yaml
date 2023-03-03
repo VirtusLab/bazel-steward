@@ -19,12 +19,12 @@ search-paths:
       - "com.google:*"
     path-patterns:
       - regex:.*\/WORKSPACE[.\w]*
-  - kinds:
+  -
+    kinds:
       - maven
-      - bazel
     path-patterns:
       - regex:.*\/WORKSPACE[.\w]*
       - "**/*.bzl"
-  - kinds:
-      - bazel
+  -
+    kinds: bazel
     path-patterns: regex:.*\/BUILD[\.bazel]*

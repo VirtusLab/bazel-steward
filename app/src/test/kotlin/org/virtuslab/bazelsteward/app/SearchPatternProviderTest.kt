@@ -6,17 +6,16 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibrary
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
-import org.virtuslab.bazelsteward.common.CommonProvider
 import org.virtuslab.bazelsteward.common.DependencyKindsFixture
+import org.virtuslab.bazelsteward.common.loadRepoConfigFromResources
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
-import java.nio.file.Paths
 
 class SearchPatternProviderTest {
 
-  private val config = CommonProvider.loadRepoConfigFromResources(this::class.java.classLoader, "example-config.yaml")
-  private val dependencyKinds = DependencyKindsFixture(Paths.get("."))
+  private val config = loadRepoConfigFromResources(javaClass, "example-config.yaml")
+  private val dependencyKinds = DependencyKindsFixture()
   private val searchPatternProvider = SearchPatternProvider(config.searchPaths, dependencyKinds.all)
 
   @Nested
