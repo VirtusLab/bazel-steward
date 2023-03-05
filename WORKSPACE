@@ -88,7 +88,7 @@ maven_install(
         "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.4",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1",
         "com.fasterxml.jackson.core:jackson-core:2.14.2",
-        "com.networknt:json-schema-validator:1.0.76",
+        "com.networknt:json-schema-validator:1.0.78",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
         "org.kohsuke:github-api:1.313",
         "io.github.microutils:kotlin-logging-jvm:3.0.4",
