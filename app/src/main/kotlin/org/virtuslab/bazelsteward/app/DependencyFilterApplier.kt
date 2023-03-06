@@ -24,7 +24,6 @@ class DependencyFilterApplier<T : DependencyFilter>(
     private fun find(predicate: (T) -> Boolean): T? {
       val filteredConfigs = configs.filter { predicate(it) }
       return filteredConfigs.firstOrNull { it.dependencies.any { f -> f.test(libraryId) } }
-        ?: kind?.let { filteredConfigs.firstOrNull { it.kinds.any { f -> f == kind.name } } }
         ?: filteredConfigs.firstOrNull { it.dependencies.isEmpty() }
     }
 
