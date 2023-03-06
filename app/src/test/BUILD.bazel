@@ -6,16 +6,16 @@ unit_tests(
     test_package = "org.virtuslab.bazelsteward.app",
     deps = [
         "//app/src/main",
-        "//core",
         "//app/src/test:common-testing",
+        "//core",
         "@maven//:commons_io_commons_io",
     ],
 )
 
 library(
     name = "common-testing",
-    srcs = glob(["kotlin/org/virtuslab/bazelsteward/testing/*.kt"]),
     testonly = True,
+    srcs = glob(["kotlin/org/virtuslab/bazelsteward/testing/*.kt"]),
     deps = [
         "//app/src/main",
         "//core",
