@@ -5,7 +5,7 @@ import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.library.Library
 
-class UpdateSuggestionsMapper(
+class LibraryToTextFilesMapper(
   private val searchPatternProvider: SearchPatternProvider,
   private val fileFinder: FileFinder
 ) {

@@ -92,7 +92,7 @@ object AppBuilder {
     val updateRulesProvider = UpdateRulesProvider(repoConfig.updateRules, dependencyKinds)
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds)
 
-    val updateSuggestionsMapper = UpdateSuggestionsMapper(
+    val libraryToTextFilesMapper = LibraryToTextFilesMapper(
       searchPatternProvider,
       fileFinder
     )
@@ -108,8 +108,7 @@ object AppBuilder {
       appConfig,
       repoConfig,
       updateRulesProvider,
-      searchPatternProvider,
-      updateSuggestionsMapper
+      libraryToTextFilesMapper
     )
   }
 }

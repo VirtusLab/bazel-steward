@@ -6,17 +6,17 @@ import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibrary
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId.ReleaseArtifact
 import org.virtuslab.bazelsteward.bazel.version.BazelLibrary
-import org.virtuslab.bazelsteward.common.DependencyKindsFixture
-import org.virtuslab.bazelsteward.common.loadRepoConfigFromResources
-import org.virtuslab.bazelsteward.common.prepareLocalWorkspace
 import org.virtuslab.bazelsteward.core.FileFinder
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
+import org.virtuslab.bazelsteward.testing.DependencyKindsFixture
+import org.virtuslab.bazelsteward.testing.loadRepoConfigFromResources
+import org.virtuslab.bazelsteward.testing.prepareLocalWorkspace
 import java.nio.file.Path
 
-class UpdateSuggestionsMapperTest {
+class LibraryToTextFilesMapperTest {
 
   @Test
   fun `should return correct paths for MavenDependencyKind`(@TempDir tempDir: Path) {
@@ -71,10 +71,10 @@ class UpdateSuggestionsMapperTest {
     val repoConfig = loadRepoConfigFromResources(javaClass, "example-config.yaml")
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds.all)
 
-    val updateSuggestionsMapper = UpdateSuggestionsMapper(
+    val libraryToTextFilesMapper = LibraryToTextFilesMapper(
       searchPatternProvider,
       fileFinder
     )
-    return updateSuggestionsMapper.map(library)
+    return libraryToTextFilesMapper.map(library)
   }
 }

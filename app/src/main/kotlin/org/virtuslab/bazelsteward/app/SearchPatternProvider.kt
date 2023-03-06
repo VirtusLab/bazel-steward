@@ -16,8 +16,7 @@ class SearchPatternProvider(
 
   fun resolveForLibrary(library: Library): List<PathPattern> {
     val filter = applier.forLibrary(library)
-    return filter.findNotNull { library }
-      .let { it?.pathPatterns }
+    return filter.findNotNull { it.pathPatterns }?.pathPatterns
       ?: filter.kind?.defaultSearchPatterns
       ?: emptyList<PathPattern>().also { logger.warn { "No search patterns for $library" } }
   }

@@ -29,8 +29,7 @@ data class App(
   val appConfig: AppConfig,
   val repoConfig: RepoConfig,
   val updateRulesProvider: UpdateRulesProvider,
-  val searchPatternProvider: SearchPatternProvider,
-  val updateSuggestionsMapper: UpdateSuggestionsMapper,
+  val libraryToTextFilesMapper: LibraryToTextFilesMapper,
 ) {
 
   suspend fun run() {
@@ -58,7 +57,7 @@ data class App(
       val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
 
       val updates = updateSuggestions.mapNotNull { updateSuggestion ->
-        val libraryFiles = updateSuggestionsMapper.map(updateSuggestion.currentLibrary)
+        val libraryFiles = libraryToTextFilesMapper.map(updateSuggestion.currentLibrary)
         libraryUpdateResolver.resolve(libraryFiles, updateSuggestion, heuristics)
       }
 

@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.testing
 
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.io.FileUtils
@@ -15,7 +15,7 @@ import kotlin.io.path.createDirectories
 
 private data class TestTextFile(override val path: Path, override val content: String) : TextFile
 
-fun prepareLocalWorkspace(javaClass: Class<Any>, tempDir: Path, testResourcePath: String): Path {
+fun prepareLocalWorkspace(javaClass: Class<*>, tempDir: Path, testResourcePath: String): Path {
   val localRepo = tempDir.resolve("local")
   val finalFile = localRepo.resolve(testResourcePath)
   val names = JarFile(File(javaClass.protectionDomain.codeSource.location.toURI())).use { jar ->
@@ -48,11 +48,11 @@ fun prepareRemoteWorkspace(tempDir: Path, testResourcePath: String, finalFile: P
   }
 }
 
-fun loadRepoConfigFromResources(javaClass: Class<Any>, resourceName: String): RepoConfig {
+fun loadRepoConfigFromResources(javaClass: Class<*>, resourceName: String): RepoConfig {
   return RepoConfigParser().parse(javaClass.classLoader.getResource(resourceName)!!.readText())
 }
 
-fun loadTextFileFromResources(javaClass: Class<Any>, fileName: String): TextFile {
+fun loadTextFileFromResources(javaClass: Class<*>, fileName: String): TextFile {
   val url = javaClass.classLoader.getResource(fileName)!!
   return TestTextFile(Path(url.path), url.readText())
 }

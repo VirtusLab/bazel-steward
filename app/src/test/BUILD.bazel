@@ -1,5 +1,5 @@
 unit_tests(
-    srcs = glob(["kotlin/**/*.kt"]),
+    srcs = glob(["kotlin/org/virtuslab/bazelsteward/app/*.kt"]),
     resources = glob(
         ["resources/**"],
     ),
@@ -7,6 +7,19 @@ unit_tests(
     deps = [
         "//app/src/main",
         "//core",
+        "//app/src/test:common-testing",
+        "@maven//:commons_io_commons_io",
+    ],
+)
+
+library(
+    name = "common-testing",
+    srcs = glob(["kotlin/org/virtuslab/bazelsteward/testing/*.kt"]),
+    testonly = True,
+    deps = [
+        "//app/src/main",
+        "//core",
+        "//repo-config",
         "@maven//:commons_io_commons_io",
     ],
 )

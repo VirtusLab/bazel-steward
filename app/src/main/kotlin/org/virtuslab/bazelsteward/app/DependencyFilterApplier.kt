@@ -18,12 +18,12 @@ class DependencyFilterApplier<T : DependencyFilter>(
 
   class FilteredByKind<T : DependencyFilter>(
     private val configs: List<T>,
-    private val libraryId: LibraryId?,
+    private val libraryId: LibraryId,
     val kind: DependencyKind<*>?
   ) {
     private fun find(predicate: (T) -> Boolean): T? {
       val filteredConfigs = configs.filter { predicate(it) }
-      return libraryId?.let { filteredConfigs.firstOrNull { it.dependencies.any { f -> f.test(libraryId) } } }
+      return filteredConfigs.firstOrNull { it.dependencies.any { f -> f.test(libraryId) } }
         ?: kind?.let { filteredConfigs.firstOrNull { it.kinds.any { f -> f == kind.name } } }
         ?: filteredConfigs.firstOrNull { it.dependencies.isEmpty() }
     }

@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.common
+package org.virtuslab.bazelsteward.testing
 
 import org.kohsuke.github.GitHub
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind

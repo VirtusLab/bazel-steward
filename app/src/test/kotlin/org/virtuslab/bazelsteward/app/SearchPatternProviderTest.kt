@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibrary
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
-import org.virtuslab.bazelsteward.common.DependencyKindsFixture
-import org.virtuslab.bazelsteward.common.loadRepoConfigFromResources
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
+import org.virtuslab.bazelsteward.testing.DependencyKindsFixture
+import org.virtuslab.bazelsteward.testing.loadRepoConfigFromResources
 
 class SearchPatternProviderTest {
 

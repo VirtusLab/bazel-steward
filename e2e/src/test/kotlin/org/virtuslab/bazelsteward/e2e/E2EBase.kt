@@ -5,8 +5,6 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
-import org.virtuslab.bazelsteward.common.prepareLocalWorkspace
-import org.virtuslab.bazelsteward.common.prepareRemoteWorkspace
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -18,6 +16,8 @@ import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenRepository
+import org.virtuslab.bazelsteward.testing.prepareLocalWorkspace
+import org.virtuslab.bazelsteward.testing.prepareRemoteWorkspace
 import java.nio.file.Path
 
 open class E2EBase {
