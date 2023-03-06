@@ -1,12 +1,12 @@
-integration_tests(
+unit_tests(
     srcs = glob(["kotlin/**/*.kt"]),
     resources = glob(
         ["resources/**"],
     ),
-    test_package = "org.virtuslab.bazelsteward.e2e",
+    test_package = "org.virtuslab.bazelsteward.app",
     deps = [
         "//app/src/main",
-        "//app/src/test:common-testing",
+        "//core",
         "@maven//:commons_io_commons_io",
     ],
 )

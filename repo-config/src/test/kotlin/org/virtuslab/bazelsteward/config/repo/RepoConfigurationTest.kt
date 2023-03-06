@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -51,7 +52,7 @@ class RepoConfigurationTest {
           dependencies = listOf(DependencyNameFilter.Default("commons-io:commons-io")),
           versioning = VersioningSchema.Loose,
           bumping = BumpingStrategy.Default,
-          pin = PinningStrategy.Prefix("2.0.")
+          pin = PinningStrategy.Prefix("2.0."),
         ),
         UpdateRulesConfig(
           dependencies = listOf(DependencyNameFilter.Default("io.get-coursier:interface")),
@@ -70,6 +71,26 @@ class RepoConfigurationTest {
           versioning = VersioningSchema.Loose,
         ),
       ),
+      listOf(
+        SearchPatternConfig(
+          dependencies = listOf(DependencyNameFilter.Default("com.google:*")),
+          pathPatterns = listOf(
+            PathPattern.Exact(value = "bazel/google-deps.bzl")
+          )
+        ),
+        SearchPatternConfig(
+          kinds = listOf("maven"),
+          pathPatterns = listOf(
+            PathPattern.Regex(value = """.*/bazel/deps.bzl""")
+          )
+        ),
+        SearchPatternConfig(
+          kinds = listOf("bazel-rules"),
+          pathPatterns = listOf(
+            PathPattern.Glob(value = "WORKSPACE{,.bazel}")
+          )
+        )
+      )
     )
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)
   }

@@ -11,3 +11,20 @@ update-rules:
     versioning: semver
   -
     bumping: default
+search-paths:
+  -
+    dependencies:
+      - "org.virtuslab:dep-a"
+      - "org.virtuslab:dep-b"
+      - "com.google:*"
+    path-patterns:
+      - regex:.*\/WORKSPACE[.\w]*
+  -
+    kinds:
+      - maven
+    path-patterns:
+      - regex:.*\/WORKSPACE[.\w]*
+      - "**/*.bzl"
+  -
+    kinds: bazel
+    path-patterns: regex:.*\/BUILD[\.bazel]*

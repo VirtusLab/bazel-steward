@@ -28,7 +28,8 @@ data class App(
   val gitHostClient: GitHostClient,
   val appConfig: AppConfig,
   val repoConfig: RepoConfig,
-  val updateRulesProvider: UpdateRulesProvider
+  val updateRulesProvider: UpdateRulesProvider,
+  val libraryToTextFilesMapper: LibraryToTextFilesMapper,
 ) {
 
   suspend fun run() {
@@ -53,13 +54,11 @@ data class App(
       }
       logger.debug { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
 
-      val searchPatterns = kind.defaultSearchPatterns // TODO: read overrides from config for given dependency kind
-      val files = fileFinder.find(searchPatterns)
-
       val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
 
       val updates = updateSuggestions.mapNotNull { updateSuggestion ->
-        libraryUpdateResolver.resolve(files, updateSuggestion, heuristics)
+        val libraryFiles = libraryToTextFilesMapper.map(updateSuggestion.currentLibrary)
+        libraryUpdateResolver.resolve(libraryFiles, updateSuggestion, heuristics)
       }
 
       updates
