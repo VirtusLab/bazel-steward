@@ -14,8 +14,8 @@ http_archive(
 )
 
 # bazel_skylib - starlark functions
-BAZEL_SKYLIB_TAG = "1.2.1"
-BAZEL_SKYLIB_SHA = "f7be3474d42aae265405a592bb7da8e171919d74c16f082a5457840f06054728"
+BAZEL_SKYLIB_TAG = "1.4.0"
+BAZEL_SKYLIB_SHA = "f24ab666394232f834f74d19e2ff142b0af17466ea0c69a3f4c276ee75f6efce"
 
 http_archive(
     name = "bazel_skylib",
