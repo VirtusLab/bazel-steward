@@ -11,7 +11,12 @@ import kotlin.math.min
 class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
 
   override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, RuleVersion> =
-    ruleId.toRepositoryId().listReleases().mapNotNull { shaFromBodyAndCurrentUrl(ruleId, it) }.toMap()
+    ruleId.toRepositoryId().listReleases()
+      .let {
+        val listSeq = it.toList()
+        it
+      }
+      .mapNotNull { shaFromBodyAndCurrentUrl(ruleId, it) }.toMap()
 
   private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion>? =
     sha256Regex.findAll(release.body).map { it.value }.toList().singleOrNull()?.let { sha ->

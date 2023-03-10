@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
+import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -29,7 +30,7 @@ open class E2EBase {
   protected fun branch(libraryId: String, version: String): String =
     "$branchRef/$libraryId/$version"
 
-  protected fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
+  fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
     return libs.map { "$branchRef/${it.first}/${it.second}" } + masterRef
   }
 
@@ -45,7 +46,7 @@ open class E2EBase {
     runBazelStewardWith(workspaceRoot, args) { x -> x }
   }
 
-  protected fun runBazelStewardWith(
+  fun runBazelStewardWith(
     tempDir: Path,
     project: String,
     args: List<String> = listOf("--push-to-remote"),
@@ -137,6 +138,12 @@ open class E2EBase {
           mockMavenRepositoryWithVersion(*versions.toTypedArray())
         )
       )
+    )
+  }
+
+  protected fun App.withRulesOnly(): App {
+    return this.copy(
+      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelRulesDependencyKind>()
     )
   }
 

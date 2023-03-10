@@ -1,0 +1,307 @@
+workspace(name = "maven-trivial")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# rules_jvm_external - for maven dependencies
+RULES_JVM_EXTERNAL_TAG = "4.4.2"
+RULES_JVM_EXTERNAL_SHA = "735602f50813eb2ea93ca3f5e43b1959bd80b213b836a07a62a29d757670b77b"
+
+http_archive(
+    name = "rules_jvm_external",
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(RULES_JVM_EXTERNAL_TAG),
+)
+
+IO_BAZEL_KOTLIN_RULES_TAG = "v1.6.0"
+IO_BAZEL_KOTLIN_RULES_SHA = "a57591404423a52bd6b18ebba7979e8cd2243534736c5c94d35c89718ea38f94"
+
+http_archive(
+    name = "io_bazel_rules_kotlin",
+    sha256 = IO_BAZEL_KOTLIN_RULES_SHA,
+    url = "https://github.com/bazelbuild/rules_kotlin/releases/download/{}/rules_kotlin_release.tgz".format(IO_BAZEL_KOTLIN_RULES_TAG),
+)
+
+load("@io_bazel_rules_kotlin//kotlin:repositories.bzl", "kotlin_repositories")
+
+kotlin_repositories()
+
+register_toolchains("//:kotlin_toolchain")
+
+# bazel_skylib - starlark functions
+BAZEL_SKYLIB_TAG = "1.2.1"
+BAZEL_SKYLIB_SHA = "f7be3474d42aae265405a592bb7da8e171919d74c16f082a5457840f06054728"
+
+http_archive(
+    name = "bazel_skylib",
+    sha256 = BAZEL_SKYLIB_SHA,
+    url = "https://github.com/bazelbuild/bazel-skylib/releases/download/{}/bazel-skylib-{}.tar.gz".format(BAZEL_SKYLIB_TAG, BAZEL_SKYLIB_TAG),
+)
+
+# io_bazel_rules_scala - required to avoid cyclic init error
+IO_BAZEL_RULES_SCALA_TAG = "20220201"
+
+IO_BAZEL_RULES_SCALA_SHA = "77a3b9308a8780fff3f10cdbbe36d55164b85a48123033f5e970fdae262e8eb2"
+
+http_archive(
+    name = "io_bazel_rules_scala",
+    sha256 = IO_BAZEL_RULES_SCALA_SHA,
+    strip_prefix = "rules_scala-{}".format(IO_BAZEL_RULES_SCALA_TAG),
+    url = "https://github.com/bazelbuild/rules_scala/releases/download/{}/rules_scala-{}.zip".format(IO_BAZEL_RULES_SCALA_TAG, IO_BAZEL_RULES_SCALA_TAG),
+)
+
+load("@io_bazel_rules_scala//:scala_config.bzl", "scala_config")
+
+scala_config(scala_version = "2.13.6")
+
+load("@io_bazel_rules_scala//scala:toolchains.bzl", "scala_register_toolchains")
+
+scala_register_toolchains()
+
+load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
+
+scala_repositories()
+
+# android_rules
+ANDROID_RULES_TAG = "0.1.0"
+ANDROID_RULES_SHA = "cd06d15dd8bb59926e4d65f9003bfc20f9da4b2519985c27e190cddc8b7a7806"
+
+http_archive(
+    name = "build_bazel_rules_android",
+    urls = ["https://github.com/bazelbuild/rules_android/archive/v{}.zip".format(ANDROID_RULES_TAG)],
+    sha256 = ANDROID_RULES_SHA,
+    strip_prefix = "rules_android-{}".format(ANDROID_RULES_TAG),
+)
+
+# apple_rules
+APPLE_RULES_TAG = "2.0.0"
+APPLE_RULES_SHA = "43737f28a578d8d8d7ab7df2fb80225a6b23b9af9655fcdc66ae38eb2abcf2ed"
+
+http_archive(
+    name = "build_bazel_rules_apple",
+    sha256 = APPLE_RULES_SHA,
+    url = "https://github.com/bazelbuild/rules_apple/releases/download/{}/rules_apple.{}.tar.gz".format(APPLE_RULES_TAG, APPLE_RULES_TAG),
+)
+
+load(
+    "@build_bazel_rules_apple//apple:repositories.bzl",
+    "apple_rules_dependencies",
+)
+
+apple_rules_dependencies()
+
+load(
+    "@build_bazel_rules_swift//swift:repositories.bzl",
+    "swift_rules_dependencies",
+)
+
+swift_rules_dependencies()
+
+load(
+    "@build_bazel_rules_swift//swift:extras.bzl",
+    "swift_rules_extra_dependencies",
+)
+
+swift_rules_extra_dependencies()
+
+load(
+    "@build_bazel_apple_support//lib:repositories.bzl",
+    "apple_support_dependencies",
+)
+
+apple_support_dependencies()
+
+# rules_cc
+RULES_CC_TAG = "0.0.5"
+RULES_CC_SHA = "2004c71f3e0a88080b2bd3b6d3b73b4c597116db9c9a36676d0ffad39b849214"
+
+http_archive(
+    name = "rules_cc",
+    urls = ["https://github.com/bazelbuild/rules_cc/releases/download/{}/rules_cc-{}.tar.gz".format(RULES_CC_TAG, RULES_CC_TAG)],
+    sha256 = RULES_CC_SHA,
+    strip_prefix = "rules_cc-{}".format(RULES_CC_TAG),
+)
+
+# rules_dotnet
+RULES_DOTNET_TAG = "0.8.5"
+RULES_DOTNET_SHA = "ddf7d09c28b7f23372fc509d2145ec8e4640d76bbcfa584b5dc8af14c38ed92f"
+
+http_archive(
+    name = "rules_dotnet",
+    sha256 = RULES_DOTNET_SHA,
+    strip_prefix = "rules_dotnet-{}".format(RULES_DOTNET_TAG),
+    url = "https://github.com/bazelbuild/rules_dotnet/archive/refs/tags/v{}.tar.gz".format(RULES_DOTNET_TAG),
+)
+
+load(
+    "@rules_dotnet//dotnet:repositories.bzl",
+    "dotnet_register_toolchains",
+    "rules_dotnet_dependencies",
+)
+
+rules_dotnet_dependencies()
+
+# Here you can specify the version of the .NET SDK to use.
+dotnet_register_toolchains("dotnet", "7.0.101")
+
+load("@rules_dotnet//dotnet:rules_dotnet_nuget_packages.bzl", "rules_dotnet_nuget_packages")
+
+rules_dotnet_nuget_packages()
+
+# rules_closure
+# RULES_CLOSURE_TAG = "0.8.0"
+# RULES_CLOSURE_SHA = "b29a8bc2cb10513c864cb1084d6f38613ef14a143797cea0af0f91cd385f5e8c"
+
+# http_archive(
+#     name = "io_bazel_rules_closure",
+#     sha256 = RULES_CLOSURE_SHA,
+#     strip_prefix = "rules_closure-{}".format(RULES_CLOSURE_TAG),
+#     urls = [
+#         "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
+#         "https://github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
+#     ],
+# )
+# load("@io_bazel_rules_closure//closure:defs.bzl", "closure_repositories")
+# closure_repositories()
+
+# rules_foreign_cc
+RULES_FOREIGN_CC_TAG = "0.8.0"
+RULES_FOREIGN_CC_SHA = "6041f1374ff32ba711564374ad8e007aef77f71561a7ce784123b9b4b88614fc"
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "rules_foreign_cc",
+    sha256 = RULES_FOREIGN_CC_SHA,
+    strip_prefix = "rules_foreign_cc-{}".format(RULES_FOREIGN_CC_TAG),
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/{}.tar.gz".format(RULES_FOREIGN_CC_TAG),
+)
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+# This sets up some common toolchains for building targets. For more details, please see
+# https://bazelbuild.github.io/rules_foreign_cc/0.8.0/flatten.html#rules_foreign_cc_dependencies
+rules_foreign_cc_dependencies()
+
+# rules_go
+
+http_archive(
+    name = "bazel_gazelle",
+    sha256 = "ecba0f04f96b4960a5b250c8e8eeec42281035970aa8852dda73098274d14a1d",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.29.0/bazel-gazelle-v0.29.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.29.0/bazel-gazelle-v0.29.0.tar.gz",
+    ],
+)
+
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+
+RULES_GO_TAG = "v0.37.0"
+RULES_GO_SHA = "56d8c5a5c91e1af73eca71a6fab2ced959b67c86d12ba37feedb0a2dfea441a6"
+
+http_archive(
+    name = "io_bazel_rules_go",
+    sha256 = RULES_GO_SHA,
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/{}/rules_go-{}.zip".format(RULES_GO_TAG, RULES_GO_TAG),
+        "https://github.com/bazelbuild/rules_go/releases/download/{}/rules_go-{}.zip".format(RULES_GO_TAG, RULES_GO_TAG),
+    ],
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains(version = "1.19.3")
+
+# rules_java
+RULES_JAVA_TAG = "5.4.0"
+RULES_JAVA_SHA = "9b87757af5c77e9db5f7c000579309afae75cf6517da745de01ba0c6e4870951"
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_archive(
+    name = "rules_java",
+    url = "https://github.com/bazelbuild/rules_java/releases/download/{}/rules_java-{}.tar.gz".format(RULES_JAVA_TAG, RULES_JAVA_TAG),
+    sha256 = RULES_JAVA_SHA,
+)
+load("@rules_java//java:repositories.bzl", "rules_java_dependencies", "rules_java_toolchains")
+rules_java_dependencies()
+rules_java_toolchains()
+
+# rules_k8s
+RULES_K8S_TAG = "0.6"
+RULES_K8S_SHA = "51f0977294699cd547e139ceff2396c32588575588678d2054da167691a227ef"
+
+# https://github.com/bazelbuild/rules_docker/#setup
+# http_archive("io_bazel_rules_docker", ...)
+
+http_archive(
+    name = "io_bazel_rules_k8s",
+    strip_prefix = "rules_k8s-{}".format(RULES_K8S_TAG),
+    urls = ["https://github.com/bazelbuild/rules_k8s/archive/v{}.tar.gz".format(RULES_K8S_TAG)],
+    sha256 = RULES_K8S_SHA,
+)
+
+load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
+
+k8s_repositories()
+
+load("@io_bazel_rules_k8s//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
+
+k8s_go_deps()
+
+# rules_python
+RULES_PYTHON_TAG = "0.16.1"
+RULES_PYTHON_SHA = "29a801171f7ca190c543406f9894abf2d483c206e14d6acbd695623662320097"
+
+http_archive(
+    name = "rules_python",
+    sha256 = RULES_PYTHON_SHA,
+    strip_prefix = "rules_python-{}".format(RULES_PYTHON_TAG),
+    url = "https://github.com/bazelbuild/rules_python/releases/download/{}/rules_python-{}.tar.gz".format(RULES_PYTHON_TAG, RULES_PYTHON_TAG),
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+# rules_proto
+RULES_PROTO_TAG = "5.3.0-21.5"
+RULES_PROTO_SHA = "80d3a4ec17354cccc898bfe32118edd934f851b03029d63ef3fc7c8663a7415c"
+
+http_archive(
+    name = "rules_proto",
+    sha256 = RULES_PROTO_SHA,
+    strip_prefix = "rules_proto-{}".format(RULES_PROTO_TAG),
+    urls = [
+        "https://github.com/bazelbuild/rules_proto/archive/refs/tags/{}.tar.gz".format(RULES_PROTO_TAG),
+    ],
+)
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+rules_proto_dependencies()
+rules_proto_toolchains()
+
+# rules_docker
+RULES_DOCKER_TAG = "0.24.0"
+RULES_DOCKER_SHA = "27d53c1d646fc9537a70427ad7b034734d08a9c38924cc6357cc973fed300820"
+
+http_archive(
+    name = "io_bazel_rules_docker",
+    sha256 = RULES_DOCKER_SHA,
+    strip_prefix = "rules_docker-{}".format(RULES_DOCKER_TAG),
+    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v{}/rules_docker-v{}.tar.gz".format(RULES_DOCKER_TAG, RULES_DOCKER_TAG)],
+)
+
+# maven deps
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+        "io.arrow-kt:arrow-core:1.1.2",
+        "io.arrow-kt:arrow-fx-coroutines:1.1.2",
+    ],
+    fetch_sources = False,
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)

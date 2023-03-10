@@ -1,0 +1,47 @@
+workspace(name = "maven-trivial")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# rules_jvm_external - for maven dependencies
+RULES_JVM_EXTERNAL_TAG = "4.4.2"
+RULES_JVM_EXTERNAL_SHA = "735602f50813eb2ea93ca3f5e43b1959bd80b213b836a07a62a29d757670b77b"
+
+http_archive(
+    name = "rules_jvm_external",
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(RULES_JVM_EXTERNAL_TAG),
+)
+
+# rules_go
+RULES_GO_TAG = "v0.37.0"
+RULES_GO_SHA = "56d8c5a5c91e1af73eca71a6fab2ced959b67c86d12ba37feedb0a2dfea441a6"
+
+http_archive(
+    name = "io_bazel_rules_go",
+    sha256 = RULES_GO_SHA,
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/{}/rules_go-{}.zip".format(RULES_GO_TAG, RULES_GO_TAG),
+        "https://github.com/bazelbuild/rules_go/releases/download/{}/rules_go-{}.zip".format(RULES_GO_TAG, RULES_GO_TAG),
+    ],
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains(version = "1.19.3")
+
+# maven deps
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+        "io.arrow-kt:arrow-core:1.1.2",
+        "io.arrow-kt:arrow-fx-coroutines:1.1.2",
+    ],
+    fetch_sources = False,
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)

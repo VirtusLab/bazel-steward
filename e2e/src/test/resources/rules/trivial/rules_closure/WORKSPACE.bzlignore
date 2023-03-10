@@ -1,0 +1,46 @@
+workspace(name = "maven-trivial")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# rules_jvm_external - for maven dependencies
+RULES_JVM_EXTERNAL_TAG = "4.4.2"
+RULES_JVM_EXTERNAL_SHA = "735602f50813eb2ea93ca3f5e43b1959bd80b213b836a07a62a29d757670b77b"
+
+http_archive(
+    name = "rules_jvm_external",
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(RULES_JVM_EXTERNAL_TAG),
+)
+
+# rules_closure
+RULES_CLOSURE_TAG = "0.10.0"
+RULES_CLOSURE_SHA = "7d206c2383811f378a5ef03f4aacbcf5f47fd8650f6abbc3fa89f3a27dd8b176"
+
+http_archive(
+    name = "io_bazel_rules_closure",
+    sha256 = RULES_CLOSURE_SHA,
+    strip_prefix = "rules_closure-{}".format(RULES_CLOSURE_TAG),
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
+        "https://github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
+    ],
+)
+
+load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
+rules_closure_dependencies()
+rules_closure_toolchains()
+
+# maven deps
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+        "io.arrow-kt:arrow-core:1.1.2",
+        "io.arrow-kt:arrow-fx-coroutines:1.1.2",
+    ],
+    fetch_sources = False,
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
