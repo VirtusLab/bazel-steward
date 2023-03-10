@@ -32,7 +32,7 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
     val name: String?,
     val sha256: String?,
     val url: String?,
-    val urls: List<String?>?,
+    val urls: List<String>?,
     val strip_prefix: String?,
   )
 
@@ -77,8 +77,8 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
             RuleLibraryId.from(it.url, it.sha256!!)
           } else {
             it.urls!!
-              .first { it1 -> it1!!.startsWith("https://github.com/") }
-              ?.let { it1 -> RuleLibraryId.from(it1, it.sha256!!) }
+              .first { url -> url.startsWith("https://github.com/") }
+              .let { url -> RuleLibraryId.from(url, it.sha256!!) }
           }
         }
       result.map { RuleLibrary(it, SimpleVersion(it.tag)) }

@@ -291,17 +291,3 @@ http_archive(
     strip_prefix = "rules_docker-{}".format(RULES_DOCKER_TAG),
     urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v{}/rules_docker-v{}.tar.gz".format(RULES_DOCKER_TAG, RULES_DOCKER_TAG)],
 )
-
-# maven deps
-load("@rules_jvm_external//:defs.bzl", "maven_install")
-
-maven_install(
-    artifacts = [
-        "io.arrow-kt:arrow-core:1.1.2",
-        "io.arrow-kt:arrow-fx-coroutines:1.1.2",
-    ],
-    fetch_sources = False,
-    repositories = [
-        "https://repo1.maven.org/maven2",
-    ],
-)
