@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Disabled
 import org.virtuslab.bazelsteward.e2e.E2EBase
 import org.virtuslab.bazelsteward.e2e.RulesUpdateTest
 
-@Disabled("test")
 class K8SRulesUpdateTest : RulesUpdateTest(
   "rules/trivial/rules_k8s",
   E2EBase().expectedBranches(
