@@ -2,10 +2,10 @@ package org.virtuslab.bazelsteward.e2e.rules_update
 
 import org.junit.jupiter.api.Disabled
 import org.virtuslab.bazelsteward.e2e.E2EBase
-import org.virtuslab.bazelsteward.e2e.RulesUpdateTest
+import org.virtuslab.bazelsteward.e2e.RulesUpdate
 
 @Disabled("Scala's release's tag is not compatible with SemVer")
-class ScalaRulesUpdateTest : RulesUpdateTest(
+class ScalaRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_scala",
   E2EBase().expectedBranches(
     "io_bazel_rules_scala" to "v5.0.0",

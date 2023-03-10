@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 
-open class RulesUpdateTest(
+open class RulesUpdate(
   private val project: String,
   private val expectedBranches: List<String>
 ) : E2EBase() {
