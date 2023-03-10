@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.e2e.rules_update
 
-import org.junit.jupiter.api.Disabled
 import org.virtuslab.bazelsteward.e2e.E2EBase
 import org.virtuslab.bazelsteward.e2e.RulesUpdateTest
 
