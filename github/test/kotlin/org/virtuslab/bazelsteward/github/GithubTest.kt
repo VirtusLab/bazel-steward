@@ -7,8 +7,6 @@ import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
 import org.virtuslab.bazelsteward.core.common.GitClient
-import org.virtuslab.bazelsteward.core.library.LibraryId
-import org.virtuslab.bazelsteward.core.library.SimpleVersion
 
 /**
  * You need to set four env vars to run this test suite:
@@ -37,20 +35,9 @@ class GithubTest {
     val gitHostClient = GithubClient.getClient(env, baseBranch = "base", gitAuthor)
 
     branchToPrStatus.forEach {
-      val branch = simpleBranch(it.first)
+      val branch = GitBranch(it.first)
       val status = gitHostClient.checkPrStatus(branch)
       Assertions.assertEquals(status, it.second)
     }
-  }
-
-  private fun simpleBranch(branch: String): GitBranch {
-    val split = branch.split('/', limit = 3)
-    val lib = object : LibraryId() {
-      override fun associatedStrings(): List<List<String>> = emptyList()
-      override val name = split[1]
-    }
-    val ver = SimpleVersion(split[2])
-
-    return GitBranch(lib.name + ver.value)
   }
 }
