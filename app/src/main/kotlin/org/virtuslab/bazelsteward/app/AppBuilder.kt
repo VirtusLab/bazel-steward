@@ -90,6 +90,12 @@ object AppBuilder {
     val pullRequestSuggester = PullRequestSuggester()
 
     val updateRulesProvider = UpdateRulesProvider(repoConfig.updateRules, dependencyKinds)
+    val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds)
+
+    val libraryToTextFilesMapper = LibraryToTextFilesMapper(
+      searchPatternProvider,
+      fileFinder
+    )
 
     return App(
       gitOperations,
@@ -101,7 +107,8 @@ object AppBuilder {
       gitHostClient,
       appConfig,
       repoConfig,
-      updateRulesProvider
+      updateRulesProvider,
+      libraryToTextFilesMapper
     )
   }
 }

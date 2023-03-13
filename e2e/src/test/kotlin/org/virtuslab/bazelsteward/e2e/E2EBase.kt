@@ -1,7 +1,6 @@
 package org.virtuslab.bazelsteward.e2e
 
 import io.kotest.common.runBlocking
-import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
@@ -17,11 +16,9 @@ import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenRepository
-import java.io.File
+import org.virtuslab.bazelsteward.testing.prepareLocalWorkspace
+import org.virtuslab.bazelsteward.testing.prepareRemoteWorkspace
 import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.jar.JarFile
-import kotlin.io.path.createDirectories
 
 open class E2EBase {
   protected val heads = "refs/heads/"
@@ -70,33 +67,8 @@ open class E2EBase {
   }
 
   protected fun prepareWorkspace(tempDir: Path, testResourcePath: String): Path {
-    val localRepo = tempDir.resolve("local")
-    val finalFile = localRepo.resolve(testResourcePath)
-    val names = JarFile(File(javaClass.protectionDomain.codeSource.location.toURI())).use { jar ->
-      val entries = jar.entries().asIterator().asSequence()
-      entries.filterNot { it.isDirectory }.map { it.name }.filter { it.startsWith(testResourcePath) }.toList()
-    }
-    names.forEach { name ->
-      FileUtils.copyURLToFile(
-        javaClass.classLoader.getResource(name),
-        localRepo.resolve(name.removeSuffix(".bzlignore")).toFile()
-      )
-    }
-
-    runBlocking {
-      val remoteRepo = tempDir.resolve("remote")
-      remoteRepo.createDirectories()
-      GitClient(remoteRepo).init(bare = true)
-
-      val git = GitClient(finalFile)
-      git.init(initialBranch = master)
-      git.configureAuthor("bazel-steward@virtuslab.org", "Bazel Steward")
-      git.add(Paths.get("."))
-      git.commit("Maven test $testResourcePath")
-      git.remoteAdd("origin", remoteRepo.toString())
-      git.push(master)
-    }
-    return finalFile
+    return prepareLocalWorkspace(javaClass, tempDir, testResourcePath)
+      .also { prepareRemoteWorkspace(tempDir, testResourcePath, it, master) }
   }
 
   protected fun checkBranchesWithVersions(

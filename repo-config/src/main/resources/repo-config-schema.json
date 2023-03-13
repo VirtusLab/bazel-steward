@@ -33,6 +33,32 @@
         "anyOf": ["versioning", "bumping", "pin", "kinds", "dependencies"],
         "additionalProperties": false
       }
+    },
+    "search-paths": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "path-patterns": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   }
 }
