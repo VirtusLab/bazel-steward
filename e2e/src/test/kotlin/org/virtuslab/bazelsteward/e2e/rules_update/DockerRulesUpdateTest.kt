@@ -4,7 +4,5 @@ import org.virtuslab.bazelsteward.e2e.RulesUpdate
 
 class DockerRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_docker",
-  arrayOf(
-    "rules_docker" to "v0.25.0"
-  )
+  "rules_docker" to "v0.25.0"
 )

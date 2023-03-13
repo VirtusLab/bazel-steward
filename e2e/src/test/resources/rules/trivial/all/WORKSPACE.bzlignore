@@ -1,5 +1,3 @@
-workspace(name = "maven-trivial")
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # rules_jvm_external - for maven dependencies
@@ -149,20 +147,22 @@ load("@rules_dotnet//dotnet:rules_dotnet_nuget_packages.bzl", "rules_dotnet_nuge
 rules_dotnet_nuget_packages()
 
 # rules_closure
-# RULES_CLOSURE_TAG = "0.8.0"
-# RULES_CLOSURE_SHA = "b29a8bc2cb10513c864cb1084d6f38613ef14a143797cea0af0f91cd385f5e8c"
+RULES_CLOSURE_TAG = "0.10.0"
+RULES_CLOSURE_SHA = "7d206c2383811f378a5ef03f4aacbcf5f47fd8650f6abbc3fa89f3a27dd8b176"
 
-# http_archive(
-#     name = "io_bazel_rules_closure",
-#     sha256 = RULES_CLOSURE_SHA,
-#     strip_prefix = "rules_closure-{}".format(RULES_CLOSURE_TAG),
-#     urls = [
-#         "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
-#         "https://github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
-#     ],
-# )
-# load("@io_bazel_rules_closure//closure:defs.bzl", "closure_repositories")
-# closure_repositories()
+http_archive(
+    name = "io_bazel_rules_closure",
+    sha256 = RULES_CLOSURE_SHA,
+    strip_prefix = "rules_closure-{}".format(RULES_CLOSURE_TAG),
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
+        "https://github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(RULES_CLOSURE_TAG),
+    ],
+)
+
+load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
+rules_closure_dependencies()
+rules_closure_toolchains()
 
 # rules_foreign_cc
 RULES_FOREIGN_CC_TAG = "0.8.0"

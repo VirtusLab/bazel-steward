@@ -4,7 +4,5 @@ import org.virtuslab.bazelsteward.e2e.RulesUpdate
 
 class GoRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_go",
-  arrayOf(
-    "rules_go" to "v0.38.1"
-  )
+  "rules_go" to "v0.38.1"
 )

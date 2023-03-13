@@ -6,7 +6,5 @@ import org.virtuslab.bazelsteward.e2e.RulesUpdate
 @Disabled("Multiple sha256 in descriptions of newest releases")
 class SkylibRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_skylib",
-  arrayOf(
-    "bazel-skylib" to "1.4.1"
-  )
+  "bazel-skylib" to "1.4.1"
 )

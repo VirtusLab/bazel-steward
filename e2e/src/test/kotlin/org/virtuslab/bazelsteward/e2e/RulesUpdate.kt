@@ -6,7 +6,7 @@ import java.nio.file.Path
 
 open class RulesUpdate(
   private val project: String,
-  private val expectedVersions: Array<Pair<String, String>>
+  private vararg val expectedVersions: Pair<String, String>
 ) : E2EBase() {
 
   @Test
@@ -15,7 +15,7 @@ open class RulesUpdate(
       it.withRulesOnly()
     }
 
-    val expectedBranches = E2EBase().expectedBranches(*expectedVersions)
+    val expectedBranches = expectedBranches(*expectedVersions)
 
     checkBranchesWithVersions(tempDir, project, expectedBranches)
   }

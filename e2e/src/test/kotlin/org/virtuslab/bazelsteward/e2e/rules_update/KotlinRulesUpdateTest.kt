@@ -4,7 +4,5 @@ import org.virtuslab.bazelsteward.e2e.RulesUpdate
 
 class KotlinRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_kotlin",
-  arrayOf(
-    "rules_kotlin" to "v1.7.1"
-  )
+  "rules_kotlin" to "v1.7.1"
 )

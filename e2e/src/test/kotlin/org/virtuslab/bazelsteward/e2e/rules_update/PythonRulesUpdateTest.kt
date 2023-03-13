@@ -6,7 +6,5 @@ import org.virtuslab.bazelsteward.e2e.RulesUpdate
 @Disabled("Multiple sha256 in descriptions of newest releases")
 class PythonRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_python",
-  arrayOf(
-    "rules_python" to "0.19.0"
-  )
+  "rules_python" to "0.19.0"
 )

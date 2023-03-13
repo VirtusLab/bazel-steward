@@ -30,7 +30,7 @@ open class E2EBase {
   protected fun branch(libraryId: String, version: String): String =
     "$branchRef/$libraryId/$version"
 
-  fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
+  protected fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
     return libs.map { "$branchRef/${it.first}/${it.second}" } + masterRef
   }
 
@@ -46,7 +46,7 @@ open class E2EBase {
     runBazelStewardWith(workspaceRoot, args) { x -> x }
   }
 
-  fun runBazelStewardWith(
+  protected fun runBazelStewardWith(
     tempDir: Path,
     project: String,
     args: List<String> = listOf("--push-to-remote"),

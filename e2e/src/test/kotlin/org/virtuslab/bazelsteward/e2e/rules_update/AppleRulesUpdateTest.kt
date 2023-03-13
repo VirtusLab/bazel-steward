@@ -4,7 +4,5 @@ import org.virtuslab.bazelsteward.e2e.RulesUpdate
 
 class AppleRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_apple",
-  arrayOf(
-    "rules_apple" to "2.1.0"
-  )
+  "rules_apple" to "2.1.0"
 )

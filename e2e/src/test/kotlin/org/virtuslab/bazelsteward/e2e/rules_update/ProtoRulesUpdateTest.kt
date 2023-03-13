@@ -6,7 +6,5 @@ import org.virtuslab.bazelsteward.e2e.RulesUpdate
 @Disabled("All releases are actually prereleases.")
 class ProtoRulesUpdateTest : RulesUpdate(
   "rules/trivial/rules_proto",
-  arrayOf(
-    "rules_proto" to "5.3.0-21.7"
-  )
+  "rules_proto" to "5.3.0-21.7"
 )
