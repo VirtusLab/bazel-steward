@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.e2e
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.virtuslab.bazelsteward.e2e.fixture.E2EBase
 import java.nio.file.Path
 
 class BazelUpdateTest : E2EBase() {

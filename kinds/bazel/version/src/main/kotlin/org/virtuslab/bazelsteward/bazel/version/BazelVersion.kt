@@ -3,7 +3,6 @@ package org.virtuslab.bazelsteward.bazel.version
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.virtuslab.bazelsteward.core.library.Version
-import java.lang.RuntimeException
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.readLines

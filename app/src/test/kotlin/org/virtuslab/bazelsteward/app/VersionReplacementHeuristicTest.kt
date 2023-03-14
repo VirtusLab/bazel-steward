@@ -12,9 +12,9 @@ import org.virtuslab.bazelsteward.core.replacement.PythonFunctionCallHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
+import org.virtuslab.bazelsteward.fixture.loadTextFileFromResources
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
-import org.virtuslab.bazelsteward.testing.loadTextFileFromResources
 
 class VersionReplacementHeuristicTest {
 
@@ -293,7 +293,7 @@ class VersionReplacementHeuristicTest {
 
   private fun version(version: String) = SemanticVersion.fromString(version)!!
 
-  private val files = listOf(loadTextFileFromResources(javaClass, "WORKSPACE.bzlignore"))
+  private val files = listOf(loadTextFileFromResources("WORKSPACE.bzlignore"))
 
   private val resolver = LibraryUpdateResolver()
 

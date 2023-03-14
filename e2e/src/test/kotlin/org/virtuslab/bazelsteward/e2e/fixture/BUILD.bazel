@@ -1,0 +1,6 @@
+test_library(
+    deps = [
+        "//app/src/main",
+        "//app/src/test/kotlin/org/virtuslab/bazelsteward/fixture",
+    ],
+)
