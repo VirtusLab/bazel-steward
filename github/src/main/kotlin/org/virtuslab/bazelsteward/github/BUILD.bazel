@@ -2,6 +2,7 @@ library(
     srcs = glob(["**/*.kt"]),
     deps = [
         "//core",
+        "//repo-config",
         "@maven//:org_kohsuke_github_api",
     ],
 )

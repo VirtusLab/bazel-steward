@@ -59,6 +59,38 @@
           }
         }
       }
+    },
+    "pull-requests": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "properties" : {
+          "kinds": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": ["string", "null"]
+          },
+          "body": {
+            "type": ["string", "null"]
+          },
+          "tags": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   }
 }
