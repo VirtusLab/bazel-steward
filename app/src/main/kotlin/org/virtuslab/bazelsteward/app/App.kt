@@ -44,7 +44,7 @@ data class App(
           "Error happened during detecting available versions for ${kind.name}. " +
             "Skipping this dependency kind..."
         }
-        logger.catching(e)
+        logger.warn("Error details: ${e.message}")
         return@mapNotNull null
       }
 

@@ -32,8 +32,7 @@ JUNIT_EXTRA_DEPENDENCIES = [
     ("io.kotest", "kotest-common-jvm", "5.2.2"),
 ]
 
-def junit_jupiter_java_repositories(
-        version = "5.8.2"):
+def junit_jupiter_java_repositories(version = "5.8.2"):
     """Imports dependencies for JUnit Jupiter"""
     for artifact_id in JUNIT_JUPITER_ARTIFACT_ID_LIST:
         jvm_maven_import_external(
@@ -55,8 +54,7 @@ def junit_jupiter_java_repositories(
             licenses = ["notice"],  # EPL 2.0 License
         )
 
-def junit_platform_java_repositories(
-        version = "1.8.2"):
+def junit_platform_java_repositories(version = "1.8.2"):
     """Imports dependencies for JUnit Platform"""
     for artifact_id in JUNIT_PLATFORM_ARTIFACT_ID_LIST:
         jvm_maven_import_external(
@@ -126,7 +124,7 @@ def kt_junit5_test(name, srcs, test_package, deps = [], runtime_deps = [], **kwa
     else:
         fail("must specify 'test_package'")
 
-    kt_jvm_test(
+    return kt_jvm_test(
         name = name,
         srcs = srcs,
         main_class = "org.junit.platform.console.ConsoleLauncher",

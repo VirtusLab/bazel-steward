@@ -1,0 +1,7 @@
+test_library(
+    deps = [
+        "//app/src/main",
+        "//core",
+        "//repo-config",
+    ],
+)

@@ -6,6 +6,5 @@ unit_tests(
     deps = [
         "//core",
         "//repo-config",
-        "@maven//:commons_io_commons_io",
     ],
 )
