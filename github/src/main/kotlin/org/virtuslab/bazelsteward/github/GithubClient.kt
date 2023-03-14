@@ -41,12 +41,13 @@ class GithubClient private constructor(
 
   override fun openNewPr(pr: NewPullRequest): PullRequest {
     logger.info { "Creating pull request for ${pr.branch}" }
-    ghRepository.createPullRequest(
+    val newPr = ghRepository.createPullRequest(
       pr.title,
       pr.branch.name,
       baseBranch,
       pr.body
     )
+    newPr.addLabels(*pr.labels.toTypedArray())
     return PullRequest(pr.branch)
   }
 
