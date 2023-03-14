@@ -1,0 +1,15 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# rules_java
+RULES_JAVA_TAG = "5.4.0"
+RULES_JAVA_SHA = "9b87757af5c77e9db5f7c000579309afae75cf6517da745de01ba0c6e4870951"
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_archive(
+    name = "rules_java",
+    url = "https://github.com/bazelbuild/rules_java/releases/download/{}/rules_java-{}.tar.gz".format(RULES_JAVA_TAG, RULES_JAVA_TAG),
+    sha256 = RULES_JAVA_SHA,
+)
+load("@rules_java//java:repositories.bzl", "rules_java_dependencies", "rules_java_toolchains")
+rules_java_dependencies()
+rules_java_toolchains()

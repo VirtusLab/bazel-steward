@@ -32,6 +32,7 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
     val name: String?,
     val sha256: String?,
     val url: String?,
+    val urls: List<String>?,
     val strip_prefix: String?,
   )
 
@@ -66,9 +67,20 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
       }
       val result = yamlReader.readValue(resultFilePath.toFile(), object : TypeReference<List<Repository>>() {})
         .filter {
-          it.kind == "http_archive" && it.generator_function.isEmpty() && !it.url.isNullOrEmpty() && !it.sha256.isNullOrEmpty()
+          it.kind == "http_archive" &&
+            it.generator_function.isEmpty() &&
+            (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
+            !it.sha256.isNullOrEmpty()
         }
-        .map { RuleLibraryId.from(it.url!!, it.sha256!!) }
+        .mapNotNull {
+          if (!it.url.isNullOrEmpty()) {
+            RuleLibraryId.from(it.url, it.sha256!!)
+          } else {
+            it.urls!!
+              .first { url -> url.startsWith("https://github.com/") }
+              .let { url -> RuleLibraryId.from(url, it.sha256!!) }
+          }
+        }
       result.map { RuleLibrary(it, SimpleVersion(it.tag)) }
     }
 

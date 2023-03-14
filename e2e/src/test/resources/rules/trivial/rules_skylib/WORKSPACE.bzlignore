@@ -1,0 +1,11 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# bazel_skylib - starlark functions
+BAZEL_SKYLIB_TAG = "1.4.0"
+BAZEL_SKYLIB_SHA = "f24ab666394232f834f74d19e2ff142b0af17466ea0c69a3f4c276ee75f6efce"
+
+http_archive(
+    name = "bazel_skylib",
+    sha256 = BAZEL_SKYLIB_SHA,
+    url = "https://github.com/bazelbuild/bazel-skylib/releases/download/{}/bazel-skylib-{}.tar.gz".format(BAZEL_SKYLIB_TAG, BAZEL_SKYLIB_TAG),
+)
