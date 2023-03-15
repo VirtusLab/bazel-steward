@@ -28,7 +28,7 @@ jobs:
         with:
           java-version: 11
       - name: Run tests
-        run: bazel test //... --keep_going --test_tag_filters=integration --flaky_test_attempts=2
+        run: bazel test //... --keep_going --test_tag_filters=integration
   klint:
     runs-on: ubuntu-latest
     steps:
