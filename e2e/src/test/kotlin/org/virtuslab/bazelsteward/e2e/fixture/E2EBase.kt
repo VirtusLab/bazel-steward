@@ -1,23 +1,24 @@
-package org.virtuslab.bazelsteward.e2e
+package org.virtuslab.bazelsteward.e2e.fixture
 
 import io.kotest.common.runBlocking
 import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
+import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
+import org.virtuslab.bazelsteward.fixture.prepareLocalWorkspace
+import org.virtuslab.bazelsteward.fixture.prepareRemoteWorkspace
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenRepository
-import org.virtuslab.bazelsteward.testing.prepareLocalWorkspace
-import org.virtuslab.bazelsteward.testing.prepareRemoteWorkspace
 import java.nio.file.Path
 
 open class E2EBase {
@@ -66,9 +67,9 @@ open class E2EBase {
     }
   }
 
-  protected fun prepareWorkspace(tempDir: Path, testResourcePath: String): Path {
-    return prepareLocalWorkspace(javaClass, tempDir, testResourcePath)
-      .also { prepareRemoteWorkspace(tempDir, testResourcePath, it, master) }
+  protected fun prepareWorkspace(tempDir: Path, resourcePath: String, extraDirs: List<String> = emptyList()): Path {
+    return prepareLocalWorkspace(tempDir, resourcePath, extraDirs)
+      .also { localWorkspace -> prepareRemoteWorkspace(tempDir, resourcePath, localWorkspace, master) }
   }
 
   protected fun checkBranchesWithVersions(
@@ -137,6 +138,12 @@ open class E2EBase {
           mockMavenRepositoryWithVersion(*versions.toTypedArray())
         )
       )
+    )
+  }
+
+  protected fun App.withRulesOnly(): App {
+    return this.copy(
+      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelRulesDependencyKind>()
     )
   }
 

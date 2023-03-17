@@ -8,13 +8,13 @@ import org.virtuslab.bazelsteward.bazel.rules.RuleLibrary
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
+import org.virtuslab.bazelsteward.fixture.DependencyKindsFixture
+import org.virtuslab.bazelsteward.fixture.loadRepoConfigFromResources
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
-import org.virtuslab.bazelsteward.testing.DependencyKindsFixture
-import org.virtuslab.bazelsteward.testing.loadRepoConfigFromResources
 
 class SearchPatternProviderTest {
 
-  private val config = loadRepoConfigFromResources(javaClass, "example-config.yaml")
+  private val config = loadRepoConfigFromResources("example-config.yaml")
   private val dependencyKinds = DependencyKindsFixture()
   private val searchPatternProvider = SearchPatternProvider(config.searchPaths, dependencyKinds.all)
 

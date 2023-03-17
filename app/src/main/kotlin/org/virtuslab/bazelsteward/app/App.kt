@@ -44,7 +44,7 @@ data class App(
           "Error happened during detecting available versions for ${kind.name}. " +
             "Skipping this dependency kind..."
         }
-        logger.catching(e)
+        logger.warn("Error details: ${e.message}")
         return@mapNotNull null
       }
 
@@ -77,7 +77,7 @@ data class App(
               val openPr = if (prStatus == NONE) {
                 val oldPrs = gitHostClient.getOpenPrs().filter {
                   it.branch.name.startsWith(pr.branchPrefix) && it.branch != pr.branch
-                }
+                }.filter { gitHostClient.checkPrStatus(it.branch) != OPEN_MODIFIED }
                 gitHostClient.closePrs(oldPrs)
                 gitHostClient.openNewPr(pr.description)
               } else {

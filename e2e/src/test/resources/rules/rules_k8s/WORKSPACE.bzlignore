@@ -1,0 +1,23 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# rules_k8s
+RULES_K8S_TAG = "0.6"
+RULES_K8S_SHA = "51f0977294699cd547e139ceff2396c32588575588678d2054da167691a227ef"
+
+# https://github.com/bazelbuild/rules_docker/#setup
+# http_archive("io_bazel_rules_docker", ...)
+
+http_archive(
+    name = "io_bazel_rules_k8s",
+    strip_prefix = "rules_k8s-{}".format(RULES_K8S_TAG),
+    urls = ["https://github.com/bazelbuild/rules_k8s/archive/v{}.tar.gz".format(RULES_K8S_TAG)],
+    sha256 = RULES_K8S_SHA,
+)
+
+load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
+
+k8s_repositories()
+
+load("@io_bazel_rules_k8s//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
+
+k8s_go_deps()

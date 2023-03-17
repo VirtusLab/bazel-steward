@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.core.common.GitClient
+import org.virtuslab.bazelsteward.e2e.fixture.E2EBase
 import java.nio.file.Path
 import kotlin.io.path.writeText
 

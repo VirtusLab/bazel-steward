@@ -1,7 +1,6 @@
 package org.virtuslab.bazelsteward.config.repo
 
 import io.kotest.common.runBlocking
-import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -9,6 +8,7 @@ import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
+import java.nio.file.Files
 import java.nio.file.Path
 
 @Suppress("RegExpUnnecessaryNonCapturingGroup")
@@ -115,9 +115,6 @@ class RepoConfigurationTest {
   }
 
   private fun copyConfigFileToTempLocation(tempDir: Path, configFileName: String) {
-    FileUtils.copyURLToFile(
-      javaClass.classLoader.getResource(configFileName),
-      tempDir.resolve(".bazel-steward.yaml").toFile()
-    )
+    Files.copy(javaClass.classLoader.getResource(configFileName)!!.openStream(), tempDir.resolve(".bazel-steward.yaml"))
   }
 }

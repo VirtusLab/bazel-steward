@@ -16,7 +16,7 @@ jobs:
         with:
           java-version: 11
       - name: Run tests
-        run: bazel test //... --keep_going --test_output=errors --test_tag_filters=unit
+        run: bazel test //... --keep_going --test_tag_filters=unit
         env:
           GITHUB_TOKEN: ${{ inputs.github-token }}
   integration-tests:
@@ -28,7 +28,7 @@ jobs:
         with:
           java-version: 11
       - name: Run tests
-        run: bazel test //... --keep_going --test_output=errors --test_tag_filters=integration
+        run: bazel test //... --keep_going --test_tag_filters=integration
   klint:
     runs-on: ubuntu-latest
     steps:

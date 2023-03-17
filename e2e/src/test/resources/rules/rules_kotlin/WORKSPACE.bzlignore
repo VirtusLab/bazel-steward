@@ -1,0 +1,17 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+IO_BAZEL_KOTLIN_RULES_TAG = "v1.6.0"
+
+IO_BAZEL_KOTLIN_RULES_SHA = "a57591404423a52bd6b18ebba7979e8cd2243534736c5c94d35c89718ea38f94"
+
+http_archive(
+    name = "io_bazel_rules_kotlin",
+    sha256 = IO_BAZEL_KOTLIN_RULES_SHA,
+    url = "https://github.com/bazelbuild/rules_kotlin/releases/download/{}/rules_kotlin_release.tgz".format(IO_BAZEL_KOTLIN_RULES_TAG),
+)
+
+load("@io_bazel_rules_kotlin//kotlin:repositories.bzl", "kotlin_repositories")
+
+kotlin_repositories()
+
+register_toolchains("//:kotlin_toolchain")

@@ -10,10 +10,10 @@ import org.virtuslab.bazelsteward.core.FileFinder
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
+import org.virtuslab.bazelsteward.fixture.DependencyKindsFixture
+import org.virtuslab.bazelsteward.fixture.loadRepoConfigFromResources
+import org.virtuslab.bazelsteward.fixture.prepareLocalWorkspace
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
-import org.virtuslab.bazelsteward.testing.DependencyKindsFixture
-import org.virtuslab.bazelsteward.testing.loadRepoConfigFromResources
-import org.virtuslab.bazelsteward.testing.prepareLocalWorkspace
 import java.nio.file.Path
 
 class LibraryToTextFilesMapperTest {
@@ -60,7 +60,7 @@ class LibraryToTextFilesMapperTest {
   }
 
   private fun prepareWorkspace(tempDir: Path): Path =
-    prepareLocalWorkspace(javaClass, tempDir, "config")
+    prepareLocalWorkspace(tempDir, "config")
 
   private fun testForDependencyKind(
     library: Library,
@@ -68,7 +68,7 @@ class LibraryToTextFilesMapperTest {
   ): List<TextFile> {
     val dependencyKinds = DependencyKindsFixture(tempDir)
     val fileFinder = FileFinder(tempDir)
-    val repoConfig = loadRepoConfigFromResources(javaClass, "example-config.yaml")
+    val repoConfig = loadRepoConfigFromResources("example-config.yaml")
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds.all)
 
     val libraryToTextFilesMapper = LibraryToTextFilesMapper(

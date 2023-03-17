@@ -1,0 +1,5 @@
+test_library(
+    deps = [
+        "//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/fixture",
+    ],
+)

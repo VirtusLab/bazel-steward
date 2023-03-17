@@ -1,0 +1,34 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# bazel_skylib - starlark functions
+BAZEL_SKYLIB_TAG = "1.4.0"
+BAZEL_SKYLIB_SHA = "f24ab666394232f834f74d19e2ff142b0af17466ea0c69a3f4c276ee75f6efce"
+
+http_archive(
+    name = "bazel_skylib",
+    sha256 = BAZEL_SKYLIB_SHA,
+    url = "https://github.com/bazelbuild/bazel-skylib/releases/download/{}/bazel-skylib-{}.tar.gz".format(BAZEL_SKYLIB_TAG, BAZEL_SKYLIB_TAG),
+)
+
+# io_bazel_rules_scala - required to avoid cyclic init error
+IO_BAZEL_RULES_SCALA_TAG = "20220201"
+IO_BAZEL_RULES_SCALA_SHA = "77a3b9308a8780fff3f10cdbbe36d55164b85a48123033f5e970fdae262e8eb2"
+
+http_archive(
+    name = "io_bazel_rules_scala",
+    sha256 = IO_BAZEL_RULES_SCALA_SHA,
+    strip_prefix = "rules_scala-{}".format(IO_BAZEL_RULES_SCALA_TAG),
+    url = "https://github.com/bazelbuild/rules_scala/releases/download/{}/rules_scala-{}.zip".format(IO_BAZEL_RULES_SCALA_TAG, IO_BAZEL_RULES_SCALA_TAG),
+)
+
+load("@io_bazel_rules_scala//:scala_config.bzl", "scala_config")
+
+scala_config(scala_version = "2.13.6")
+
+load("@io_bazel_rules_scala//scala:toolchains.bzl", "scala_register_toolchains")
+
+scala_register_toolchains()
+
+load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
+
+scala_repositories()
