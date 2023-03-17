@@ -11,18 +11,15 @@ import kotlin.math.min
 class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
 
   override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, RuleVersion> =
-    ruleId.toRepositoryId().listReleases().mapNotNull { shaFromBodyAndCurrentUrl(ruleId, it) }.toMap()
+    ruleId.toRepositoryId().listReleases().map { shaFromBodyAndCurrentUrl(ruleId, it) }.toMap()
 
-  private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion>? =
-    sha256Regex.findAll(release.body).map { it.value }.toList().singleOrNull()?.let { sha ->
+  private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion> {
+    return sha256Regex.findAll(release.body).map { it.value }.singleOrNull().let { sha ->
       val newArtifactName = ruleId.artifactName.replace(ruleId.tag, release.tagName)
-      val rule = when (ruleId) {
-        is RuleLibraryId.ReleaseArtifact -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
-        is RuleLibraryId.ArchiveTagRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
-        is RuleLibraryId.ArchiveRuleId -> ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
-      }
-      rule to RuleVersion(rule.downloadUrl, sha, release.tagName)
+      val rule = ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+      rule to RuleVersion.create(rule.downloadUrl, sha, release.tagName)
     }
+  }
 
   private fun RepositoryId.listReleases(): Sequence<GHRelease> =
     gitHubClient.getRepository(this.toString()).listReleases().asSequence()
@@ -32,10 +29,27 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
 
     private fun RuleLibraryId.toRepositoryId() = RepositoryId(repoName, ruleName)
 
-    private fun GHAsset.sha256() = URL(browserDownloadUrl).getFileChecksum(MessageDigest.getInstance("SHA-256"))
+    private fun GHAsset.sha256() = URL(this.browserDownloadUrl).getFileChecksum(MessageDigest.getInstance("SHA-256"))
 
     private data class RepositoryId(val user: String, val repository: String) {
       override fun toString(): String = "$user/$repository"
+    }
+
+    private fun RuleLibraryId.copy(
+      sha256: String?,
+      tag: String,
+      artifactName: String
+    ): RuleLibraryId {
+      return when (this) {
+        is RuleLibraryId.ReleaseArtifact ->
+          this.copy(sha256 = sha256, tag = tag, artifactName = artifactName)
+
+        is RuleLibraryId.ArchiveTagRuleId ->
+          this.copy(sha256 = sha256, tag = tag, artifactName = artifactName)
+
+        is RuleLibraryId.ArchiveRuleId ->
+          this.copy(sha256 = sha256, tag = tag, artifactName = artifactName)
+      }
     }
 
     private fun levenshtein(lhs: CharSequence, rhs: CharSequence): Int {
@@ -76,7 +90,7 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
       return cost[lhsLength - 1]
     }
 
-    private fun URL.getFileChecksum(digest: MessageDigest): String {
+    internal fun URL.getFileChecksum(digest: MessageDigest): String {
       var messageDigest: MessageDigest
       DigestInputStream(this.openStream(), digest).use { dis ->
         while (dis.read() != -1);

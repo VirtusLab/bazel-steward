@@ -3,7 +3,7 @@ package org.virtuslab.bazelsteward.bazel.rules
 import org.virtuslab.bazelsteward.core.library.LibraryId
 
 sealed class RuleLibraryId : LibraryId() {
-  abstract val sha256: String
+  abstract val sha256: String?
   abstract val tag: String
   abstract val artifactName: String
   abstract val repoName: String
@@ -12,10 +12,10 @@ sealed class RuleLibraryId : LibraryId() {
   override val name: String
     get() = ruleName
 
-  override fun associatedStrings(): List<List<String>> = listOf(listOf(downloadUrl, sha256))
+  override fun associatedStrings(): List<List<String>> = listOf(listOfNotNull(downloadUrl, sha256))
 
   data class ReleaseArtifact(
-    override val sha256: String,
+    override val sha256: String?,
     override val tag: String,
     override val artifactName: String,
     override val repoName: String,
@@ -40,7 +40,7 @@ sealed class RuleLibraryId : LibraryId() {
   }
 
   data class ArchiveTagRuleId(
-    override val sha256: String,
+    override val sha256: String?,
     override val tag: String,
     override val artifactName: String,
     override val repoName: String,
@@ -67,7 +67,7 @@ sealed class RuleLibraryId : LibraryId() {
   }
 
   data class ArchiveRuleId(
-    override val sha256: String,
+    override val sha256: String?,
     override val tag: String,
     override val artifactName: String,
     override val repoName: String,
