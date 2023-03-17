@@ -14,7 +14,7 @@ class PullRequestSuggesterTest {
 
   @Test
   fun `should fill placeholder values with artifact data`() {
-    val provider = object : PullRequestProvider(emptyList(), emptyList()) {
+    val provider = object : PullRequestConfigProvider(emptyList(), emptyList()) {
       override fun resolveForLibrary(library: Library): PullRequestConfig {
         return PullRequestConfig(
           "\${group} and \${artifact}",

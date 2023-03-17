@@ -17,12 +17,12 @@ data class PullRequestSuggestion(
 }
 
 data class PullRequestConfig(
-  val title: String,
-  val body: String,
+  val titleTemplate: String,
+  val bodyTemplate: String,
   val labels: List<String>
 )
 
-class PullRequestSuggester(private val provider: PullRequestProvider) {
+class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
 
   fun suggestPullRequests(updates: List<LibraryUpdate>): List<PullRequestSuggestion> {
     return updates.map { update ->
@@ -33,9 +33,9 @@ class PullRequestSuggester(private val provider: PullRequestProvider) {
 
       val config = provider.resolveForLibrary(update.suggestion.currentLibrary)
       val params = mutableMapOf(
-        "versionFrom" to versionFrom,
-        "versionTo" to versionTo,
-        "libraryId" to libraryId
+        "versionFrom" to versionFrom.value,
+        "versionTo" to versionTo.value,
+        "libraryId" to libraryId.name
       )
       if (libraryId is MavenLibraryId) {
         params["group"] = libraryId.group
@@ -43,8 +43,8 @@ class PullRequestSuggester(private val provider: PullRequestProvider) {
       }
       val substitutor = StringSubstitutor(params).also { it.isEnableUndefinedVariableException = false }
 
-      val title = substitutor.replace(config.title)
-      val body = substitutor.replace(config.body)
+      val title = substitutor.replace(config.titleTemplate)
+      val body = substitutor.replace(config.bodyTemplate)
       val commits = listOf(CommitRequest(title, update.fileChanges))
       PullRequestSuggestion(
         NewPullRequest(
