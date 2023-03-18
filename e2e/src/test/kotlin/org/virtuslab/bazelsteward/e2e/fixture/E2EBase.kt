@@ -156,12 +156,6 @@ open class E2EBase {
     )
   }
 
-  protected fun App.withoutRules(): App {
-    return this.copy(
-      dependencyKinds = this.dependencyKinds.filterNot{it is BazelRulesDependencyKind}
-    )
-  }
-
   protected fun App.withGitHostClient(gitHostClient: GitHostClient): App {
     return this.copy(
       pullRequestManager = PullRequestManager(
