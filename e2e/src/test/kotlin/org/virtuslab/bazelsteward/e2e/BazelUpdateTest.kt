@@ -15,6 +15,7 @@ class BazelUpdateTest : E2EBase() {
       it.withBazelVersionOnly()
     }
     val expectedBranches = expectedBranches()
+
     checkBranchesWithVersions(tempDir, project, expectedBranches)
   }
 
