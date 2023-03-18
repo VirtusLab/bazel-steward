@@ -92,7 +92,7 @@ maven_install(
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
         "org.kohsuke:github-api:1.313",
         "io.github.microutils:kotlin-logging-jvm:3.0.4",
-        "org.slf4j:slf4j-simple:2.0.6",
+        "org.slf4j:slf4j-simple:2.0.7",
         "org.json:json:20220924",
     ],
     fetch_sources = True,
