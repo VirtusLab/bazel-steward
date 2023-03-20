@@ -58,21 +58,18 @@ update-rules:
     versioning: loose
 search-paths:
   -
-    dependencies:
-      - "org.virtuslab:dep-a"
-      - "org.virtuslab:dep-b"
-      - "com.google:*"
+    dependencies: "com.google:*"
     path-patterns:
-      - regex:.*\/WORKSPACE[.\w]*
+      - "bazel/google_deps.bzl"
   -
-    kinds:
-      - maven
+    kinds: maven
     path-patterns:
-      - regex:.*\/WORKSPACE[.\w]*
-      - "**/*.bzl"
+      - "3rdparty/jvm/*.BUILD.bazel"
   -
     kinds: bazel
-    path-patterns: regex:.*\/BUILD[\.bazel]*
+    path-patterns:
+      - ".bazelversion"
+      - ".github/**/*.yaml"
 
 ```
 
@@ -88,11 +85,11 @@ When the rule is found, it can configure for a dependency the following things:
     It can be an exact version, prefix or regular expression.
     Bazel steward will try to automatically determine what kind of input it is.
     You can override this by prepending the value with `prefix:`, `exact:` or `regex:`.
-    * `bumping` (string) <br/>
-      Sets the strategy for bumping this dependency.
-      1. `latest` - Bump to the latest version
-      2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
-      3. `minor` - First bump to the latest minor, and then to the latest major.
+  * `bumping` (string) <br/>
+    Sets the strategy for bumping this dependency.
+    1. `latest` - Bump to the latest version
+    2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
+    3. `minor` - First bump to the latest minor, and then to the latest major.
 
 * In search-paths section:
   * `path-patterns` (list of strings) <br/>
