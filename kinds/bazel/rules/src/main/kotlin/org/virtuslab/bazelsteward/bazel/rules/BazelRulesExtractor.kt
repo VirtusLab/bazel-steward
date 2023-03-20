@@ -65,11 +65,29 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
       if (!resultFilePath.exists()) {
         throw RuntimeException("Failed to find a file")
       }
-      val result = yamlReader.readValue(resultFilePath.toFile(), object : TypeReference<List<Repository>>() {})
+
+      val yamlNode = yamlReader.readTree(resultFilePath.toFile())
+      val repositories = yamlNode.elements().asSequence().toList()
         .filter {
-          it.kind == "http_archive" &&
-            it.generator_function.isEmpty() &&
-            (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
+          it.has("kind") &&
+            it.get("kind").textValue() == "http_archive" &&
+            it.has("generator_function") &&
+            it.get("generator_function").textValue().isEmpty()
+        }
+        .mapNotNull {
+          it.let {
+            try {
+              yamlReader.convertValue(it, object : TypeReference<Repository>() {})
+            } catch (e: Exception) {
+              logger.warn { e.message }
+              null
+            }
+          }
+        }
+
+      val result = repositories
+        .filter {
+          (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
             !it.sha256.isNullOrEmpty()
         }
         .mapNotNull {
