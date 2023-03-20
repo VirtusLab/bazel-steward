@@ -94,8 +94,8 @@ When the rule is found, it can configure for a dependency the following things:
       2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
       3. `minor` - First bump to the latest minor, and then to the latest major.
 
-* In search-pattern section:
-  * `path-patterns` <br/>
+* In search-paths section:
+  * `path-patterns` (list of strings) <br/>
     Overrides path in which dependency will be searched for. 
     It can be an exact version, glob or regular expression.
     Bazel steward will try to automatically determine what kind of input it is.
