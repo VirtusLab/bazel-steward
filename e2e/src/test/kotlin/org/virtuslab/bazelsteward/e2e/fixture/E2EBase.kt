@@ -6,6 +6,7 @@ import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
+import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -144,6 +145,12 @@ open class E2EBase {
   protected fun App.withRulesOnly(): App {
     return this.copy(
       dependencyKinds = this.dependencyKinds.filterIsInstance<BazelRulesDependencyKind>()
+    )
+  }
+
+  protected fun App.withBazelVersionOnly(): App {
+    return this.copy(
+      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelVersionDependencyKind>()
     )
   }
 
