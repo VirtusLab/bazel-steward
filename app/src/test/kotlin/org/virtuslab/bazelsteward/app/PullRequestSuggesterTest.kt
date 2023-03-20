@@ -12,7 +12,7 @@ import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 class PullRequestSuggesterTest {
 
-//  @Test
+  //  @Test
   fun `should fill placeholder values with artifact data`() {
     val provider = object : PullRequestConfigProvider(emptyList(), emptyList()) {
       override fun resolveForLibrary(library: Library): PullRequestConfig {
@@ -36,7 +36,7 @@ class PullRequestSuggesterTest {
 
     val dependencyId = mavenLibraryId.name
 
-    val newPr = prSuggester.suggestPullRequests(listOf(libraryUpdate))[0]
+    val newPr = prSuggester.suggestPullRequests(listOf(libraryUpdate)).single()
     val dsc = newPr.description
 
     dsc.title shouldBe "$group and $artifact"
@@ -45,7 +45,7 @@ class PullRequestSuggesterTest {
   }
 
   @Test
-  fun `should provide default template`(){
+  fun `should provide default template`() {
     val provider = PullRequestConfigProvider(emptyList(), emptyList())
 
     val group = "group-name"
