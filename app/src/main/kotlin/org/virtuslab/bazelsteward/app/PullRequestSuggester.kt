@@ -35,7 +35,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
       val params = mutableMapOf(
         "versionFrom" to versionFrom.value,
         "versionTo" to versionTo.value,
-        "libraryId" to libraryId.name
+        "dependencyId" to libraryId.name
       )
       if (libraryId is MavenLibraryId) {
         params["group"] = libraryId.group

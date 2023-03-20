@@ -20,8 +20,8 @@ open class PullRequestConfigProvider(
 
   companion object {
     val defaultPullRequestConfig = PullRequestConfig(
-      "Updated \${libraryId} to \${versionTo}",
-      "Updates \${libraryId} from \${versionFrom} to \${versionTo}",
+      "Updated \${dependencyId} to \${versionTo}",
+      "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
       emptyList()
     )
   }
