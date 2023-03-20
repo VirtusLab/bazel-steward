@@ -93,10 +93,16 @@ When the rule is found, it can configure for a dependency the following things:
 
 * In search-paths section:
   * `path-patterns` (list of strings) <br/>
-    Overrides path in which dependency will be searched for. 
-    It can be an exact version, glob or regular expression.
-    Bazel steward will try to automatically determine what kind of input it is.
-    Allowed values: `glob:...`, `regex:...`, `exact:...`
+    Overrides paths where Bazel Steward will look for a version to update 
+    (it is used by version replacement mechanism, not version detection). 
+    A path pattern can either be:
+    1. exact path: "exact:WORKSPACE.bazel"
+    2. glob pattern: "glob:**/*.bzl"
+    3. regex pattern: "regex:.test./BUILD(.bazel)?"
+    
+    All paths are relative to the Bazel workspace root. 
+    The "exact:", "glob:", "regex:" prefixes are used to determine type of path pattern. 
+    They can usually be omitted and correct syntax should be detected automatically.
 
 # Installation
 
