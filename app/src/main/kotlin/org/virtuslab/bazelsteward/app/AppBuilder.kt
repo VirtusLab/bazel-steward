@@ -40,6 +40,12 @@ object AppBuilder {
       fullName = "push-to-remote",
       shortName = "p"
     ).default(true)
+    val updateAllPullRequests by parser.option(
+      ArgType.Boolean,
+      description = "Update all pull requests",
+      fullName = "update-all-prs",
+      shortName = "f"
+    ).default(false)
     val baseBranch by parser.option(
       ArgType.String,
       fullName = "base-branch",
@@ -61,7 +67,14 @@ object AppBuilder {
     val gitAuthor = runBlocking { gitClient.getAuthor() }
     val configResolvedPath = configPath?.let { Path(it) } ?: repositoryRoot.resolve(".bazel-steward.yaml")
 
-    val appConfig = AppConfig(repositoryRoot, configResolvedPath, pushToRemote, baseBranchName, gitAuthor)
+    val appConfig = AppConfig(
+      repositoryRoot,
+      configResolvedPath,
+      pushToRemote,
+      updateAllPullRequests,
+      baseBranchName,
+      gitAuthor
+    )
     logger.info { appConfig }
 
     val repoConfig = runBlocking { RepoConfigParser().load(appConfig.configPath) }
@@ -71,6 +84,12 @@ object AppBuilder {
     val gitOperations = GitOperations(appConfig.workspaceRoot, appConfig.baseBranch)
     val gitHostClient =
       if (github) GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor) else GitHostClient.stub
+    val pullRequestManager = PullRequestManager(
+      gitHostClient,
+      gitOperations,
+      appConfig.pushToRemote,
+      appConfig.updateAllPullRequests
+    )
     val bazelRulesExtractor = BazelRulesExtractor(appConfig.workspaceRoot)
     val bazelUpdater = BazelUpdater()
     val githubRulesResolver = GithubRulesResolver(
@@ -101,14 +120,13 @@ object AppBuilder {
       gitOperations,
       dependencyKinds,
       updateLogic,
-      fileFinder,
       libraryUpdateResolver,
       pullRequestSuggester,
-      gitHostClient,
-      appConfig,
       repoConfig,
       updateRulesProvider,
-      libraryToTextFilesMapper
+      libraryToTextFilesMapper,
+      pullRequestManager,
+      appConfig.workspaceRoot
     )
   }
 }
