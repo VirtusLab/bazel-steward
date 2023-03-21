@@ -20,7 +20,7 @@ class PullRequestManager(
   suspend fun applySuggestions(pullRequestSuggestions: List<PullRequestSuggestion>) {
     pullRequestSuggestions.forEach { pr ->
       val prStatus = gitHostClient.checkPrStatus(pr.branch)
-      if (prStatus == NONE || prStatus == OPEN_NOT_MERGEABLE || (updateAllPullRequests && prStatus == OPEN_MERGEABLE)) {
+      if (canCreateOrUpdate(prStatus)) {
         logger.info { "Creating branch ${pr.branch}, PR status: $prStatus" }
         runCatching {
           gitOperations.createBranchWithChange(pr.branch, pr.commits)
@@ -44,4 +44,11 @@ class PullRequestManager(
       }
     }
   }
+
+  private fun canCreateOrUpdate(prStatus: GitHostClient.PrStatus): Boolean =
+    when (prStatus) {
+      NONE, OPEN_NOT_MERGEABLE -> true
+      OPEN_MERGEABLE, OPEN_MODIFIED -> updateAllPullRequests
+      else -> false
+    }
 }
