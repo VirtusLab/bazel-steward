@@ -1,5 +1,8 @@
 name: Dependencies (Force)
 
+on:
+  workflow_dispatch:
+
 jobs:
   bazel-steward:
     runs-on: ubuntu-latest
