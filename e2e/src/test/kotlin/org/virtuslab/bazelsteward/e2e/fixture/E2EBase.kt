@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
+import org.virtuslab.bazelsteward.app.PullRequestManager
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
@@ -135,7 +136,7 @@ open class E2EBase {
     return this.copy(
       dependencyKinds = listOf(
         MavenDependencyKind(
-          MavenDataExtractor(this.appConfig.workspaceRoot),
+          MavenDataExtractor(this.workspaceRoot),
           mockMavenRepositoryWithVersion(*versions.toTypedArray())
         )
       )
@@ -156,7 +157,12 @@ open class E2EBase {
 
   protected fun App.withGitHostClient(gitHostClient: GitHostClient): App {
     return this.copy(
-      gitHostClient = gitHostClient
+      pullRequestManager = PullRequestManager(
+        gitHostClient,
+        this.gitOperations,
+        pushToRemote = true,
+        updateAllPullRequests = false
+      )
     )
   }
 

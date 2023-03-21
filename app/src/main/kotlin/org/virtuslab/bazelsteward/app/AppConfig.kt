@@ -7,6 +7,7 @@ data class AppConfig(
   val workspaceRoot: Path,
   val configPath: Path,
   val pushToRemote: Boolean,
+  val updateAllPullRequests: Boolean,
   val baseBranch: String,
   val gitAuthor: GitAuthor
 )
