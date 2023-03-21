@@ -95,9 +95,9 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
         }
       result
         .also {
-          logger.info { "Found ${result.size} Bazel Rules. " }
+          logger.debug { "Found ${result.size} Bazel Rules. " }
           if (result.isNotEmpty()) {
-            logger.info { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.name}:${it.tag}" }}" }
+            logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.name}:${it.tag}" }}" }
           }
         }
         .map { RuleLibrary(it, SimpleVersion(it.tag)) }
