@@ -63,7 +63,7 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
       val bazelPath = CommandRunner.run("bazel info output_base".split(' '), workspaceRoot).removeSuffix("\n")
       val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
       if (!resultFilePath.exists()) {
-        throw RuntimeException("Failed to find a file")
+        throw RuntimeException("Failed to find a file: $resultFilePath")
       }
 
       val yamlNode = yamlReader.readTree(resultFilePath.toFile())
