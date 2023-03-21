@@ -93,7 +93,14 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
               .let { url -> RuleLibraryId.from(url, it.sha256!!) }
           }
         }
-      result.map { RuleLibrary(it, SimpleVersion(it.tag)) }
+      result
+        .also {
+          logger.info { "Found ${result.size} Bazel Rules. "}
+          if (result.isNotEmpty()) {
+            logger.info { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.name}:${it.tag}" }}" }
+          }
+        }
+        .map { RuleLibrary(it, SimpleVersion(it.tag)) }
     }
 
   private fun deleteFile(file: File) {
