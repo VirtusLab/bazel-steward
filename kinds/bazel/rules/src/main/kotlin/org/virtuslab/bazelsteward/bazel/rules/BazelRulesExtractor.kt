@@ -98,7 +98,6 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
       if (result.isNotEmpty()) {
         logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.name}:${it.tag}" }}" }
       }
-      
       result.map { RuleLibrary(it, SimpleVersion(it.tag)) }
     }
 
