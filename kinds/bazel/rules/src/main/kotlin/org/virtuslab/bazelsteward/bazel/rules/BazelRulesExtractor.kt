@@ -54,7 +54,8 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
         |dump_all_repositories(
         |    name = "all_external_repositories",
         |    repositories_json = repositories_as_json()
-        |)""".trimMargin()
+        |)
+        """.trimMargin(),
       )
       // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
       CommandRunner.run("bazel build @all_external_repositories//:result.json".split(' '), workspaceRoot)

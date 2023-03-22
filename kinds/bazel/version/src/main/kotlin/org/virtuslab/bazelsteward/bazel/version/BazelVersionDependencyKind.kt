@@ -10,7 +10,7 @@ import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import java.nio.file.Path
 
 class BazelVersionDependencyKind(
-  private val bazelUpdater: BazelUpdater
+  private val bazelUpdater: BazelUpdater,
 ) : DependencyKind<BazelLibrary> {
 
   override val name: String = "bazel"

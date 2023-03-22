@@ -10,12 +10,12 @@ data class FileChange(
   val file: Path,
   val offset: Int,
   val length: Int,
-  val replacement: String
+  val replacement: String,
 )
 
 data class CommitRequest(
   val message: String,
-  val changes: List<FileChange>
+  val changes: List<FileChange>,
 )
 
 class GitOperations(workspaceRoot: Path, private val baseBranch: String) {

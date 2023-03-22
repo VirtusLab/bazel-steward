@@ -27,7 +27,7 @@ class GithubTest {
       "bazel-steward/testing/merged" to PrStatus.MERGED,
       "bazel-steward/testing/modified" to PrStatus.OPEN_MODIFIED,
       "bazel-steward/testing/not_mergeable" to PrStatus.OPEN_NOT_MERGEABLE,
-      "bazel-steward/testing/none" to PrStatus.NONE
+      "bazel-steward/testing/none" to PrStatus.NONE,
     )
 
     val env = Environment.system

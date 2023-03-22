@@ -7,5 +7,5 @@ import org.virtuslab.bazelsteward.e2e.rules.fixture.RulesUpdate
 class ScalaRulesUpdateTest : RulesUpdate(
   "rules/rules_scala",
   "io_bazel_rules_scala" to "v5.0.0",
-  "bazel-skylib" to "1.4.1"
+  "bazel-skylib" to "1.4.1",
 )

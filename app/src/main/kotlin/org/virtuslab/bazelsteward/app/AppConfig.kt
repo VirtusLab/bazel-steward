@@ -9,5 +9,5 @@ data class AppConfig(
   val pushToRemote: Boolean,
   val updateAllPullRequests: Boolean,
   val baseBranch: String,
-  val gitAuthor: GitAuthor
+  val gitAuthor: GitAuthor,
 )

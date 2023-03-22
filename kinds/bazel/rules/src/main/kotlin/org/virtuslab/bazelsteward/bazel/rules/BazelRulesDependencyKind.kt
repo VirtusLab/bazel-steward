@@ -9,7 +9,7 @@ import java.nio.file.Path
 
 class BazelRulesDependencyKind(
   private val bazelRulesExtractor: BazelRulesExtractor,
-  private val githubRulesResolver: GithubRulesResolver
+  private val githubRulesResolver: GithubRulesResolver,
 ) : DependencyKind<RuleLibrary> {
   override val name: String = "bazel-rules"
 
@@ -25,7 +25,7 @@ class BazelRulesDependencyKind(
     PathPattern.Glob("**/BUILD{,.bazel}"),
     PathPattern.Glob("**/*.bzl"),
     PathPattern.Exact("WORKSPACE.bazel"),
-    PathPattern.Exact("WORKSPACE")
+    PathPattern.Exact("WORKSPACE"),
   )
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(BazelRuleHeuristic)

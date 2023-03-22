@@ -15,7 +15,7 @@ private val logger = KotlinLogging.logger {}
 
 class MavenDependencyKind(
   private val mavenDataExtractor: MavenDataExtractor,
-  private val mavenRepository: MavenRepository
+  private val mavenRepository: MavenRepository,
 ) : DependencyKind<MavenCoordinates> {
 
   override val name: String = "maven"
@@ -33,12 +33,12 @@ class MavenDependencyKind(
     PathPattern.Glob("**/BUILD{,.bazel}"),
     PathPattern.Glob("**/*.bzl"),
     PathPattern.Exact("WORKSPACE.bazel"),
-    PathPattern.Exact("WORKSPACE")
+    PathPattern.Exact("WORKSPACE"),
   )
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(
     WholeLibraryHeuristic,
     VersionOnlyHeuristic,
-    PythonFunctionCallHeuristic
+    PythonFunctionCallHeuristic,
   )
 }

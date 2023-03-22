@@ -10,21 +10,25 @@ data class SemanticVersion(
 
   override val value: String =
     StringBuilder("$major.$minor.$patch").apply {
-      if (prerelease.isNotBlank())
+      if (prerelease.isNotBlank()) {
         append("-$prerelease")
-      if (buildmetadata.isNotBlank())
+      }
+      if (buildmetadata.isNotBlank()) {
         append("+$buildmetadata")
+      }
     }.toString()
 
-  override fun compareTo(other: SemanticVersion): Int = if (this.major != other.major)
+  override fun compareTo(other: SemanticVersion): Int = if (this.major != other.major) {
     this.major.compareTo(other.major)
-  else if (this.minor != other.minor)
+  } else if (this.minor != other.minor) {
     this.minor.compareTo(other.minor)
-  else if (this.patch != other.patch)
+  } else if (this.patch != other.patch) {
     this.patch.compareTo(other.patch)
-  else if (this.prerelease != other.prerelease)
+  } else if (this.prerelease != other.prerelease) {
     this.comparePreReleases(this.prerelease, other.prerelease)
-  else 0
+  } else {
+    0
+  }
 
   private fun comparePreReleases(first: String, second: String): Int {
     // "alpha" < "beta" < "milestone" < "rc" = "cr" < "snapshot" < "" = "final" = "ga" < "sp"
@@ -54,7 +58,9 @@ data class SemanticVersion(
         val firstWithoutQualifier = getPreReleaseWithoutQualifier(firstQualifier, first)
         val secondWithoutQualifier = getPreReleaseWithoutQualifier(otherQualifier, second)
         firstWithoutQualifier.compareTo(secondWithoutQualifier)
-      } else it
+      } else {
+        it
+      }
     }
   }
 

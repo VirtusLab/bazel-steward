@@ -30,9 +30,9 @@ object PythonFunctionCallHeuristic : VersionReplacementHeuristic {
             matchedVersion.origin,
             matchedVersion.offset,
             updateSuggestion.currentLibrary.version.value.length,
-            updateSuggestion.suggestedVersion.value
-          )
-        )
+            updateSuggestion.suggestedVersion.value,
+          ),
+        ),
       )
     }
     return null

@@ -7,7 +7,7 @@ import org.virtuslab.bazelsteward.core.library.Library
 
 class UpdateRulesProvider(
   configs: List<UpdateRulesConfig>,
-  dependencyKinds: List<DependencyKind<*>>
+  dependencyKinds: List<DependencyKind<*>>,
 ) {
 
   companion object {
@@ -24,7 +24,7 @@ class UpdateRulesProvider(
     return UpdateRules(
       versioningForDependency?.versioning ?: defaultUpdateRules.versioningSchema,
       bumpingForDependency?.bumping ?: defaultUpdateRules.bumpingStrategy,
-      pinForDependency?.pin ?: defaultUpdateRules.pinningStrategy
+      pinForDependency?.pin ?: defaultUpdateRules.pinningStrategy,
     )
   }
 }

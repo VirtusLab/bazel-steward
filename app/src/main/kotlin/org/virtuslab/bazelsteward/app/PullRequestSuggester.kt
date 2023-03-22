@@ -8,7 +8,7 @@ import org.virtuslab.bazelsteward.core.replacement.LibraryUpdate
 data class PullRequestSuggestion(
   val description: NewPullRequest,
   val branchPrefix: String,
-  val commits: List<CommitRequest>
+  val commits: List<CommitRequest>,
 ) {
   val branch: GitBranch
     get() = description.branch
@@ -33,7 +33,7 @@ class PullRequestSuggester {
           labels = listOf("automatic"),
         ),
         branch.prefix,
-        commits
+        commits,
       )
     }
   }

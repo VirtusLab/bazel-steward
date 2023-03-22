@@ -7,13 +7,12 @@ import org.virtuslab.bazelsteward.core.library.Library
 
 class LibraryToTextFilesMapper(
   private val searchPatternProvider: SearchPatternProvider,
-  private val fileFinder: FileFinder
+  private val fileFinder: FileFinder,
 ) {
 
   private val cache: MutableMap<Set<PathPattern>, List<TextFile>> = mutableMapOf()
 
   fun map(currentLibrary: Library): List<TextFile> {
-
     return searchPatternProvider.resolveForLibrary(currentLibrary).let {
       val pathPatternsSet = it.toSet()
       cache[pathPatternsSet]

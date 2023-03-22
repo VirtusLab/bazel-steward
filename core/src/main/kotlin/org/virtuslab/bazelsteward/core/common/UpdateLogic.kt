@@ -11,7 +11,7 @@ data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: V
 data class UpdateRules(
   val versioningSchema: VersioningSchema = VersioningSchema.Loose,
   val bumpingStrategy: BumpingStrategy = BumpingStrategy.Minor,
-  val pinningStrategy: PinningStrategy = PinningStrategy.None
+  val pinningStrategy: PinningStrategy = PinningStrategy.None,
 )
 
 class UpdateLogic {
@@ -19,9 +19,8 @@ class UpdateLogic {
   fun selectUpdate(
     library: Library,
     availableVersions: List<Version>,
-    updateRules: UpdateRules
+    updateRules: UpdateRules,
   ): UpdateSuggestion? {
-
     fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
       availableVersions
         .filter { version -> updateRules.pinningStrategy.test(version) }

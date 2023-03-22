@@ -26,7 +26,7 @@ class LibraryToTextFilesMapperTest {
     val result = testForDependencyKind(library, tempDir)
 
     result.map { it.path } shouldContainExactlyInAnyOrder listOf(
-      workspace.resolve("WORKSPACE")
+      workspace.resolve("WORKSPACE"),
     )
   }
 
@@ -39,7 +39,7 @@ class LibraryToTextFilesMapperTest {
 
     result.map { it.path } shouldContainExactlyInAnyOrder listOf(
       workspace.resolve("app/BUILD"),
-      workspace.resolve("core/BUILD")
+      workspace.resolve("core/BUILD"),
     )
   }
 
@@ -48,14 +48,14 @@ class LibraryToTextFilesMapperTest {
     val workspace = prepareWorkspace(tempDir)
     val library = RuleLibrary(
       ReleaseArtifact("", "", "", "", ""),
-      SimpleVersion("5.3.0")
+      SimpleVersion("5.3.0"),
     )
 
     val result = testForDependencyKind(library, tempDir)
 
     result.map { it.path } shouldContainExactlyInAnyOrder listOf(
       workspace.resolve("app/BUILD"),
-      workspace.resolve("core/BUILD")
+      workspace.resolve("core/BUILD"),
     )
   }
 
@@ -64,7 +64,7 @@ class LibraryToTextFilesMapperTest {
 
   private fun testForDependencyKind(
     library: Library,
-    tempDir: Path
+    tempDir: Path,
   ): List<TextFile> {
     val dependencyKinds = DependencyKindsFixture(tempDir)
     val fileFinder = FileFinder(tempDir)
@@ -73,7 +73,7 @@ class LibraryToTextFilesMapperTest {
 
     val libraryToTextFilesMapper = LibraryToTextFilesMapper(
       searchPatternProvider,
-      fileFinder
+      fileFinder,
     )
     return libraryToTextFilesMapper.map(library)
   }
