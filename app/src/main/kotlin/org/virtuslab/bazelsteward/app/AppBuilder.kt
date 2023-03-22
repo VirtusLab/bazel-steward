@@ -90,7 +90,7 @@ object AppBuilder {
       appConfig.pushToRemote,
       appConfig.updateAllPullRequests,
     )
-    val bazelRulesExtractor = BazelRulesExtractor(appConfig.workspaceRoot)
+    val bazelRulesExtractor = BazelRulesExtractor()
     val bazelUpdater = BazelUpdater()
     val githubRulesResolver = GithubRulesResolver(
       env["GITHUB_TOKEN"]

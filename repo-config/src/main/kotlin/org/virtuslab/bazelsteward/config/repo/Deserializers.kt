@@ -45,7 +45,7 @@ class VersioningSchemaDeserializer : StdDeserializer<VersioningSchema?>(Versioni
 }
 
 class PinningStrategyDeserializer : StdDeserializer<PinningStrategy?>(PinningStrategy::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PinningStrategy? {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PinningStrategy {
     val pinFieldValue = (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString()
     return PinningStrategy.parse(pinFieldValue)
   }
@@ -70,7 +70,7 @@ class DependencyNameFilterDeserializer : StdDeserializer<DependencyNameFilter?>(
 }
 
 class PathPatternDeserializer : StdDeserializer<PathPattern?>(PathPattern::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PathPattern? {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): PathPattern {
     return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText().toString().let { PathPattern.parse(it) }
   }
 }

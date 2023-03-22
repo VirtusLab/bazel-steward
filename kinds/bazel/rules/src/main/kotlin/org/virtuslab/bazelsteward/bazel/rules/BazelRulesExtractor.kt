@@ -21,7 +21,7 @@ import kotlin.io.path.writeText
 
 private val logger = KotlinLogging.logger {}
 
-class BazelRulesExtractor(private val workspaceRoot: Path) {
+class BazelRulesExtractor {
 
   private val yamlReader: ObjectMapper by lazy {
     ObjectMapper(YAMLFactory()).apply { registerModule(KotlinModule.Builder().build()) }
@@ -86,8 +86,7 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
             it.generator_function.isEmpty() &&
             (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
             !it.sha256.isNullOrEmpty()
-        }
-        .mapNotNull {
+        }.map {
           if (!it.url.isNullOrEmpty()) {
             RuleLibraryId.from(it.url, it.sha256!!)
           } else {

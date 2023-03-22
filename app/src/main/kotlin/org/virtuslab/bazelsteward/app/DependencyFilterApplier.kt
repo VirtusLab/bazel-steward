@@ -23,12 +23,16 @@ class DependencyFilterApplier<T : DependencyFilter>(
   ) {
     private fun find(predicate: (T) -> Boolean): T? {
       val filteredConfigs = configs.filter { predicate(it) }
-      return filteredConfigs.firstOrNull { it.dependencies.any { f -> f.test(libraryId) } }
+      return filteredConfigs.firstOrNull { it.dependencies.any { depFilter -> depFilter.test(libraryId) } }
         ?: filteredConfigs.firstOrNull { it.dependencies.isEmpty() }
     }
 
     fun findNotNull(getter: (T) -> Any?): T? {
       return find { getter(it) != null }
+    }
+
+    fun <R> findNotNullOrDefault(default: R, getter: (T) -> R?): R {
+      return find { getter(it) != null }?.let(getter) ?: default
     }
   }
 }

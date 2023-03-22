@@ -18,13 +18,10 @@ class UpdateRulesProvider(
 
   fun resolveForLibrary(library: Library): UpdateRules {
     val filter = applier.forLibrary(library)
-    val versioningForDependency = filter.findNotNull { it.versioning }
-    val bumpingForDependency = filter.findNotNull { it.bumping }
-    val pinForDependency = filter.findNotNull { it.pin }
     return UpdateRules(
-      versioningForDependency?.versioning ?: defaultUpdateRules.versioningSchema,
-      bumpingForDependency?.bumping ?: defaultUpdateRules.bumpingStrategy,
-      pinForDependency?.pin ?: defaultUpdateRules.pinningStrategy,
+      filter.findNotNullOrDefault(defaultUpdateRules.versioningSchema) { it.versioning },
+      filter.findNotNullOrDefault(defaultUpdateRules.bumpingStrategy) { it.bumping },
+      filter.findNotNullOrDefault(defaultUpdateRules.pinningStrategy) { it.pin },
     )
   }
 }

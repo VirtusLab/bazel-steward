@@ -11,7 +11,7 @@ open class RulesUpdate(
 ) : E2EBase() {
 
   @Test
-  fun `Project with specific rules`(@TempDir tempDir: Path) {
+  fun `project with specific rules`(@TempDir tempDir: Path) {
     val workspace = prepareWorkspace(tempDir, project, extraDirs = listOf("rules/base"))
     runBazelStewardWith(workspace) {
       it.withRulesOnly()

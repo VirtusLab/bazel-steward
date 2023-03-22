@@ -21,5 +21,5 @@ If you do not have Bazel Plugin or followed the instruction above, follow these 
 
 1. Run setup-bsp.sh script
 2. Open this project in IntelliJ
-3. Select all `./bazel-*` directories and mark them as excluded. Otherwise they will pollute search scope and other features.
+3. Select all `./bazel-*` directories and mark them as excluded. Otherwise, they will pollute search scope and other features.
 
