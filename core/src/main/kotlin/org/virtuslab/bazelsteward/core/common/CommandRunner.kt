@@ -12,7 +12,7 @@ class CommandRunner {
 
   companion object {
     suspend fun run(command: List<String>, directory: Path): String {
-      logger.debug { command }
+      logger.debug { command.joinToString(" ") { if (it.contains(" ")) """"$it"""" else it } }
       return withContext(Dispatchers.IO) {
         val process = ProcessBuilder(command).directory(directory.toFile()).start()
           .onExit().await()
