@@ -23,7 +23,9 @@ private val logger = KotlinLogging.logger {}
 
 class BazelRulesExtractor(private val workspaceRoot: Path) {
 
-  private val yamlReader: ObjectMapper by lazy { ObjectMapper(YAMLFactory()).apply { registerModule(KotlinModule()) } }
+  private val yamlReader: ObjectMapper by lazy {
+    ObjectMapper(YAMLFactory()).apply { registerModule(KotlinModule.Builder().build()) }
+  }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   data class Repository(

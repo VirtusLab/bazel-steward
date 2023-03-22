@@ -60,7 +60,7 @@ class RepoConfigParser {
     .trim()
 
   private fun configureObjectMapper(): ObjectMapper {
-    val kotlinModule = KotlinModule().apply {
+    val kotlinModule = KotlinModule.Builder().build().apply {
       addDeserializer(VersioningSchema::class.java, VersioningSchemaDeserializer())
       addDeserializer(PinningStrategy::class.java, PinningStrategyDeserializer())
       addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
