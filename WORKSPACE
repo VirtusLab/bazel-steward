@@ -14,9 +14,9 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(RULES_JVM_EXTERNAL_TAG),
 )
 
-IO_BAZEL_KOTLIN_RULES_TAG = "v1.6.0"
+IO_BAZEL_KOTLIN_RULES_TAG = "v1.7.1"
 
-IO_BAZEL_KOTLIN_RULES_SHA = "a57591404423a52bd6b18ebba7979e8cd2243534736c5c94d35c89718ea38f94"
+IO_BAZEL_KOTLIN_RULES_SHA = "fd92a98bd8a8f0e1cdcb490b93f5acef1f1727ed992571232d33de42395ca9b3"
 
 http_archive(
     name = "io_bazel_rules_kotlin",
