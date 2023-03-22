@@ -8,7 +8,7 @@ import org.virtuslab.bazelsteward.core.library.Library
 
 class SearchPatternProvider(
   configs: List<SearchPatternConfig>,
-  dependencyKinds: List<DependencyKind<*>>
+  dependencyKinds: List<DependencyKind<*>>,
 ) {
 
   private val logger = KotlinLogging.logger {}

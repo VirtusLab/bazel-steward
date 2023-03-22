@@ -43,7 +43,7 @@ private fun copyFilesFromJar(resourcePath: String, targetPath: (Path) -> Path) {
 fun prepareLocalWorkspace(
   tempDir: Path,
   resourcePath: String,
-  extraDirs: List<String> = emptyList()
+  extraDirs: List<String> = emptyList(),
 ): Path {
   val localRepo = tempDir.resolve("local")
   val workspacePath = localRepo.resolve(resourcePath)

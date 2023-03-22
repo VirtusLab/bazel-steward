@@ -19,9 +19,13 @@ class CommandRunner {
         val stdout = process.inputStream.bufferedReader().use { it.readText() }
         val stderr = process.errorStream.bufferedReader().use { it.readText() }
 
-        if (process.exitValue() == 0) stdout else throw RuntimeException(
-          "${command.joinToString(" ")}\n$stdout\n$stderr"
-        )
+        if (process.exitValue() == 0) {
+          stdout
+        } else {
+          throw RuntimeException(
+            "${command.joinToString(" ")}\n$stdout\n$stderr",
+          )
+        }
       }
     }
   }

@@ -12,7 +12,7 @@ data class RepoConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   val updateRules: List<UpdateRulesConfig> = emptyList(),
   @JsonSetter(nulls = Nulls.AS_EMPTY)
-  val searchPaths: List<SearchPatternConfig> = emptyList()
+  val searchPaths: List<SearchPatternConfig> = emptyList(),
 )
 
 data class UpdateRulesConfig(

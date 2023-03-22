@@ -43,7 +43,7 @@ data class App(
 
   private suspend fun resolveAvailableVersionsOfUsedLibraries(
     kind: DependencyKind<*>,
-    workspaceRoot: Path
+    workspaceRoot: Path,
   ): Map<out Library, List<Version>>? {
     return try {
       kind.findAvailableVersions(workspaceRoot)
@@ -68,7 +68,7 @@ data class App(
 
   private fun resolveUpdates(
     kind: DependencyKind<*>,
-    updateSuggestions: List<UpdateSuggestion>
+    updateSuggestions: List<UpdateSuggestion>,
   ): List<LibraryUpdate> {
     val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
     val updates = updateSuggestions.mapNotNull { updateSuggestion ->

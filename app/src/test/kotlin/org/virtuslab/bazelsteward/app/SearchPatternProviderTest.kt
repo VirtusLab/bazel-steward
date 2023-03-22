@@ -27,7 +27,7 @@ class SearchPatternProviderTest {
       val result = searchPatternProvider.resolveForLibrary(library)
 
       result shouldContainExactlyInAnyOrder listOf(
-        PathPattern.Regex(""".*\/WORKSPACE[.\w]*""")
+        PathPattern.Regex(""".*\/WORKSPACE[.\w]*"""),
       )
     }
 
@@ -42,7 +42,7 @@ class SearchPatternProviderTest {
         PathPattern.Glob("**/BUILD{,.bazel}"),
         PathPattern.Glob("**/*.bzl"),
         PathPattern.Exact("WORKSPACE.bazel"),
-        PathPattern.Exact("WORKSPACE")
+        PathPattern.Exact("WORKSPACE"),
       )
     }
   }

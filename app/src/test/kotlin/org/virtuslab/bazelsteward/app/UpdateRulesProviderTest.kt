@@ -80,7 +80,7 @@ class UpdateRulesProviderTest {
     return listOf(
       BazelVersionDependencyKind(BazelUpdater()),
       MavenDependencyKind(MavenDataExtractor(workspaceRoot), MavenRepository()),
-      BazelRulesDependencyKind(BazelRulesExtractor(workspaceRoot), GithubRulesResolver(GitHub.connectAnonymously()))
+      BazelRulesDependencyKind(BazelRulesExtractor(workspaceRoot), GithubRulesResolver(GitHub.connectAnonymously())),
     )
   }
 

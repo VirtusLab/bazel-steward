@@ -27,10 +27,12 @@ class GitClient(private val repositoryRoot: Path) {
 
   suspend fun push(branch: String? = null, remote: String = "origin", force: Boolean = false) {
     val args = mutableListOf("push", quiet)
-    if (branch != null)
+    if (branch != null) {
       args.addAll(listOf("--set-upstream", remote, branch))
-    if (force)
+    }
+    if (force) {
       args.add("--force")
+    }
     run(args)
   }
 

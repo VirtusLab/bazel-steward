@@ -15,7 +15,7 @@ class PullRequestManager(
   private val gitHostClient: GitHostClient,
   private val gitOperations: GitOperations,
   private val pushToRemote: Boolean,
-  private val updateAllPullRequests: Boolean
+  private val updateAllPullRequests: Boolean,
 ) {
   suspend fun applySuggestions(pullRequestSuggestions: List<PullRequestSuggestion>) {
     pullRequestSuggestions.forEach { pr ->

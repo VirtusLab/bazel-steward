@@ -7,7 +7,7 @@ import java.nio.file.Path
 
 open class RulesUpdate(
   private val project: String,
-  private vararg val expectedVersions: Pair<String, String>
+  private vararg val expectedVersions: Pair<String, String>,
 ) : E2EBase() {
 
   @Test

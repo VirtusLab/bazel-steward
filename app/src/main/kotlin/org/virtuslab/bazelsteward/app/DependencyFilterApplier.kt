@@ -7,7 +7,7 @@ import org.virtuslab.bazelsteward.core.library.LibraryId
 
 class DependencyFilterApplier<T : DependencyFilter>(
   private val configs: List<T>,
-  private val dependencyKinds: List<DependencyKind<*>>
+  private val dependencyKinds: List<DependencyKind<*>>,
 ) {
 
   fun forLibrary(library: Library): FilteredByKind<T> {
@@ -19,7 +19,7 @@ class DependencyFilterApplier<T : DependencyFilter>(
   class FilteredByKind<T : DependencyFilter>(
     private val configs: List<T>,
     private val libraryId: LibraryId,
-    val kind: DependencyKind<*>?
+    val kind: DependencyKind<*>?,
   ) {
     private fun find(predicate: (T) -> Boolean): T? {
       val filteredConfigs = configs.filter { predicate(it) }

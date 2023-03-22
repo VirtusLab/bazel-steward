@@ -38,23 +38,23 @@ object AppBuilder {
       ArgType.Boolean,
       description = "Push to remote",
       fullName = "push-to-remote",
-      shortName = "p"
+      shortName = "p",
     ).default(true)
     val updateAllPullRequests by parser.option(
       ArgType.Boolean,
       description = "Update all pull requests",
       fullName = "update-all-prs",
-      shortName = "f"
+      shortName = "f",
     ).default(false)
     val baseBranch by parser.option(
       ArgType.String,
       fullName = "base-branch",
-      description = "Branch that will be set as a base in pull request"
+      description = "Branch that will be set as a base in pull request",
     )
     val configPath by parser.option(
       ArgType.String,
       fullName = "config-path",
-      description = "Path to the config file"
+      description = "Path to the config file",
     )
 
     parser.parse(args)
@@ -73,7 +73,7 @@ object AppBuilder {
       pushToRemote,
       updateAllPullRequests,
       baseBranchName,
-      gitAuthor
+      gitAuthor,
     )
     logger.info { appConfig }
 
@@ -88,21 +88,21 @@ object AppBuilder {
       gitHostClient,
       gitOperations,
       appConfig.pushToRemote,
-      appConfig.updateAllPullRequests
+      appConfig.updateAllPullRequests,
     )
     val bazelRulesExtractor = BazelRulesExtractor(appConfig.workspaceRoot)
     val bazelUpdater = BazelUpdater()
     val githubRulesResolver = GithubRulesResolver(
       env["GITHUB_TOKEN"]
         ?.let(GitHub::connectUsingOAuth)
-        ?: GitHub.connectAnonymously()
+        ?: GitHub.connectAnonymously(),
     )
     val fileFinder = FileFinder(appConfig.workspaceRoot)
 
     val dependencyKinds = listOf(
       BazelVersionDependencyKind(bazelUpdater),
       MavenDependencyKind(mavenDataExtractor, mavenRepository),
-      BazelRulesDependencyKind(bazelRulesExtractor, githubRulesResolver)
+      BazelRulesDependencyKind(bazelRulesExtractor, githubRulesResolver),
     )
 
     val libraryUpdateResolver = LibraryUpdateResolver()
@@ -113,7 +113,7 @@ object AppBuilder {
 
     val libraryToTextFilesMapper = LibraryToTextFilesMapper(
       searchPatternProvider,
-      fileFinder
+      fileFinder,
     )
 
     return App(
@@ -126,7 +126,7 @@ object AppBuilder {
       updateRulesProvider,
       libraryToTextFilesMapper,
       pullRequestManager,
-      appConfig.workspaceRoot
+      appConfig.workspaceRoot,
     )
   }
 }

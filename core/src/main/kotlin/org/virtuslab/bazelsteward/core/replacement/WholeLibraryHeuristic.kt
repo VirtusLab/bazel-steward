@@ -29,9 +29,9 @@ object WholeLibraryHeuristic : VersionReplacementHeuristic {
           matchResult.origin,
           versionOffset,
           updateSuggestion.currentLibrary.version.value.length,
-          updateSuggestion.suggestedVersion.value
-        )
-      )
+          updateSuggestion.suggestedVersion.value,
+        ),
+      ),
     )
   }
 }

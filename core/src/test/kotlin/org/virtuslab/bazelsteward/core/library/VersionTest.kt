@@ -52,6 +52,6 @@ class VersionTest {
     "1.final1+whatever",
     "1.0-0",
     "1.0beta1-SNAPSHOT",
-    "1.0-alpha1"
+    "1.0-alpha1",
   )
 }

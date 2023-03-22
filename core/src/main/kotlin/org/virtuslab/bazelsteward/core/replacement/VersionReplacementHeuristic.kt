@@ -7,13 +7,13 @@ import java.nio.file.Path
 
 data class LibraryUpdate(
   val suggestion: UpdateSuggestion,
-  val fileChanges: List<FileChange>
+  val fileChanges: List<FileChange>,
 )
 
 data class MatchedText(
   val match: MatchResult,
   val origin: Path,
-  val baseOffset: Int = 0
+  val baseOffset: Int = 0,
 ) {
   val offset: Int
     get() = match.range.start + baseOffset

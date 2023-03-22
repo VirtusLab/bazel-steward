@@ -52,7 +52,7 @@ open class E2EBase {
     tempDir: Path,
     project: String,
     args: List<String> = listOf("--push-to-remote"),
-    transform: (App) -> App
+    transform: (App) -> App,
   ) {
     val file = prepareWorkspace(tempDir, project)
     runBazelStewardWith(file, args, transform)
@@ -61,7 +61,7 @@ open class E2EBase {
   protected fun runBazelStewardWith(
     workspaceRoot: Path,
     args: List<String> = listOf("--push-to-remote"),
-    transform: (App) -> App
+    transform: (App) -> App,
   ) {
     val app = transform(AppBuilder.fromArgs(arrayOf(workspaceRoot.toString()) + args, Environment.system))
     runBlocking {
@@ -79,7 +79,7 @@ open class E2EBase {
     testResourcePath: String,
     branches: List<String>,
     skipLocal: Boolean = false,
-    skipRemote: Boolean = false
+    skipRemote: Boolean = false,
   ) {
     val localRepo = tempDir.resolve("local").resolve(testResourcePath)
     val remoteRepo = tempDir.resolve("remote")
@@ -88,8 +88,9 @@ open class E2EBase {
       checkForBranchesWithVersions(localRepo, branches)
       checkStatusOfBranches(localRepo, branches)
     }
-    if (!skipRemote)
+    if (!skipRemote) {
       checkForBranchesWithVersions(remoteRepo, branches)
+    }
   }
 
   protected fun checkBranchesWithoutVersions(tempDir: Path, testResourcePath: String, branchesPattern: List<String>) {
@@ -137,21 +138,21 @@ open class E2EBase {
       dependencyKinds = listOf(
         MavenDependencyKind(
           MavenDataExtractor(this.workspaceRoot),
-          mockMavenRepositoryWithVersion(*versions.toTypedArray())
-        )
-      )
+          mockMavenRepositoryWithVersion(*versions.toTypedArray()),
+        ),
+      ),
     )
   }
 
   protected fun App.withRulesOnly(): App {
     return this.copy(
-      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelRulesDependencyKind>()
+      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelRulesDependencyKind>(),
     )
   }
 
   protected fun App.withBazelVersionOnly(): App {
     return this.copy(
-      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelVersionDependencyKind>()
+      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelVersionDependencyKind>(),
     )
   }
 
@@ -161,8 +162,8 @@ open class E2EBase {
         gitHostClient,
         this.gitOperations,
         pushToRemote = true,
-        updateAllPullRequests = false
-      )
+        updateAllPullRequests = false,
+      ),
     )
   }
 

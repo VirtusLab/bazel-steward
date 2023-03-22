@@ -16,7 +16,7 @@ object BazelLibraryId : LibraryId() {
 }
 
 data class BazelLibrary(
-  override val version: Version
+  override val version: Version,
 ) : Library {
   override val id: BazelLibraryId = BazelLibraryId
 }
