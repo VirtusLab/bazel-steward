@@ -3,9 +3,9 @@ load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_config")
 
 define_kt_toolchain(
     name = "kotlin_toolchain",
-    api_version = "1.6",
+    api_version = "1.7",
     jvm_target = "11",
-    language_version = "1.6",
+    language_version = "1.7",
 )
 
 ktlint_config(
