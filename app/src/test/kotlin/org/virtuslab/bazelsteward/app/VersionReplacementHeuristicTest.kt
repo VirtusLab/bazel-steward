@@ -288,7 +288,7 @@ class VersionReplacementHeuristicTest {
   private fun library(group: String, artifact: String, version: String) =
     MavenCoordinates(
       MavenLibraryId(group, artifact),
-      version(version)
+      version(version),
     )
 
   private fun version(version: String) = SemanticVersion.fromString(version)!!
@@ -302,7 +302,7 @@ class VersionReplacementHeuristicTest {
   private fun resolveUpdates(
     library: MavenCoordinates,
     version: SemanticVersion,
-    vararg heuristics: VersionReplacementHeuristic = allHeuristics
+    vararg heuristics: VersionReplacementHeuristic = allHeuristics,
   ): FileChange? {
     return resolver.resolve(files, UpdateSuggestion(library, version), heuristics.toList())?.fileChanges?.firstOrNull()
   }

@@ -10,7 +10,8 @@ sealed class VersioningSchema {
       if (!namedGroupsFromConfigRegex.containsAll(expectedGroups)) {
         throw IllegalArgumentException(
           """Regex provided in format: ${regex.pattern}
-          |does not contain all required groups: ${expectedGroups.joinToString()}""".trimMargin()
+          |does not contain all required groups: ${expectedGroups.joinToString()}
+          """.trimMargin(),
         )
       }
     }

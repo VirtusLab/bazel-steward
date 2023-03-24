@@ -10,7 +10,7 @@ import org.virtuslab.bazelsteward.maven.MavenLibraryId
 data class PullRequestSuggestion(
   val description: NewPullRequest,
   val branchPrefix: String,
-  val commits: List<CommitRequest>
+  val commits: List<CommitRequest>,
 ) {
   val branch: GitBranch
     get() = description.branch
@@ -54,7 +54,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
           config.labels,
         ),
         branch.prefix,
-        commits
+        commits,
       )
     }
   }

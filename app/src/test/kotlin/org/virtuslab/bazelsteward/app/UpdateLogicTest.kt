@@ -92,7 +92,7 @@ class UpdateLogicTest {
     version: String,
     suggestion: String,
     versioningSchema: VersioningSchema,
-    bumpingStrategy: BumpingStrategy
+    bumpingStrategy: BumpingStrategy,
   ) {
     val coordinates = MavenCoordinates.of(group, artifact, version)
     val updateRules = UpdateRules(versioningSchema, bumpingStrategy)
@@ -148,7 +148,7 @@ class UpdateLogicTest {
     Arguments.of("2.0.0", "2.3.2+beta", "2.3.2+beta"),
     Arguments.of("2.0.1+beta", "2.0.2", "2.0.2"),
     Arguments.of("2.0.0-alpha", "5.0.0", null),
-    Arguments.of("2.0.2+beta", "2.2", null)
+    Arguments.of("2.0.2+beta", "2.2", null),
   )
 
   @ParameterizedTest

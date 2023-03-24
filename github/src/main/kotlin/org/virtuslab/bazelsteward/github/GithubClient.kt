@@ -45,7 +45,7 @@ class GithubClient private constructor(
       pr.title,
       pr.branch.name,
       baseBranch,
-      pr.body
+      pr.body,
     )
     newPr.addLabels(*pr.labels.toTypedArray())
     return PullRequest(pr.branch)
@@ -65,8 +65,9 @@ class GithubClient private constructor(
 
   override suspend fun onPrChange(pr: PullRequest, prStatusBefore: PrStatus) {
     ghPatRepository?.let { repository ->
-      if (prStatusBefore != PrStatus.NONE)
+      if (prStatusBefore != PrStatus.NONE) {
         delay(10000)
+      }
       val ghPr =
         repository.queryPullRequests().state(GHIssueState.OPEN).head(pr.branch.name).list().firstOrNull()
           ?: throw RuntimeException("PR for branch ${pr.branch.name} not found")
@@ -77,20 +78,21 @@ class GithubClient private constructor(
   }
 
   private fun checkPrStatus(pr: GHPullRequest?): PrStatus {
-    return if (pr == null)
+    return if (pr == null) {
       PrStatus.NONE
-    else if (pr.isMerged)
+    } else if (pr.isMerged) {
       PrStatus.MERGED
-    else if (pr.state == GHIssueState.CLOSED)
+    } else if (pr.state == GHIssueState.CLOSED) {
       PrStatus.CLOSED
-    else if (pr.listCommits().toList().any { it.commit.author.name != gitAuthor.name })
+    } else if (pr.listCommits().toList().any { it.commit.author.name != gitAuthor.name }) {
       PrStatus.OPEN_MODIFIED
-    else
+    } else {
       when (pr.mergeable) {
         null -> PrStatus.OPEN_MODIFIED
         true -> PrStatus.OPEN_MERGEABLE
         false -> PrStatus.OPEN_NOT_MERGEABLE
       }
+    }
   }
 
   private fun createClient(token: String): GHRepository {

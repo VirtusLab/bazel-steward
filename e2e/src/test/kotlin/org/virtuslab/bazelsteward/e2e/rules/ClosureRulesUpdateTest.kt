@@ -6,5 +6,5 @@ import org.virtuslab.bazelsteward.e2e.rules.fixture.RulesUpdate
 @Disabled("No sha in description of newer releases.")
 class ClosureRulesUpdateTest : RulesUpdate(
   "rules/rules_closure",
-  "rules_closure" to "0.12.0"
+  "rules_closure" to "0.12.0",
 )

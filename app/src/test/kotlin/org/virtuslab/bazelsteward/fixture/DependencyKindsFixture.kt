@@ -17,8 +17,8 @@ class DependencyKindsFixture(workspaceRoot: Path = Paths.get(".")) {
   val bazelVersion = BazelVersionDependencyKind(BazelUpdater())
   val maven = MavenDependencyKind(MavenDataExtractor(workspaceRoot), MavenRepository())
   val bazelRules = BazelRulesDependencyKind(
-    BazelRulesExtractor(workspaceRoot),
-    GithubRulesResolver(GitHub.connectAnonymously())
+    BazelRulesExtractor(),
+    GithubRulesResolver(GitHub.connectAnonymously()),
   )
   val all = listOf(maven, bazelVersion, bazelRules)
 }

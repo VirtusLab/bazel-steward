@@ -8,7 +8,7 @@ import org.virtuslab.bazelsteward.core.library.Library
 
 class SearchPatternProvider(
   configs: List<SearchPatternConfig>,
-  dependencyKinds: List<DependencyKind<*>>
+  dependencyKinds: List<DependencyKind<*>>,
 ) {
 
   private val logger = KotlinLogging.logger {}
@@ -16,8 +16,7 @@ class SearchPatternProvider(
 
   fun resolveForLibrary(library: Library): List<PathPattern> {
     val filter = applier.forLibrary(library)
-    return filter.findNotNull { it.pathPatterns }?.pathPatterns
-      ?: filter.kind?.defaultSearchPatterns
+    return filter.findNotNullOrDefault(filter.kind?.defaultSearchPatterns) { it.pathPatterns }
       ?: emptyList<PathPattern>().also { logger.warn { "No search patterns for $library" } }
   }
 }

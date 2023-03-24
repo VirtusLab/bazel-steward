@@ -10,12 +10,12 @@ data class FileChange(
   val file: Path,
   val offset: Int,
   val length: Int,
-  val replacement: String
+  val replacement: String,
 )
 
 data class CommitRequest(
   val message: String,
-  val changes: List<FileChange>
+  val changes: List<FileChange>,
 )
 
 class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
@@ -31,9 +31,7 @@ class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
     try {
       git.push(branchName, force = force)
     } catch (ex: RuntimeException) {
-      if (ex.message?.contains("non-fast-forward") == true)
-        git.push(branchName, force = true)
-      else throw ex
+      git.push(branchName, force = true)
     }
   }
 

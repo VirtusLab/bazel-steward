@@ -5,7 +5,9 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
+import org.virtuslab.bazelsteward.app.PullRequestManager
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
+import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitHostClient
@@ -50,7 +52,7 @@ open class E2EBase {
     tempDir: Path,
     project: String,
     args: List<String> = listOf("--push-to-remote"),
-    transform: (App) -> App
+    transform: (App) -> App,
   ) {
     val file = prepareWorkspace(tempDir, project)
     runBazelStewardWith(file, args, transform)
@@ -59,7 +61,7 @@ open class E2EBase {
   protected fun runBazelStewardWith(
     workspaceRoot: Path,
     args: List<String> = listOf("--push-to-remote"),
-    transform: (App) -> App
+    transform: (App) -> App,
   ) {
     val app = transform(AppBuilder.fromArgs(arrayOf(workspaceRoot.toString()) + args, Environment.system))
     runBlocking {
@@ -77,7 +79,7 @@ open class E2EBase {
     testResourcePath: String,
     branches: List<String>,
     skipLocal: Boolean = false,
-    skipRemote: Boolean = false
+    skipRemote: Boolean = false,
   ) {
     val localRepo = tempDir.resolve("local").resolve(testResourcePath)
     val remoteRepo = tempDir.resolve("remote")
@@ -86,8 +88,9 @@ open class E2EBase {
       checkForBranchesWithVersions(localRepo, branches)
       checkStatusOfBranches(localRepo, branches)
     }
-    if (!skipRemote)
+    if (!skipRemote) {
       checkForBranchesWithVersions(remoteRepo, branches)
+    }
   }
 
   protected fun checkBranchesWithoutVersions(tempDir: Path, testResourcePath: String, branchesPattern: List<String>) {
@@ -134,22 +137,33 @@ open class E2EBase {
     return this.copy(
       dependencyKinds = listOf(
         MavenDependencyKind(
-          MavenDataExtractor(this.appConfig.workspaceRoot),
-          mockMavenRepositoryWithVersion(*versions.toTypedArray())
-        )
-      )
+          MavenDataExtractor(this.workspaceRoot),
+          mockMavenRepositoryWithVersion(*versions.toTypedArray()),
+        ),
+      ),
     )
   }
 
   protected fun App.withRulesOnly(): App {
     return this.copy(
-      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelRulesDependencyKind>()
+      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelRulesDependencyKind>(),
+    )
+  }
+
+  protected fun App.withBazelVersionOnly(): App {
+    return this.copy(
+      dependencyKinds = this.dependencyKinds.filterIsInstance<BazelVersionDependencyKind>(),
     )
   }
 
   protected fun App.withGitHostClient(gitHostClient: GitHostClient): App {
     return this.copy(
-      gitHostClient = gitHostClient
+      pullRequestManager = PullRequestManager(
+        gitHostClient,
+        this.gitOperations,
+        pushToRemote = true,
+        updateAllPullRequests = false,
+      ),
     )
   }
 

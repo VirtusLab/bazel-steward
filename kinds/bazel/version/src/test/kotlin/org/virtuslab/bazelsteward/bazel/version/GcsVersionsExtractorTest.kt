@@ -12,6 +12,7 @@ class GcsVersionsExtractorTest {
       assert(versions.isNotEmpty())
     }
   }
+
   @Test
   fun `should list versions with prefix`() {
     runBlocking {

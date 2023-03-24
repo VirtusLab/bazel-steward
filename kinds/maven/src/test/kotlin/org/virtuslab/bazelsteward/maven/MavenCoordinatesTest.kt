@@ -11,7 +11,7 @@ class MavenCoordinatesTest {
     val fromConstructor =
       MavenCoordinates(
         MavenLibraryId("org.virtuslab.ideprobe", "driver_2.12"),
-        SimpleVersion("0.47.0")
+        SimpleVersion("0.47.0"),
       )
     fromFactory shouldBe fromConstructor
   }

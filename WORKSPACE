@@ -3,9 +3,9 @@ workspace(name = "bazel-steward")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # rules_jvm_external - for maven dependencies
-RULES_JVM_EXTERNAL_TAG = "4.4.2"
+RULES_JVM_EXTERNAL_TAG = "4.5"
 
-RULES_JVM_EXTERNAL_SHA = "735602f50813eb2ea93ca3f5e43b1959bd80b213b836a07a62a29d757670b77b"
+RULES_JVM_EXTERNAL_SHA = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6"
 
 http_archive(
     name = "rules_jvm_external",
@@ -14,9 +14,9 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(RULES_JVM_EXTERNAL_TAG),
 )
 
-IO_BAZEL_KOTLIN_RULES_TAG = "v1.6.0"
+IO_BAZEL_KOTLIN_RULES_TAG = "v1.7.1"
 
-IO_BAZEL_KOTLIN_RULES_SHA = "a57591404423a52bd6b18ebba7979e8cd2243534736c5c94d35c89718ea38f94"
+IO_BAZEL_KOTLIN_RULES_SHA = "fd92a98bd8a8f0e1cdcb490b93f5acef1f1727ed992571232d33de42395ca9b3"
 
 http_archive(
     name = "io_bazel_rules_kotlin",
@@ -82,17 +82,17 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 maven_install(
     artifacts = [
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4",
         "io.get-coursier:interface:1.0.13",
         "commons-io:commons-io:2.11.0",
-        "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.4",
-        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1",
+        "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2",
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2",
         "com.fasterxml.jackson.core:jackson-core:2.14.2",
         "com.networknt:json-schema-validator:1.0.78",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
-        "org.kohsuke:github-api:1.313",
+        "org.kohsuke:github-api:1.314",
         "io.github.microutils:kotlin-logging-jvm:3.0.4",
-        "org.slf4j:slf4j-simple:2.0.6",
+        "org.slf4j:slf4j-simple:2.0.7",
         "org.json:json:20220924",
         "org.apache.commons:commons-text:1.10.0",
     ],

@@ -25,7 +25,7 @@ class RepoConfigurationTest {
           "update-rules[1].versioning: does not match the regex pattern ^regex:",
           "update-rules[1].bumping: does not have a value in the enumeration [default, latest]",
           "update-rules[2].kinds[0]: integer found, string expected",
-        ).joinToString(System.lineSeparator())
+        ).joinToString(System.lineSeparator()),
       )
   }
 
@@ -76,14 +76,14 @@ class RepoConfigurationTest {
         SearchPatternConfig(
           dependencies = listOf(DependencyNameFilter.Default("com.google:*")),
           pathPatterns = listOf(
-            PathPattern.Exact(value = "bazel/google-deps.bzl")
-          )
+            PathPattern.Exact(value = "bazel/google-deps.bzl"),
+          ),
         ),
         SearchPatternConfig(
           kinds = listOf("maven"),
           pathPatterns = listOf(
-            PathPattern.Regex(value = """.*/bazel/deps.bzl""")
-          )
+            PathPattern.Regex(value = """.*/bazel/deps.bzl"""),
+          ),
         ),
         SearchPatternConfig(
           kinds = listOf("bazel-rules"),

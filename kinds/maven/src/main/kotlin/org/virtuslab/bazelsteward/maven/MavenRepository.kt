@@ -57,8 +57,9 @@ open class MavenRepository {
                 .withModule(Module.of(coordinates.id.group, coordinates.id.artifact))
                 .withCache(cache)
                 .versions()
-            if (versionResult.errors.isNotEmpty())
+            if (versionResult.errors.isNotEmpty() && versionResult.mergedListings.available.isEmpty()) {
               logger.error { versionResult.errors }
+            }
             coordinates to versionResult.mergedListings.available.map { SimpleVersion(it) }
           }
         }.awaitAll().toMap()

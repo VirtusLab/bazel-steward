@@ -1,0 +1,16 @@
+name: Dependencies (Force)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bazel-steward:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: VirtusLab/bazel-steward@latest
+        with:
+          github-personal-token: ${{ secrets.PAT_GITHUB_TOKEN }}
+          additional-args: "--update-all-prs"

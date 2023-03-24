@@ -25,7 +25,7 @@ data class MavenCoordinates(
     fun of(
       group: String,
       artifact: String,
-      version: String
+      version: String,
     ): MavenCoordinates = MavenCoordinates(MavenLibraryId(group, artifact), SimpleVersion(version))
   }
 }

@@ -21,9 +21,11 @@ import kotlin.io.path.writeText
 
 private val logger = KotlinLogging.logger {}
 
-class BazelRulesExtractor(private val workspaceRoot: Path) {
+class BazelRulesExtractor {
 
-  private val yamlReader: ObjectMapper by lazy { ObjectMapper(YAMLFactory()).apply { registerModule(KotlinModule()) } }
+  private val yamlReader: ObjectMapper by lazy {
+    ObjectMapper(YAMLFactory()).apply { registerModule(KotlinModule.Builder().build()) }
+  }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   data class Repository(
@@ -54,7 +56,8 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
         |dump_all_repositories(
         |    name = "all_external_repositories",
         |    repositories_json = repositories_as_json()
-        |)""".trimMargin()
+        |)
+        """.trimMargin(),
       )
       // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
       CommandRunner.run("bazel build @all_external_repositories//:result.json".split(' '), workspaceRoot)
@@ -63,16 +66,27 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
       val bazelPath = CommandRunner.run("bazel info output_base".split(' '), workspaceRoot).removeSuffix("\n")
       val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
       if (!resultFilePath.exists()) {
-        throw RuntimeException("Failed to find a file")
+        throw RuntimeException("Failed to find a file: $resultFilePath")
       }
-      val result = yamlReader.readValue(resultFilePath.toFile(), object : TypeReference<List<Repository>>() {})
+
+      val yamlNode = yamlReader.readTree(resultFilePath.toFile())
+      val repositories = yamlNode.elements().asSequence().toList()
+        .mapNotNull {
+          try {
+            yamlReader.convertValue(it, object : TypeReference<Repository>() {})
+          } catch (e: Exception) {
+            logger.warn { e.message }
+            null
+          }
+        }
+
+      val result = repositories
         .filter {
           it.kind == "http_archive" &&
             it.generator_function.isEmpty() &&
             (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
             !it.sha256.isNullOrEmpty()
-        }
-        .mapNotNull {
+        }.map {
           if (!it.url.isNullOrEmpty()) {
             RuleLibraryId.from(it.url, it.sha256!!)
           } else {
@@ -81,6 +95,11 @@ class BazelRulesExtractor(private val workspaceRoot: Path) {
               .let { url -> RuleLibraryId.from(url, it.sha256!!) }
           }
         }
+
+      logger.debug { "Found ${result.size} Bazel Rules. " }
+      if (result.isNotEmpty()) {
+        logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.name}:${it.tag}" }}" }
+      }
       result.map { RuleLibrary(it, SimpleVersion(it.tag)) }
     }
 

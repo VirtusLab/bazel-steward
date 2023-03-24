@@ -6,7 +6,7 @@ data class NewPullRequest(
   val branch: GitBranch,
   val title: String,
   val body: String,
-  val labels: List<String>
+  val labels: List<String>,
 )
 
 interface GitHostClient {

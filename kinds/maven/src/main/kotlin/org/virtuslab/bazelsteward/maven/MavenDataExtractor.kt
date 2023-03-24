@@ -23,7 +23,7 @@ class MavenDataExtractor(private val workspaceRoot: Path) {
       ProcessBuilder(bazelQuery.format(fileName).split(' ')).directory(workspaceRoot.toFile()).start().onExit().await()
     val xml = process.inputStream.bufferedReader().use { it.readText() }
     val fileLocation = Regex(regexPattern.format(fileName)).find(xml)?.let { it.groups[1]?.value }
-      ?: throw RuntimeException("Failed to find file")
+      ?: throw RuntimeException("Failed to find file: $fileName")
 
     Path.of(fileLocation).toFile().readLines()
   }

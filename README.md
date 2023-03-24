@@ -56,25 +56,53 @@ update-rules:
     versioning: loose
   -
     versioning: loose
+search-paths:
+  -
+    dependencies: "com.google:*"
+    path-patterns:
+      - "bazel/google_deps.bzl"
+  -
+    kinds: maven
+    path-patterns:
+      - "3rdparty/jvm/*.BUILD.bazel"
+  -
+    kinds: bazel
+    path-patterns:
+      - ".bazelversion"
+      - ".github/**/*.yaml"
+
 ```
 
 When resolving which rule to use, Bazel Steward first checks rules with the dependencies key defined (in order they are declared) and then other rules (also in declaration order).
 
 When the rule is found, it can configure for a dependency the following things:
-* `versioning` (string) <br/>
+* In update-rules section
+  * `versioning` (string) <br/>
   Overrides what kind of versioning schema is used for the dependency.
   Default: `loose`. Allowed values: `loose`, `semver`, `regex:...`.
-* `pin` (string) <br/>
-  Filters versions that are allowed for the dependency.
-  It can be an exact version, prefix or regular expression
-  Bazel steward will try to automatically determine what kind of input it is.
-  You can override this by prepending the value with `prefix:`, `exact:` or `regex:`.
-* `bumping` (string) <br/>
-  Sets the strategy for bumping this dependency.
-  1. `latest` - Bump to the latest version
-  2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
-  3. `minor` - First bump to the latest minor, and then to the latest major.
+  * `pin` (string) <br/>
+    Filters versions that are allowed for the dependency.
+    It can be an exact version, prefix or regular expression.
+    Bazel steward will try to automatically determine what kind of input it is.
+    You can override this by prepending the value with `prefix:`, `exact:` or `regex:`.
+  * `bumping` (string) <br/>
+    Sets the strategy for bumping this dependency.
+    1. `latest` - Bump to the latest version
+    2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
+    3. `minor` - First bump to the latest minor, and then to the latest major.
 
+* In search-paths section:
+  * `path-patterns` (list of strings) <br/>
+    Overrides paths where Bazel Steward will look for a version to update 
+    (it is used by version replacement mechanism, not version detection). 
+    A path pattern can either be:
+    1. exact path: "exact:WORKSPACE.bazel"
+    2. glob pattern: "glob:**/*.bzl"
+    3. regex pattern: "regex:.test./BUILD(.bazel)?"
+    
+    All paths are relative to the Bazel workspace root. 
+    The "exact:", "glob:", "regex:" prefixes are used to determine type of path pattern. 
+    They can usually be omitted and correct syntax should be detected automatically.
 
 # Installation
 

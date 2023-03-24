@@ -12,16 +12,20 @@ class CommandRunner {
 
   companion object {
     suspend fun run(command: List<String>, directory: Path): String {
-      logger.debug { command }
+      logger.debug { command.joinToString(" ") { if (it.contains(" ")) """"$it"""" else it } }
       return withContext(Dispatchers.IO) {
         val process = ProcessBuilder(command).directory(directory.toFile()).start()
           .onExit().await()
         val stdout = process.inputStream.bufferedReader().use { it.readText() }
         val stderr = process.errorStream.bufferedReader().use { it.readText() }
 
-        if (process.exitValue() == 0) stdout else throw RuntimeException(
-          "${command.joinToString(" ")}\n$stdout\n$stderr"
-        )
+        if (process.exitValue() == 0) {
+          stdout
+        } else {
+          throw RuntimeException(
+            "${command.joinToString(" ")}\n$stdout\n$stderr",
+          )
+        }
       }
     }
   }
