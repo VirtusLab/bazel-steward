@@ -14,7 +14,7 @@ class BazelRuleLibraryIdTest {
   @ParameterizedTest
   @MethodSource("argumentsForCreateBazelLibraryId")
   fun `should create BazelRuleLibraryId`(url: String, tag: String, artifactName: String) {
-    Assertions.assertThat(RuleLibraryId.from(url, "sha256"))
+    Assertions.assertThat(RuleLibraryId.from(url))
       .hasFieldOrPropertyWithValue("repoName", "repo1")
       .hasFieldOrPropertyWithValue("ruleName", "name1")
       .hasFieldOrPropertyWithValue("tag", tag)
@@ -32,7 +32,7 @@ class BazelRuleLibraryIdTest {
   @ParameterizedTest
   @MethodSource("argumentsForThrowException")
   fun `should throw an exception when creating BazelRuleLibraryId`(url: String) {
-    Assertions.assertThatThrownBy { RuleLibraryId.from(url, "sha256") }
+    Assertions.assertThatThrownBy { RuleLibraryId.from(url) }
       .hasMessageContaining("Unrecognised artifact URL format")
   }
 
@@ -48,7 +48,7 @@ class BazelRuleLibraryIdTest {
 
   @Test
   fun `should throw an exception when creating BazelRuleLibraryId`() {
-    Assertions.assertThatThrownBy { RuleLibraryId.from("https://github.com/repo1/name1/archive/refs/tags/v0.3.1.trr", "sha256") }
+    Assertions.assertThatThrownBy { RuleLibraryId.from("https://github.com/repo1/name1/archive/refs/tags/v0.3.1.trr") }
       .hasMessageContaining("Unrecognised artifact URL format")
   }
 }

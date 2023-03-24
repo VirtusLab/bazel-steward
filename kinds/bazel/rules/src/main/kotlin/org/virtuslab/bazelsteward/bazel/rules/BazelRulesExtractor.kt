@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.common.CommandRunner
-import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -70,7 +69,7 @@ class BazelRulesExtractor {
       }
 
       val yamlNode = yamlReader.readTree(resultFilePath.toFile())
-      val repositories = yamlNode.elements().asSequence().toList()
+      val repositories: List<Repository> = yamlNode.elements().asSequence().toList()
         .mapNotNull {
           try {
             yamlReader.convertValue(it, object : TypeReference<Repository>() {})
@@ -80,27 +79,30 @@ class BazelRulesExtractor {
           }
         }
 
-      val result = repositories
+      repositories
         .filter {
           it.kind == "http_archive" &&
             it.generator_function.isEmpty() &&
             (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
             !it.sha256.isNullOrEmpty()
-        }.map {
-          if (!it.url.isNullOrEmpty()) {
-            RuleLibraryId.from(it.url, it.sha256!!)
+        }
+        .mapNotNull {
+          val libraryId = if (!it.url.isNullOrEmpty()) {
+            RuleLibraryId.from(it.url)
           } else {
             it.urls!!
               .first { url -> url.startsWith("https://github.com/") }
-              .let { url -> RuleLibraryId.from(url, it.sha256!!) }
+              .let { url -> RuleLibraryId.from(url) }
+          }
+          val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256, libraryId.tag)
+          RuleLibrary(libraryId, ruleVersion)
+        }
+        .also{ result ->
+          logger.debug { "Found ${result.size} Bazel Rules. " }
+          if (result.isNotEmpty()) {
+            logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.id.name}:${it.id.tag}" }}" }
           }
         }
-
-      logger.debug { "Found ${result.size} Bazel Rules. " }
-      if (result.isNotEmpty()) {
-        logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.name}:${it.tag}" }}" }
-      }
-      result.map { RuleLibrary(it, SimpleVersion(it.tag)) }
     }
 
   private fun deleteFile(file: File) {

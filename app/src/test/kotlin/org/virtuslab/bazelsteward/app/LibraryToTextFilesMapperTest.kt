@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibrary
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId.ReleaseArtifact
+import org.virtuslab.bazelsteward.bazel.rules.RuleVersion
 import org.virtuslab.bazelsteward.bazel.version.BazelLibrary
 import org.virtuslab.bazelsteward.core.FileFinder
 import org.virtuslab.bazelsteward.core.common.TextFile
@@ -47,8 +48,8 @@ class LibraryToTextFilesMapperTest {
   fun `should return correct paths for BazelRulesDependencyKind`(@TempDir tempDir: Path) {
     val workspace = prepareWorkspace(tempDir)
     val library = RuleLibrary(
-      ReleaseArtifact("", "", "", "", ""),
-      SimpleVersion("5.3.0"),
+      ReleaseArtifact("", "", "", ""),
+      RuleVersion.create("", "", "5.3.0")
     )
 
     val result = testForDependencyKind(library, tempDir)

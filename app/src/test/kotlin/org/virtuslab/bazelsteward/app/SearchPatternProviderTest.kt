@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibrary
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
+import org.virtuslab.bazelsteward.bazel.rules.RuleVersion
 import org.virtuslab.bazelsteward.core.PathPattern
-import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.fixture.DependencyKindsFixture
 import org.virtuslab.bazelsteward.fixture.loadRepoConfigFromResources
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
@@ -34,7 +34,7 @@ class SearchPatternProviderTest {
     @Test
     fun `should return default for Library without custom searchPattern`() {
       val libraryIdURL = "https://github.com/aaa/aaa/archive/aaa.zip"
-      val library = RuleLibrary(RuleLibraryId.from(libraryIdURL, "aaa"), SimpleVersion("1.0.0"))
+      val library = RuleLibrary(RuleLibraryId.from(libraryIdURL), RuleVersion.create(libraryIdURL, "aaa", "1.0.0"))
 
       val result = searchPatternProvider.resolveForLibrary(library)
 

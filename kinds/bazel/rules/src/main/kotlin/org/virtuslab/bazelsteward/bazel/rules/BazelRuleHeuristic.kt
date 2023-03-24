@@ -14,7 +14,7 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
       val ruleLibrary = updateSuggestion.currentLibrary as RuleLibrary
       val currentUrl = ruleLibrary.id.downloadUrl
       val currentVersion = updateSuggestion.currentLibrary.version.value
-      val currentSha = ruleLibrary.id.sha256 ?: throw NullPointerException("Current library should not have null sha256")
+      val currentSha = ruleLibrary.version.sha256
 
       val changes = with(updateSuggestion.suggestedVersion as RuleVersion) {
         listOf(currentUrl, currentVersion, currentSha).zip(listOf(url, value, sha256)).flatMap { (current, suggested) ->
