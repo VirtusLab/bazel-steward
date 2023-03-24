@@ -19,7 +19,7 @@ class PullRequestSuggesterTest {
         return PullRequestConfig(
           "\${group} and \${artifact}",
           "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
-          listOf("test-label")
+          listOf("test-label"),
         )
       }
     }

@@ -35,4 +35,4 @@ pull-requests:
   - title: "Updated ${group}/${artifact} from ${versionFrom} to ${versionTo}"
     labels: "maintenance"
     kinds: maven
-  - title: "Updated ${name}"
+  - title: "Updated ${dependencyId}"

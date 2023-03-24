@@ -14,7 +14,7 @@ data class RepoConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   val searchPaths: List<SearchPatternConfig> = emptyList(),
   @JsonSetter(nulls = Nulls.AS_EMPTY)
-  val pullRequests: List<PullRequestsConfig> = emptyList()
+  val pullRequests: List<PullRequestsConfig> = emptyList(),
 )
 
 data class UpdateRulesConfig(
@@ -52,5 +52,5 @@ data class PullRequestsConfig(
   val body: String? = null,
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   @JsonDeserialize(using = ListOrItemDeserializer::class)
-  val labels: List<String> = emptyList()
+  val labels: List<String> = emptyList(),
 ) : DependencyFilter

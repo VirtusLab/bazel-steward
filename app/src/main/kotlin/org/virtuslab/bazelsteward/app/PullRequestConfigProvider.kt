@@ -6,7 +6,7 @@ import org.virtuslab.bazelsteward.core.library.Library
 
 open class PullRequestConfigProvider(
   configs: List<PullRequestsConfig>,
-  dependencyKinds: List<DependencyKind<*>>
+  dependencyKinds: List<DependencyKind<*>>,
 ) {
   private val applier = DependencyFilterApplier(configs, dependencyKinds)
 
@@ -22,7 +22,7 @@ open class PullRequestConfigProvider(
     val defaultPullRequestConfig = PullRequestConfig(
       "Updated \${dependencyId} to \${versionTo}",
       "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
-      emptyList()
+      emptyList(),
     )
   }
 }

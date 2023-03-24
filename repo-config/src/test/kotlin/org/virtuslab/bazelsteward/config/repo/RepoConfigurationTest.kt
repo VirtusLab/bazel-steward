@@ -88,24 +88,24 @@ class RepoConfigurationTest {
         SearchPatternConfig(
           kinds = listOf("bazel-rules"),
           pathPatterns = listOf(
-            PathPattern.Glob(value = "WORKSPACE{,.bazel}")
-          )
-        )
+            PathPattern.Glob(value = "WORKSPACE{,.bazel}"),
+          ),
+        ),
       ),
       listOf(
         PullRequestsConfig(
           title = "Updated bazel deps",
           body = "Some body",
           labels = listOf("maintenance", "bazel"),
-          dependencies = listOf(DependencyNameFilter.Default("org.akka:*"))
+          dependencies = listOf(DependencyNameFilter.Default("org.akka:*")),
         ),
         PullRequestsConfig(
           title = "Updated \${group}/\${artifact} from \${versionFrom} to \${versionTo}",
           labels = listOf("maintenance"),
-          kinds = listOf("maven")
+          kinds = listOf("maven"),
         ),
-        PullRequestsConfig(title = "Updated \${name}")
-      )
+        PullRequestsConfig(title = "Updated \${name}"),
+      ),
     )
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)
   }
