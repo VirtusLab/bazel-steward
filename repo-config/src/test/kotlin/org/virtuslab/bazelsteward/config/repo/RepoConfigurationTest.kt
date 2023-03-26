@@ -104,7 +104,7 @@ class RepoConfigurationTest {
           labels = listOf("maintenance"),
           kinds = listOf("maven"),
         ),
-        PullRequestsConfig(title = "Updated \${name}"),
+        PullRequestsConfig(title = "Updated \${dependencyId}"),
       ),
     )
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)
