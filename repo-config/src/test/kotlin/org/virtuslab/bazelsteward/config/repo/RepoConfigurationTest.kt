@@ -11,6 +11,7 @@ import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Files
 import java.nio.file.Path
 
+@Suppress("RegExpUnnecessaryNonCapturingGroup")
 class RepoConfigurationTest {
 
   @Test
@@ -90,6 +91,20 @@ class RepoConfigurationTest {
             PathPattern.Glob(value = "WORKSPACE{,.bazel}"),
           ),
         ),
+      ),
+      listOf(
+        PullRequestsConfig(
+          title = "Updated bazel deps",
+          body = "Some body",
+          labels = listOf("maintenance", "bazel"),
+          dependencies = listOf(DependencyNameFilter.Default("org.akka:*")),
+        ),
+        PullRequestsConfig(
+          title = "Updated \${group}/\${artifact} from \${versionFrom} to \${versionTo}",
+          labels = listOf("maintenance"),
+          kinds = listOf("maven"),
+        ),
+        PullRequestsConfig(title = "Updated \${dependencyId}"),
       ),
     )
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)

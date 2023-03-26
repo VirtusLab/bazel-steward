@@ -27,3 +27,12 @@ search-paths:
   - kinds: bazel-rules
     path-patterns:
       - "glob:WORKSPACE{,.bazel}"
+pull-requests:
+  - title: "Updated bazel deps"
+    body: "Some body"
+    labels: ["maintenance", "bazel"]
+    dependencies: "org.akka:*"
+  - title: "Updated ${group}/${artifact} from ${versionFrom} to ${versionTo}"
+    labels: "maintenance"
+    kinds: maven
+  - title: "Updated ${dependencyId}"
