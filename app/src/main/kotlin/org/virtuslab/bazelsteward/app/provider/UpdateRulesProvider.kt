@@ -1,5 +1,6 @@
-package org.virtuslab.bazelsteward.app
+package org.virtuslab.bazelsteward.app.provider
 
+import org.virtuslab.bazelsteward.app.DependencyFilterApplier
 import org.virtuslab.bazelsteward.config.repo.UpdateRulesConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.common.UpdateRules

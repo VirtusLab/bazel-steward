@@ -41,12 +41,26 @@ class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
       commit.changes.groupBy { it.file }.forEach { (path, changes) ->
         val contents = path.readText()
         val newContents = changes.fold(Pair(contents, 0)) { (content, offset), replacement ->
-          content.replaceRange(replacement.offset + offset, replacement.offset + offset + replacement.length, replacement.replacement) to (offset + replacement.replacement.length - replacement.length)
+          content.replaceRange(
+            replacement.offset + offset,
+            replacement.offset + offset + replacement.length,
+            replacement.replacement,
+          ) to (offset + replacement.replacement.length - replacement.length)
         }.first
         path.writeText(newContents)
         git.add(path)
       }
       git.commit(commit.message)
     }
+  }
+
+  suspend fun commitSelectedFiles(filesToCommit: List<String>, commitMessage: String) {
+    git.add(filesToCommit)
+    git.commit(commitMessage)
+  }
+
+  suspend fun squashLastTwoCommits(newMessage: String) {
+    git.run("reset", "--soft", "HEAD~2")
+    git.commit(newMessage)
   }
 }

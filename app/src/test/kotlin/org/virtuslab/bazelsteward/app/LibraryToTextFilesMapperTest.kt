@@ -3,6 +3,7 @@ package org.virtuslab.bazelsteward.app
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.virtuslab.bazelsteward.app.provider.SearchPatternProvider
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibrary
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId.ReleaseArtifact
 import org.virtuslab.bazelsteward.bazel.version.BazelLibrary

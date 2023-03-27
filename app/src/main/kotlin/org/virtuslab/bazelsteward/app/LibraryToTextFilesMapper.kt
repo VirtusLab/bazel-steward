@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.app
 
+import org.virtuslab.bazelsteward.app.provider.SearchPatternProvider
 import org.virtuslab.bazelsteward.core.FileFinder
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.TextFile

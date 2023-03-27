@@ -21,6 +21,10 @@ class GitClient(private val repositoryRoot: Path) {
     run(listOf("add") + names)
   }
 
+  suspend fun add(paths: List<String>) {
+    run(listOf("add") + paths)
+  }
+
   suspend fun commit(message: String) {
     run("commit", quiet, "-m", message)
   }

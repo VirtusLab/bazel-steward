@@ -1,0 +1,9 @@
+post-update-hooks:
+  - kinds: maven
+    commands:
+      - "./generate_litter.sh"
+    files-to-commit:
+      - rubbish
+      - trash
+      - garbage
+    run-for: pull-request

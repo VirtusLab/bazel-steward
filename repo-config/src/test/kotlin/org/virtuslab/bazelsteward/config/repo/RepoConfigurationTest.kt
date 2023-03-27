@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.common.HookRunFor
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -105,6 +106,21 @@ class RepoConfigurationTest {
           kinds = listOf("maven"),
         ),
         PullRequestsConfig(title = "Updated \${dependencyId}"),
+      ),
+      listOf(
+        PostUpdateHooksConfig(
+          kinds = listOf("maven"),
+          dependencies = listOf(DependencyNameFilter.Default("com.google:*")),
+          commands = listOf("bazel run @unpinned_maven//:pin"),
+          filesToCommit = listOf("maven_install.json"),
+          runFor = HookRunFor.Commit,
+        ),
+        PostUpdateHooksConfig(
+          commands = listOf("buildifier ."),
+          filesToCommit = listOf("**/*.bzl", "**/BUILD.bazel"),
+          runFor = HookRunFor.PullRequest,
+          commitMessage = "Apply buildifier",
+        ),
       ),
     )
     Assertions.assertThat(configuration).isEqualTo(expectedConfiguration)

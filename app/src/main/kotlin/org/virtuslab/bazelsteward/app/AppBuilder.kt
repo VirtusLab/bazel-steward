@@ -7,6 +7,10 @@ import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.kohsuke.github.GitHub
+import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
+import org.virtuslab.bazelsteward.app.provider.SearchPatternProvider
+import org.virtuslab.bazelsteward.app.provider.UpdateRulesProvider
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
@@ -84,12 +88,6 @@ object AppBuilder {
     val gitOperations = GitOperations(appConfig.workspaceRoot, appConfig.baseBranch)
     val gitHostClient =
       if (github) GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor) else GitHostClient.stub
-    val pullRequestManager = PullRequestManager(
-      gitHostClient,
-      gitOperations,
-      appConfig.pushToRemote,
-      appConfig.updateAllPullRequests,
-    )
     val bazelRulesExtractor = BazelRulesExtractor()
     val bazelUpdater = BazelUpdater()
     val githubRulesResolver = GithubRulesResolver(
@@ -110,6 +108,7 @@ object AppBuilder {
     val updateRulesProvider = UpdateRulesProvider(repoConfig.updateRules, dependencyKinds)
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds)
     val pullRequestConfigProvider = PullRequestConfigProvider(repoConfig.pullRequests, dependencyKinds)
+    val postUpdateHookProvider = PostUpdateHookProvider(repoConfig.postUpdateHooks, dependencyKinds)
 
     val libraryToTextFilesMapper = LibraryToTextFilesMapper(
       searchPatternProvider,
@@ -117,6 +116,14 @@ object AppBuilder {
     )
 
     val pullRequestSuggester = PullRequestSuggester(pullRequestConfigProvider)
+    val pullRequestManager = PullRequestManager(
+      gitHostClient,
+      gitOperations,
+      postUpdateHookProvider,
+      appConfig.workspaceRoot,
+      appConfig.pushToRemote,
+      appConfig.updateAllPullRequests,
+    )
 
     return App(
       gitOperations,

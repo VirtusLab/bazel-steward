@@ -1,0 +1,8 @@
+post-update-hooks:
+  - kinds: maven
+    commands:
+      - "./generate_litter.sh"
+    files-to-commit:
+      - "**/*.txt"
+    run-for: commit
+    commit-message: "Test message"
