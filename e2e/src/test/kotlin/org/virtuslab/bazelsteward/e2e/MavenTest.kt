@@ -17,6 +17,7 @@ class MavenTest : E2EBase() {
       "bazel" to "5.4.0",
       "rules_jvm_external" to "4.5",
       "rules_kotlin" to "v1.7.1",
+      "bazel-skylib" to "1.4.1",
     )
     checkBranchesWithVersions(tempDir, project, expectedBranches)
   }
