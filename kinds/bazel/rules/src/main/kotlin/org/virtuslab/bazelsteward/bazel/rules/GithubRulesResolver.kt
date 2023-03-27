@@ -16,7 +16,7 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
   private fun shaFromBodyAndCurrentUrl(ruleId: RuleLibraryId, release: GHRelease): Pair<RuleLibraryId, RuleVersion> {
     return sha256Regex.findAll(release.body).map { it.value }.singleOrNull().let { sha ->
       val newArtifactName = ruleId.artifactName.replace(ruleId.tag, release.tagName)
-      val rule = ruleId.copy(sha256 = sha, tag = release.tagName, artifactName = newArtifactName)
+      val rule = ruleId.copy(tag = release.tagName, artifactName = newArtifactName)
       rule to RuleVersion.create(rule.downloadUrl, sha, release.tagName)
     }
   }
@@ -36,19 +36,18 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
     }
 
     private fun RuleLibraryId.copy(
-      sha256: String?,
       tag: String,
-      artifactName: String
+      artifactName: String,
     ): RuleLibraryId {
       return when (this) {
         is RuleLibraryId.ReleaseArtifact ->
-          this.copy(sha256 = sha256, tag = tag, artifactName = artifactName)
+          this.copy(tag = tag, artifactName = artifactName)
 
         is RuleLibraryId.ArchiveTagRuleId ->
-          this.copy(sha256 = sha256, tag = tag, artifactName = artifactName)
+          this.copy(tag = tag, artifactName = artifactName)
 
         is RuleLibraryId.ArchiveRuleId ->
-          this.copy(sha256 = sha256, tag = tag, artifactName = artifactName)
+          this.copy(tag = tag, artifactName = artifactName)
       }
     }
 

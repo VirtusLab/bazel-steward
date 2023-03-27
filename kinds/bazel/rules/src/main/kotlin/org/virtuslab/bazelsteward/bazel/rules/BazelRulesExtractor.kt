@@ -85,8 +85,7 @@ class BazelRulesExtractor {
             it.generator_function.isEmpty() &&
             (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
             !it.sha256.isNullOrEmpty()
-        }
-        .mapNotNull {
+        }.map {
           val libraryId = if (!it.url.isNullOrEmpty()) {
             RuleLibraryId.from(it.url)
           } else {
@@ -100,7 +99,7 @@ class BazelRulesExtractor {
         .also{ result ->
           logger.debug { "Found ${result.size} Bazel Rules. " }
           if (result.isNotEmpty()) {
-            logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.id.name}:${it.id.tag}" }}" }
+            logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.id.name}:${it.version.tag}" }}" }
           }
         }
     }
