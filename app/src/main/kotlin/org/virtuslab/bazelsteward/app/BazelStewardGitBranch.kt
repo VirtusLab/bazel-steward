@@ -9,7 +9,7 @@ data class BazelStewardGitBranch(val libraryId: LibraryId, val version: Version)
   val gitBranch = GitBranch(prefix + version)
 
   companion object {
-    const val bazelPrefix = "bazel-steward"
+    const val bazelPrefix = "bazel-steward:update"
     private fun sanitizeLibraryId(libraryId: LibraryId) = libraryId.name.replace(":", "/")
   }
 }
