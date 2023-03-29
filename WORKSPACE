@@ -93,7 +93,7 @@ maven_install(
         "org.kohsuke:github-api:1.314",
         "io.github.microutils:kotlin-logging-jvm:3.0.5",
         "org.slf4j:slf4j-simple:2.0.7",
-        "org.json:json:20220924",
+        "org.json:json:20230227",
         "org.apache.commons:commons-text:1.10.0",
     ],
     fetch_sources = True,
