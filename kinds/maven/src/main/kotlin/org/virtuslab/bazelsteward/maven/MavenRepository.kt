@@ -58,7 +58,7 @@ open class MavenRepository {
                 .withCache(cache)
                 .versions()
             if (versionResult.errors.isNotEmpty() && versionResult.mergedListings.available.isEmpty()) {
-              logger.error { versionResult.errors }
+              logger.error { "Found error for ${coordinates.id.name}:${coordinates.version}:\n${versionResult.errors}" }
             }
             coordinates to versionResult.mergedListings.available.map { SimpleVersion(it) }
           }
