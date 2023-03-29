@@ -39,7 +39,7 @@ class UpdateLogic {
         val nextVersion = when (updateRules.bumpingStrategy) {
           BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
           BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
-          BumpingStrategy.Minor -> maxMinor ?: maxPatch
+          BumpingStrategy.Minor -> maxMinor ?: maxPatch ?: maxMajor
         }
         nextVersion?.let { UpdateSuggestion(library, it) }
       }
