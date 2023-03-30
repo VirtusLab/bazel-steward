@@ -14,10 +14,10 @@ class PostUpdateHookProvider(
 
   fun resolveForLibrary(library: Library): PostUpdateHookConfig {
     val filter = applier.forLibrary(library)
-    val commands = filter.findNotNull { it.commands }?.commands ?: default.commands
-    val filesToCommit = filter.findNotNull { it.filesToCommit }?.filesToCommit ?: default.filesToCommit
-    val runFor = filter.findNotNull { it.runFor }?.runFor ?: default.runFor
-    val commitMessage = filter.findNotNull { it.commitMessage }?.commitMessage ?: default.commitMessage
+    val commands = filter.findNotNullOrDefault(default.commands) { it.commands }
+    val filesToCommit = filter.findNotNullOrDefault(default.filesToCommit) { it.filesToCommit }
+    val runFor = filter.findNotNullOrDefault(default.runFor) { it.runFor }
+    val commitMessage = filter.findNotNullOrDefault(default.commitMessage) { it.commitMessage }
     return PostUpdateHookConfig(commands, filesToCommit, runFor, commitMessage)
   }
 
