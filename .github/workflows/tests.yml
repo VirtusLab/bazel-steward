@@ -27,7 +27,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - run: stat /home/runner/.cache/coursier
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
       - name: Run tests
 #        run: bazel test //... --keep_going --test_tag_filters=integration
         run: bazel test //e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e:e2e_PostUpdateHookTest.kt --keep_going --test_tag_filters=integration
