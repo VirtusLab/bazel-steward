@@ -1,8 +1,7 @@
 post-update-hooks:
   - kinds: maven
     commands:
-      - "./generate_litter.sh"
+      - "bazel run @unpinned_maven//:pin"
     files-to-commit:
-      - "**/*.txt"
-    run-for: commit
-    commit-message: "Test message"
+      - "maven_install.json"
+    run-for: pull-request
