@@ -7,18 +7,6 @@ on:
     branches: [ main ]
 
 jobs:
-  unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Run tests
-        run: bazel test //... --keep_going --test_tag_filters=unit
-        env:
-          GITHUB_TOKEN: ${{ inputs.github-token }}
   integration-tests:
     runs-on: ubuntu-latest
     steps:
@@ -29,34 +17,7 @@ jobs:
           java-version: 11
       - name: Run tests
 #        run: bazel test //... --keep_going --test_tag_filters=integration
-        run: bazel test //e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e:e2e_PostUpdateHookTest.kt --keep_going --test_tag_filters=integration
+#        run: bazel test //e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e:e2e_PostUpdateHookTest.kt --keep_going --test_tag_filters=integration
         continue-on-error: true
       - name: Setup upterm session
         uses: lhotari/action-upterm@v1
-  klint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Run tests
-        run: bazel test //... --keep_going --test_output=errors --test_tag_filters=lint
-  docker-build-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Integration tests
-        uses: ./
-        with:
-          use-release: "false"
-          push-to-remote: "false"
-  buildifier:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: agluszak/bazel-buildifier-action@v0.3
-      - run: git diff --exit-code

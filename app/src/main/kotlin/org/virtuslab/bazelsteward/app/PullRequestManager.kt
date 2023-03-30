@@ -33,6 +33,7 @@ data class PullRequestManager(
           gitOperations.createBranchWithChange(pr.branch, pr.commits)
           if (config.commands.isNotEmpty()) {
             config.commands.forEach {
+              Thread.sleep(1000)
               CommandRunner.run(listOf("sh", "-c", it), workspaceRoot)
             }
             gitOperations.commitSelectedFiles(config.filesToCommit, config.commitMessage)
