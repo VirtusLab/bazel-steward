@@ -1,9 +1,7 @@
 post-update-hooks:
   - kinds: maven
     commands:
-      - "touch /home/runner/readytg"
-      - "sleep 30min"
-#      - "bazel run @unpinned_maven//:pin"
+      - "bazel run @unpinned_maven//:pin"
     files-to-commit:
       - "maven_install.json"
     run-for: pull-request
