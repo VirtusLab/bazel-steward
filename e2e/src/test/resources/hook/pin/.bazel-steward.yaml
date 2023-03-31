@@ -1,6 +1,7 @@
 post-update-hooks:
   - kinds: maven
     commands:
+      - "bazel build //..."
       - "bazel run @unpinned_maven//:pin"
     files-to-commit:
       - "maven_install.json"
