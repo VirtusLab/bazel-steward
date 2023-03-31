@@ -39,18 +39,18 @@ open class E2EBase {
     return libs.map { "$branchRef/$it/" } + masterRef
   }
 
-  protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = listOf("--push-to-remote")) {
+  protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = emptyList()) {
     runBazelStewardWith(tempDir, project, args) { x -> x }
   }
 
-  protected fun runBazelSteward(workspaceRoot: Path, args: List<String> = listOf("--push-to-remote")) {
+  protected fun runBazelSteward(workspaceRoot: Path, args: List<String> = emptyList()) {
     runBazelStewardWith(workspaceRoot, args) { x -> x }
   }
 
   protected fun runBazelStewardWith(
     tempDir: Path,
     project: String,
-    args: List<String> = listOf("--push-to-remote"),
+    args: List<String> = emptyList(),
     transform: (App) -> App,
   ) {
     val file = prepareWorkspace(tempDir, project)
@@ -59,7 +59,7 @@ open class E2EBase {
 
   protected fun runBazelStewardWith(
     workspaceRoot: Path,
-    args: List<String> = listOf("--push-to-remote"),
+    args: List<String> = emptyList(),
     transform: (App) -> App,
   ) {
     val app = transform(AppBuilder.fromArgs(arrayOf(workspaceRoot.toString()) + args, Environment.system))

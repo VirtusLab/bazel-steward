@@ -38,12 +38,12 @@ object AppBuilder {
     val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan")
       .optional().default(".")
     val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
-    val pushToRemote by parser.option(
+    val noRemote by parser.option(
       ArgType.Boolean,
-      description = "Push to remote",
-      fullName = "push-to-remote",
-      shortName = "p",
-    ).default(true)
+      description = "Do not push to remote",
+      fullName = "no-remote",
+      shortName = "n",
+    ).default(false)
     val updateAllPullRequests by parser.option(
       ArgType.Boolean,
       description = "Update all pull requests",
@@ -74,7 +74,7 @@ object AppBuilder {
     val appConfig = AppConfig(
       repositoryRoot,
       configResolvedPath,
-      pushToRemote,
+      !noRemote,
       updateAllPullRequests,
       baseBranchName,
       gitAuthor,

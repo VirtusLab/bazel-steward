@@ -51,12 +51,12 @@ runs:
     - name: Run bazel steward
       run: |
         java -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG -jar bazel-steward.jar \
-        --github $PUSH_TO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
+        --github $NO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         PERSONAL_TOKEN: ${{ inputs.github-personal-token }}
-        PUSH_TO_REMOTE: ${{ inputs.push-to-remote == 'true' && '--push-to-remote' || '' }}
+        NO_REMOTE: ${{ inputs.push-to-remote == 'true' && '' || '--no-remote' }}
 
 branding:
   icon: 'umbrella'
