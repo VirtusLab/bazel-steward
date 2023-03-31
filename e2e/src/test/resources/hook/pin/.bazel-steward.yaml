@@ -1,7 +1,6 @@
 post-update-hooks:
   - kinds: maven
     commands:
-      - cp -r . /tmp/test
       - "bazel run @unpinned_maven//:pin"
     files-to-commit:
       - "maven_install.json"
