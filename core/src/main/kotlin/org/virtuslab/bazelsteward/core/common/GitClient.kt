@@ -69,6 +69,10 @@ class GitClient(private val repositoryRoot: Path) {
     return GitAuthor(name, email)
   }
 
+  suspend fun diff(): String {
+    return run("diff")
+  }
+
   suspend fun run(vararg gitArgs: String?): String = run(gitArgs.toList())
 
   suspend fun run(gitArgs: List<String?>): String {

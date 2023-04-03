@@ -6,6 +6,9 @@ import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
+import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
+import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
+import org.virtuslab.bazelsteward.bazel.rules.RulesResolver
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
@@ -15,12 +18,9 @@ import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.fixture.prepareLocalWorkspace
 import org.virtuslab.bazelsteward.fixture.prepareRemoteWorkspace
-import org.virtuslab.bazelsteward.maven.MavenCoordinates
-import org.virtuslab.bazelsteward.maven.MavenData
-import org.virtuslab.bazelsteward.maven.MavenDataExtractor
-import org.virtuslab.bazelsteward.maven.MavenDependencyKind
-import org.virtuslab.bazelsteward.maven.MavenRepository
+import org.virtuslab.bazelsteward.maven.*
 import java.nio.file.Path
+import kotlin.io.path.readText
 
 open class E2EBase {
   protected val heads = "refs/heads/"
@@ -132,6 +132,21 @@ open class E2EBase {
     }
   }
 
+  protected fun checkChangesInBranches(tempDir: Path, testResourcePath: String, originalFile: Path, resultFile: Path){
+    val localRepo = tempDir.resolve("local").resolve(testResourcePath)
+    val git = GitClient(localRepo)
+    runBlocking {
+      val branches = git.showRef(heads = true)
+      branches.forEach { branch ->
+        if(branch != "refs/heads/master") {
+          git.checkout(branch)
+          Assertions.assertThat(originalFile.readText()).isEqualTo(resultFile.readText())
+        }
+      }
+    }
+
+  }
+
   protected fun App.withMavenOnly(versions: List<String>): App {
     return this.copy(
       dependencyKinds = listOf(
@@ -155,14 +170,24 @@ open class E2EBase {
     )
   }
 
-  protected fun App.withGitHostClient(gitHostClient: GitHostClient): App {
+  protected fun App.withGitHostClient(gitHostClient: GitHostClient, pushToRemote: Boolean = true): App {
     return this.copy(
       pullRequestManager = this.pullRequestManager.copy(
         gitHostClient,
         this.gitOperations,
-        pushToRemote = true,
+        pushToRemote = pushToRemote,
         updateAllPullRequests = false,
       ),
+    )
+  }
+
+  protected fun App.withGitHubRulesResolver(githubRulesResolver: RulesResolver): App{
+    return this.copy(
+      dependencyKinds = this.dependencyKinds.map {
+        if(it is BazelRulesDependencyKind){
+          BazelRulesDependencyKind(BazelRulesExtractor(), githubRulesResolver)
+        } else it
+      }
     )
   }
 
@@ -180,6 +205,12 @@ open class E2EBase {
   protected fun mockGitHostClientWithStatus(status: GitHostClient.PrStatus): CountingGitHostClient {
     return object : CountingGitHostClient() {
       override fun checkPrStatus(branch: GitBranch) = status
+    }
+  }
+
+  class GithubRulesResolverMock(private val expectedVersion: Version): RulesResolver{
+    override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, Version> {
+      return mapOf(ruleId to expectedVersion)
     }
   }
 }

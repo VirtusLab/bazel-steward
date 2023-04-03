@@ -9,7 +9,7 @@ import java.nio.file.Path
 
 class BazelRulesDependencyKind(
   private val bazelRulesExtractor: BazelRulesExtractor,
-  private val githubRulesResolver: GithubRulesResolver,
+  private val githubRulesResolver: RulesResolver,
 ) : DependencyKind<RuleLibrary> {
   override val name: String = "bazel-rules"
 
