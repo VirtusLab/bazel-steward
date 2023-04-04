@@ -11,7 +11,7 @@ http_archive(
     strip_prefix = "rules_closure-{}".format(CLOSURE_RULES_TAG),
     urls = [
         "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(CLOSURE_RULES_TAG),
-        "https://github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(CLOSURE_RULES_TAG,
+        "https://github.com/bazelbuild/rules_closure/archive/{}.tar.gz".format(CLOSURE_RULES_TAG),
     ],
 )
 

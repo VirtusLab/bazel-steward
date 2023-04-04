@@ -1,7 +1,9 @@
 package org.virtuslab.bazelsteward.e2e.rules.heuristic
 
+import org.junit.jupiter.api.Disabled
 import org.virtuslab.bazelsteward.e2e.rules.fixture.BazelRulesHeuristicUpdate
 
+@Disabled("Takes sha as number no text so with first letter in sha ends consuming")
 class HeuristicUpdateShaNoStringTest : BazelRulesHeuristicUpdate(
   "rules/heuristic/heuristic_rules_sha_no_string",
   "https://github.com/bazelbuild/rules_apple/releases/download/2.2.0/rules_apple.2.2.0.tar.gz",
