@@ -47,7 +47,7 @@ class GithubClient private constructor(
       baseBranch,
       pr.body,
     )
-    if(pr.labels.isNotEmpty()) {
+    if (pr.labels.isNotEmpty()) {
       newPr.addLabels(*pr.labels.toTypedArray())
     }
     return PullRequest(pr.branch)
