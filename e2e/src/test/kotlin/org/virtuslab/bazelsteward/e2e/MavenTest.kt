@@ -26,7 +26,13 @@ class MavenTest : E2EBase() {
   fun `Check dependency update not in maven central repository`(@TempDir tempDir: Path) {
     val project = "maven/external"
     runBazelSteward(tempDir, project)
-    val expectedBranches = expectedBranchPrefixes("com.7theta/utilis", "bazel", "rules_jvm_external", "rules_kotlin")
+    val expectedBranches = expectedBranchPrefixes(
+      "com.7theta/utilis",
+      "bazel",
+      "rules_jvm_external",
+      "rules_kotlin",
+      "bazel-skylib"
+    )
     checkBranchesWithoutVersions(tempDir, project, expectedBranches)
   }
 }
