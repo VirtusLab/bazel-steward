@@ -3,7 +3,6 @@ package org.virtuslab.bazelsteward.bazel.rules
 import org.virtuslab.bazelsteward.core.library.LibraryId
 
 sealed class RuleLibraryId : LibraryId() {
-  abstract val sha256: String
   abstract val tag: String
   abstract val artifactName: String
   abstract val repoName: String
@@ -12,10 +11,9 @@ sealed class RuleLibraryId : LibraryId() {
   override val name: String
     get() = ruleName
 
-  override fun associatedStrings(): List<List<String>> = listOf(listOf(downloadUrl, sha256))
+  override fun associatedStrings(): List<List<String>> = listOf(listOfNotNull(downloadUrl))
 
   data class ReleaseArtifact(
-    override val sha256: String,
     override val tag: String,
     override val artifactName: String,
     override val repoName: String,
@@ -26,10 +24,9 @@ sealed class RuleLibraryId : LibraryId() {
 
     companion object {
       private val regex = Regex("""^https://github.com/(?<repoName>[^/]+)/(?<ruleName>[^/]+)/releases/download/(?<tag>[^/]+)/(?<artifactName>[^/]+)""")
-      fun from(url: String, sha256: String): ReleaseArtifact? =
+      fun from(url: String): ReleaseArtifact? =
         regex.matchEntire(url)?.let { result ->
           ReleaseArtifact(
-            sha256,
             result.groups["tag"]!!.value,
             result.groups["artifactName"]!!.value,
             result.groups["repoName"]!!.value,
@@ -40,7 +37,6 @@ sealed class RuleLibraryId : LibraryId() {
   }
 
   data class ArchiveTagRuleId(
-    override val sha256: String,
     override val tag: String,
     override val artifactName: String,
     override val repoName: String,
@@ -51,12 +47,11 @@ sealed class RuleLibraryId : LibraryId() {
 
     companion object {
       private val regex = Regex("""^https://github.com/(?<repoName>[^/]+)/(?<ruleName>[^/]+)/archive/refs/tags/(?<artifactName>[^/]+)""")
-      fun from(url: String, sha256: String): ArchiveTagRuleId? =
+      fun from(url: String): ArchiveTagRuleId? =
         regex.matchEntire(url)
           ?.takeIf { result -> isArtifactInAllowedFormat(result.groups["artifactName"]!!.value) }
           ?.let { result ->
             ArchiveTagRuleId(
-              sha256,
               result.groups["artifactName"]!!.value.removeSuffixes(allowedArtifactExtensions),
               result.groups["artifactName"]!!.value,
               result.groups["repoName"]!!.value,
@@ -67,7 +62,6 @@ sealed class RuleLibraryId : LibraryId() {
   }
 
   data class ArchiveRuleId(
-    override val sha256: String,
     override val tag: String,
     override val artifactName: String,
     override val repoName: String,
@@ -78,12 +72,11 @@ sealed class RuleLibraryId : LibraryId() {
 
     companion object {
       private val regex = Regex("""^https://github.com/(?<repoName>[^/]+)/(?<ruleName>[^/]+)/archive/(?<artifactName>[^/]+)""")
-      fun from(url: String, sha256: String): ArchiveRuleId? =
+      fun from(url: String): ArchiveRuleId? =
         regex.matchEntire(url)
           ?.takeIf { result -> isArtifactInAllowedFormat(result.groups["artifactName"]!!.value) }
           ?.let { result ->
             ArchiveRuleId(
-              sha256,
               result.groups["artifactName"]!!.value.removeSuffixes(allowedArtifactExtensions),
               result.groups["artifactName"]!!.value,
               result.groups["repoName"]!!.value,
@@ -98,8 +91,8 @@ sealed class RuleLibraryId : LibraryId() {
     private fun String.removeSuffixes(suffixes: Collection<String>): String = suffixes.fold(this) { str, suffix -> str.removeSuffix(suffix) }
     private fun isArtifactInAllowedFormat(artifact: String): Boolean = allowedArtifactExtensions.any { artifact.endsWith(it) }
 
-    fun from(url: String, sha256: String): RuleLibraryId =
-      ReleaseArtifact.from(url, sha256) ?: ArchiveTagRuleId.from(url, sha256) ?: ArchiveRuleId.from(url, sha256)
+    fun from(url: String): RuleLibraryId =
+      ReleaseArtifact.from(url) ?: ArchiveTagRuleId.from(url) ?: ArchiveRuleId.from(url)
         ?: throw RuntimeException("Unrecognised artifact URL format $url")
   }
 }
