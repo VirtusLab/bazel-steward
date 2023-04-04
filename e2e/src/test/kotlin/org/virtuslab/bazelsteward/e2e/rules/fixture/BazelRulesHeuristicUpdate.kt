@@ -21,7 +21,7 @@ open class BazelRulesHeuristicUpdate(
 
     val gitHostClient = mockGitHostClientWithStatus(GitHostClient.PrStatus.NONE)
     val githubRulesResolverMock = GithubRulesResolverMock(
-      RuleVersion(
+      RuleVersion.create(
         expectedUrl,
         expectedSha256,
         expectedVersion,
