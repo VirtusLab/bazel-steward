@@ -1,0 +1,13 @@
+integration_test_suite(
+    size = "small",
+    resources = [
+        "//e2e/src/test/resources/rules",
+        "//e2e/src/test/resources/rules/heuristic"
+    ],
+    test_package = "org.virtuslab.bazelsteward.e2e.rules.heuristic",
+    deps = [
+        "//app/src/main",
+        "//app/src/test/kotlin/org/virtuslab/bazelsteward/fixture",
+        "//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules/fixture",
+    ],
+)

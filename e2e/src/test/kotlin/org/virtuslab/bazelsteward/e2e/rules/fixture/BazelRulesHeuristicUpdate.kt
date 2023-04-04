@@ -12,6 +12,7 @@ open class BazelRulesHeuristicUpdate(
   private val expectedUrl: String,
   private val expectedSha256: String,
   private val expectedVersion: String,
+  private val expectedBranch: String,
 ) : E2EBase() {
 
   @Test
@@ -35,7 +36,8 @@ open class BazelRulesHeuristicUpdate(
 
     val workspaceFile = workspace.resolve("WORKSPACE")
     val resultWorkspaceFile = workspace.resolve("Result_WORKSPACE")
+    val expectedBranchName = "$expectedBranch/$expectedVersion"
 
-    checkChangesInBranches(tempDir, project, workspaceFile, resultWorkspaceFile)
+    checkChangesInBranches(tempDir, project, workspaceFile, resultWorkspaceFile, expectedBranchName)
   }
 }

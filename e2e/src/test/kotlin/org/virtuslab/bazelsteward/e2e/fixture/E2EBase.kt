@@ -136,16 +136,22 @@ open class E2EBase {
     }
   }
 
-  protected fun checkChangesInBranches(tempDir: Path, testResourcePath: String, originalFile: Path, resultFile: Path) {
+  protected fun checkChangesInBranches(
+    tempDir: Path,
+    testResourcePath: String,
+    originalFile: Path,
+    resultFile: Path,
+    branchName: String,
+  ) {
     val localRepo = tempDir.resolve("local").resolve(testResourcePath)
     val git = GitClient(localRepo)
     runBlocking {
       val branches = git.showRef(heads = true)
-      branches.forEach { branch ->
-        if (branch != "refs/heads/master") {
-          git.checkout(branch)
-          Assertions.assertThat(originalFile.readText()).isEqualTo(resultFile.readText())
-        }
+      branches.single {
+        it.endsWith(branchName)
+      }.also { branch ->
+        git.checkout(branch)
+        Assertions.assertThat(originalFile.readText()).isEqualTo(resultFile.readText())
       }
     }
   }
