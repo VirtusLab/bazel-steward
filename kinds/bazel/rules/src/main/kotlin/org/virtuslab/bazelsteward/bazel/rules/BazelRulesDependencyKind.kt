@@ -9,7 +9,7 @@ import java.nio.file.Path
 
 class BazelRulesDependencyKind(
   private val bazelRulesExtractor: BazelRulesExtractor,
-  private val githubRulesResolver: GithubRulesResolver,
+  private val rulesResolver: RulesResolver,
 ) : DependencyKind<RuleLibrary> {
   override val name: String = "bazel-rules"
 
@@ -18,7 +18,7 @@ class BazelRulesDependencyKind(
   override suspend fun findAvailableVersions(workspaceRoot: Path): Map<RuleLibrary, List<Version>> {
     val usedBazelRules = bazelRulesExtractor.extractCurrentRules(workspaceRoot)
     return usedBazelRules
-      .associateWith { it: RuleLibrary -> githubRulesResolver.resolveRuleVersions(it.id).values.toList() }
+      .associateWith { it: RuleLibrary -> rulesResolver.resolveRuleVersions(it.id).values.toList() }
   }
 
   override val defaultSearchPatterns: List<PathPattern> = listOf(
