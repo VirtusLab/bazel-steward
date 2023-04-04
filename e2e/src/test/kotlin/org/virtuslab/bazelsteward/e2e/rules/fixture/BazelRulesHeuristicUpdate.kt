@@ -23,7 +23,8 @@ open class BazelRulesHeuristicUpdate(
       RuleVersion(
         expectedUrl,
         expectedSha256,
-        expectedVersion)
+        expectedVersion,
+      ),
     )
 
     runBazelStewardWith(workspace) {
@@ -34,7 +35,7 @@ open class BazelRulesHeuristicUpdate(
 
     val workspaceFile = workspace.resolve("WORKSPACE")
     val resultWorkspaceFile = workspace.resolve("Result_WORKSPACE")
-    
+
     checkChangesInBranches(tempDir, project, workspaceFile, resultWorkspaceFile)
   }
 }

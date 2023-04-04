@@ -18,7 +18,11 @@ import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.fixture.prepareLocalWorkspace
 import org.virtuslab.bazelsteward.fixture.prepareRemoteWorkspace
-import org.virtuslab.bazelsteward.maven.*
+import org.virtuslab.bazelsteward.maven.MavenCoordinates
+import org.virtuslab.bazelsteward.maven.MavenData
+import org.virtuslab.bazelsteward.maven.MavenDataExtractor
+import org.virtuslab.bazelsteward.maven.MavenDependencyKind
+import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.nio.file.Path
 import kotlin.io.path.readText
 
@@ -132,19 +136,18 @@ open class E2EBase {
     }
   }
 
-  protected fun checkChangesInBranches(tempDir: Path, testResourcePath: String, originalFile: Path, resultFile: Path){
+  protected fun checkChangesInBranches(tempDir: Path, testResourcePath: String, originalFile: Path, resultFile: Path) {
     val localRepo = tempDir.resolve("local").resolve(testResourcePath)
     val git = GitClient(localRepo)
     runBlocking {
       val branches = git.showRef(heads = true)
       branches.forEach { branch ->
-        if(branch != "refs/heads/master") {
+        if (branch != "refs/heads/master") {
           git.checkout(branch)
           Assertions.assertThat(originalFile.readText()).isEqualTo(resultFile.readText())
         }
       }
     }
-
   }
 
   protected fun App.withMavenOnly(versions: List<String>): App {
@@ -181,13 +184,14 @@ open class E2EBase {
     )
   }
 
-  protected fun App.withGitHubRulesResolver(githubRulesResolver: RulesResolver): App{
+  protected fun App.withGitHubRulesResolver(githubRulesResolver: RulesResolver): App {
     return this.copy(
-      dependencyKinds = this.dependencyKinds.map {
-        if(it is BazelRulesDependencyKind){
-          BazelRulesDependencyKind(BazelRulesExtractor(), githubRulesResolver)
-        } else it
-      }
+      dependencyKinds = this.dependencyKinds.map { dependencyKind ->
+        when (dependencyKind) {
+          is BazelRulesDependencyKind -> BazelRulesDependencyKind(BazelRulesExtractor(), githubRulesResolver)
+          else -> dependencyKind
+        }
+      },
     )
   }
 
@@ -208,7 +212,7 @@ open class E2EBase {
     }
   }
 
-  class GithubRulesResolverMock(private val expectedVersion: Version): RulesResolver{
+  class GithubRulesResolverMock(private val expectedVersion: Version) : RulesResolver {
     override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, Version> {
       return mapOf(ruleId to expectedVersion)
     }
