@@ -31,7 +31,7 @@ class MavenTest : E2EBase() {
       "bazel",
       "rules_jvm_external",
       "rules_kotlin",
-      "bazel-skylib"
+      "bazel-skylib",
     )
     checkBranchesWithoutVersions(tempDir, project, expectedBranches)
   }
