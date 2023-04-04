@@ -91,6 +91,44 @@
           }
         }
       }
+    },
+    "post-update-hooks" : {
+      "type" : ["array", "null"],
+      "items" : {
+        "type": "object",
+        "properties" : {
+          "kinds": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "commands": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "files-to-commit": {
+            "type": ["array", "string", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "run-for": {
+            "type": ["string", "null"]
+          },
+          "commit-message": {
+            "type": ["string", "null"]
+          }
+        }
+      }
     }
   }
 }

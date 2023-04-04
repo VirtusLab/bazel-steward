@@ -7,6 +7,10 @@ import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.kohsuke.github.GitHub
+import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
+import org.virtuslab.bazelsteward.app.provider.SearchPatternProvider
+import org.virtuslab.bazelsteward.app.provider.UpdateRulesProvider
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
@@ -34,12 +38,12 @@ object AppBuilder {
     val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan")
       .optional().default(".")
     val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
-    val pushToRemote by parser.option(
+    val noRemote by parser.option(
       ArgType.Boolean,
-      description = "Push to remote",
-      fullName = "push-to-remote",
-      shortName = "p",
-    ).default(true)
+      description = "Do not push to remote",
+      fullName = "no-remote",
+      shortName = "n",
+    ).default(false)
     val updateAllPullRequests by parser.option(
       ArgType.Boolean,
       description = "Update all pull requests",
@@ -70,7 +74,7 @@ object AppBuilder {
     val appConfig = AppConfig(
       repositoryRoot,
       configResolvedPath,
-      pushToRemote,
+      !noRemote,
       updateAllPullRequests,
       baseBranchName,
       gitAuthor,
@@ -84,12 +88,6 @@ object AppBuilder {
     val gitOperations = GitOperations(appConfig.workspaceRoot, appConfig.baseBranch)
     val gitHostClient =
       if (github) GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor) else GitHostClient.stub
-    val pullRequestManager = PullRequestManager(
-      gitHostClient,
-      gitOperations,
-      appConfig.pushToRemote,
-      appConfig.updateAllPullRequests,
-    )
     val bazelRulesExtractor = BazelRulesExtractor()
     val bazelUpdater = BazelUpdater()
     val githubRulesResolver = GithubRulesResolver(
@@ -110,6 +108,7 @@ object AppBuilder {
     val updateRulesProvider = UpdateRulesProvider(repoConfig.updateRules, dependencyKinds)
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds)
     val pullRequestConfigProvider = PullRequestConfigProvider(repoConfig.pullRequests, dependencyKinds)
+    val postUpdateHookProvider = PostUpdateHookProvider(repoConfig.postUpdateHooks, dependencyKinds)
 
     val libraryToTextFilesMapper = LibraryToTextFilesMapper(
       searchPatternProvider,
@@ -117,6 +116,14 @@ object AppBuilder {
     )
 
     val pullRequestSuggester = PullRequestSuggester(pullRequestConfigProvider)
+    val pullRequestManager = PullRequestManager(
+      gitHostClient,
+      gitOperations,
+      postUpdateHookProvider,
+      appConfig.workspaceRoot,
+      appConfig.pushToRemote,
+      appConfig.updateAllPullRequests,
+    )
 
     return App(
       gitOperations,

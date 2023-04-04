@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.common.HookRunFor
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -66,6 +67,7 @@ class RepoConfigParser {
       addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
       addDeserializer(DependencyNameFilter::class.java, DependencyNameFilterDeserializer())
       addDeserializer(PathPattern::class.java, PathPatternDeserializer())
+      addDeserializer(HookRunFor::class.java, HookRunForDeserializer())
     }
     return ObjectMapper(YAMLFactory()).apply {
       propertyNamingStrategy = PropertyNamingStrategies.KEBAB_CASE

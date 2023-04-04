@@ -3,6 +3,8 @@ package org.virtuslab.bazelsteward.app
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfig
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.SimpleVersion

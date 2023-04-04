@@ -1,9 +1,11 @@
 package org.virtuslab.bazelsteward.app
 
 import org.apache.commons.text.StringSubstitutor
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.NewPullRequest
 import org.virtuslab.bazelsteward.core.common.CommitRequest
+import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdate
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
@@ -11,16 +13,11 @@ data class PullRequestSuggestion(
   val description: NewPullRequest,
   val branchPrefix: String,
   val commits: List<CommitRequest>,
+  val oldLibrary: Library,
 ) {
   val branch: GitBranch
     get() = description.branch
 }
-
-data class PullRequestConfig(
-  val titleTemplate: String,
-  val bodyTemplate: String,
-  val labels: List<String>,
-)
 
 class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
 
@@ -55,6 +52,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
         ),
         branch.prefix,
         commits,
+        update.suggestion.currentLibrary,
       )
     }
   }

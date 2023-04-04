@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
-import org.virtuslab.bazelsteward.app.PullRequestManager
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
@@ -26,7 +25,7 @@ import java.nio.file.Path
 open class E2EBase {
   protected val heads = "refs/heads/"
   private val branchRef = "$heads${BazelStewardGitBranch.bazelPrefix}"
-  private val master = "master"
+  protected val master = "master"
   protected val masterRef = "$heads$master"
 
   protected fun branch(libraryId: String, version: String): String =
@@ -40,18 +39,18 @@ open class E2EBase {
     return libs.map { "$branchRef/$it/" } + masterRef
   }
 
-  protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = listOf("--push-to-remote")) {
+  protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = emptyList()) {
     runBazelStewardWith(tempDir, project, args) { x -> x }
   }
 
-  protected fun runBazelSteward(workspaceRoot: Path, args: List<String> = listOf("--push-to-remote")) {
+  protected fun runBazelSteward(workspaceRoot: Path, args: List<String> = emptyList()) {
     runBazelStewardWith(workspaceRoot, args) { x -> x }
   }
 
   protected fun runBazelStewardWith(
     tempDir: Path,
     project: String,
-    args: List<String> = listOf("--push-to-remote"),
+    args: List<String> = emptyList(),
     transform: (App) -> App,
   ) {
     val file = prepareWorkspace(tempDir, project)
@@ -60,7 +59,7 @@ open class E2EBase {
 
   protected fun runBazelStewardWith(
     workspaceRoot: Path,
-    args: List<String> = listOf("--push-to-remote"),
+    args: List<String> = emptyList(),
     transform: (App) -> App,
   ) {
     val app = transform(AppBuilder.fromArgs(arrayOf(workspaceRoot.toString()) + args, Environment.system))
@@ -158,7 +157,7 @@ open class E2EBase {
 
   protected fun App.withGitHostClient(gitHostClient: GitHostClient): App {
     return this.copy(
-      pullRequestManager = PullRequestManager(
+      pullRequestManager = this.pullRequestManager.copy(
         gitHostClient,
         this.gitOperations,
         pushToRemote = true,

@@ -32,6 +32,9 @@ private fun copyFilesFromJar(resourcePath: String, targetPath: (Path) -> Path) {
         }
         Files.createDirectories(target.parent)
         Files.copy(fileInJar, target, StandardCopyOption.REPLACE_EXISTING)
+        if (target.name.endsWith(".sh")) {
+          target.toFile().setExecutable(true)
+        }
       }
     }
   }

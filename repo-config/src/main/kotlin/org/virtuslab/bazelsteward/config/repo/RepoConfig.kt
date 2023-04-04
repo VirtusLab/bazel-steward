@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.Nulls
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.common.HookRunFor
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
@@ -15,6 +16,8 @@ data class RepoConfig(
   val searchPaths: List<SearchPatternConfig> = emptyList(),
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   val pullRequests: List<PullRequestsConfig> = emptyList(),
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  val postUpdateHooks: List<PostUpdateHooksConfig> = emptyList(),
 )
 
 data class UpdateRulesConfig(
@@ -53,4 +56,21 @@ data class PullRequestsConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   @JsonDeserialize(using = ListOrItemDeserializer::class)
   val labels: List<String> = emptyList(),
+) : DependencyFilter
+
+data class PostUpdateHooksConfig(
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  @JsonDeserialize(using = ListOrItemDeserializer::class)
+  override val kinds: List<String> = emptyList(),
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  @JsonDeserialize(using = ListOrItemDeserializer::class)
+  override val dependencies: List<DependencyNameFilter> = emptyList(),
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  @JsonDeserialize(using = ListOrItemDeserializer::class)
+  val commands: List<String> = emptyList(),
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  @JsonDeserialize(using = ListOrItemDeserializer::class)
+  val filesToCommit: List<String> = emptyList(),
+  val runFor: HookRunFor? = null,
+  val commitMessage: String? = null,
 ) : DependencyFilter

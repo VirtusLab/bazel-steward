@@ -36,3 +36,17 @@ pull-requests:
     labels: "maintenance"
     kinds: maven
   - title: "Updated ${dependencyId}"
+post-update-hooks:
+  - kinds: maven
+    dependencies: "com.google:*"
+    commands:
+      - "bazel run @unpinned_maven//:pin"
+    files-to-commit:
+      - "maven_install.json"
+    run-for: commit
+  - commands: "buildifier ."
+    files-to-commit:
+      - "**/*.bzl"
+      - "**/BUILD.bazel"
+    run-for: pull-request
+    commit-message: "Apply buildifier"

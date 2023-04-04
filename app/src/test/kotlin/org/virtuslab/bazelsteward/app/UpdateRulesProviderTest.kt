@@ -3,6 +3,7 @@ package org.virtuslab.bazelsteward.app
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.kohsuke.github.GitHub
+import org.virtuslab.bazelsteward.app.provider.UpdateRulesProvider
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
