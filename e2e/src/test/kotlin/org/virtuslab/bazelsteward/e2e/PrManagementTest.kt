@@ -12,7 +12,6 @@ import kotlin.io.path.writeText
 
 class PrManagementTest : E2EBase() {
 
-
   @Test
   fun `Test managing PRs when new version of library appears`(@TempDir tempDir: Path) {
     val project = "maven/updating-pr"
