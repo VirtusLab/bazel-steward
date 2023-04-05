@@ -50,13 +50,14 @@ runs:
       uses: fregante/setup-git-user@v1
     - name: Run bazel steward
       run: |
+        NO_REMOTE=$([[ $PUSH_TO_REMOTE == 'true' ]] && echo "" || echo "--no-remote")
         java -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG -jar bazel-steward.jar \
         --github $NO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         PERSONAL_TOKEN: ${{ inputs.github-personal-token }}
-        NO_REMOTE: ${{ inputs.push-to-remote == 'true' && '' || '--no-remote' }}
+        PUSH_TO_REMOTE: ${{ inputs.push-to-remote }}
 
 branding:
   icon: 'umbrella'
