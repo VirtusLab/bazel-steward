@@ -1,5 +1,7 @@
 package org.virtuslab.bazelsteward.core.library
 
+import java.util.*
+
 data class SemanticVersion(
   val major: Int,
   val minor: Int,
@@ -17,6 +19,9 @@ data class SemanticVersion(
         append("+$buildmetadata")
       }
     }.toString()
+
+  override val date: Date?
+    get() = null
 
   override fun compareTo(other: SemanticVersion): Int = if (this.major != other.major) {
     this.major.compareTo(other.major)

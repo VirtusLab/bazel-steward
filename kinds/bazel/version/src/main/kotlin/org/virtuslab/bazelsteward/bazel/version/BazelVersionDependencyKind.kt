@@ -2,6 +2,7 @@ package org.virtuslab.bazelsteward.bazel.version
 
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
@@ -30,4 +31,7 @@ class BazelVersionDependencyKind(
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> =
     listOf(WholeLibraryHeuristic, VersionOnlyHeuristic)
+
+  override val defaultUpdateRules: UpdateRules
+    get() = UpdateRules()
 }

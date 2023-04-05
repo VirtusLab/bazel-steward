@@ -1,3 +1,8 @@
 package org.virtuslab.bazelsteward.core.library
 
-data class SimpleVersion(override val value: String) : Version()
+import java.util.*
+
+data class SimpleVersion(override val value: String) : Version() {
+  override val date: Date?
+    get() = null
+}

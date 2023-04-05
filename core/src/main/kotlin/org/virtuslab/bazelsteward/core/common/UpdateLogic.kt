@@ -29,19 +29,46 @@ class UpdateLogic {
         .maxByOrNull { it.second }
         ?.first
 
-    return library.version.toSemVer(updateRules.versioningSchema)
-      ?.takeIf { version -> version.prerelease.isBlank() }
-      ?.let { version ->
-        val maxPatch =
-          maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
-        val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
-        val maxMajor = maxAvailableVersion { a -> a.major > version.major }
-        val nextVersion = when (updateRules.bumpingStrategy) {
-          BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
-          BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
-          BumpingStrategy.Minor -> maxMinor ?: maxPatch ?: maxMajor
+    fun selectByDate(): UpdateSuggestion? {
+      return library.version.toSemVer(updateRules.versioningSchema)
+        ?.takeIf { version -> version.prerelease.isBlank() }
+        ?.let { libVersion ->
+          val nextVersion = availableVersions
+            .filter { version -> updateRules.pinningStrategy.test(version) }
+            .filter { it.date != null }
+            .sortedByDescending { it.date }
+            .firstOrNull()
+          nextVersion?.let {
+            if (it != libVersion) {
+              UpdateSuggestion(library, it)
+            } else {
+              null
+            }
+          }
         }
-        nextVersion?.let { UpdateSuggestion(library, it) }
-      }
+    }
+
+    fun selectDefault(): UpdateSuggestion? =
+      library.version.toSemVer(updateRules.versioningSchema)
+        ?.takeIf { version -> version.prerelease.isBlank() }
+        ?.let { version ->
+          val maxPatch =
+            maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
+          val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
+          val maxMajor = maxAvailableVersion { a -> a.major > version.major }
+          val nextVersion = when (updateRules.bumpingStrategy) {
+            BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
+            BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
+            BumpingStrategy.Minor -> maxMinor ?: maxPatch ?: maxMajor
+            else -> null
+          }
+          nextVersion?.let { UpdateSuggestion(library, it) }
+        }
+
+    return if (updateRules.bumpingStrategy == BumpingStrategy.LatestByDate) {
+      selectByDate()
+    } else {
+      selectDefault()
+    }
   }
 }
