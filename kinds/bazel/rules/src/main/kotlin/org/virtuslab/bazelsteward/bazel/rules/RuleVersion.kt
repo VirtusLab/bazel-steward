@@ -5,7 +5,6 @@ import org.virtuslab.bazelsteward.core.library.Version
 import java.net.URL
 import java.security.MessageDigest
 import java.time.Instant
-import java.util.*
 
 @Suppress("CanBeParameter")
 sealed class RuleVersion(val url: String, val tag: String, override val date: Instant?) : Version() {

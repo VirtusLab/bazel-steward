@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.virtuslab.bazelsteward.core.library.Version
 import java.nio.file.Path
-import java.util.*
 import kotlin.io.path.exists
 import kotlin.io.path.readLines
 import kotlin.io.path.readText
