@@ -20,9 +20,6 @@ data class SemanticVersion(
       }
     }.toString()
 
-  override val date: Date?
-    get() = null
-
   override fun compareTo(other: SemanticVersion): Int = if (this.major != other.major) {
     this.major.compareTo(other.major)
   } else if (this.minor != other.minor) {

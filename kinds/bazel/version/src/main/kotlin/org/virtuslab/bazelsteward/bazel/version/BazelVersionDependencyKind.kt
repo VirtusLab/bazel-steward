@@ -2,7 +2,6 @@ package org.virtuslab.bazelsteward.bazel.version
 
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
-import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
@@ -12,7 +11,7 @@ import java.nio.file.Path
 
 class BazelVersionDependencyKind(
   private val bazelUpdater: BazelUpdater,
-) : DependencyKind<BazelLibrary> {
+) : DependencyKind<BazelLibrary>() {
 
   override val name: String = "bazel"
 
@@ -32,6 +31,4 @@ class BazelVersionDependencyKind(
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> =
     listOf(WholeLibraryHeuristic, VersionOnlyHeuristic)
 
-  override val defaultUpdateRules: UpdateRules
-    get() = UpdateRules()
 }

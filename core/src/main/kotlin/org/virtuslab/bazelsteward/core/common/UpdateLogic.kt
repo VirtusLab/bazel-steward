@@ -21,32 +21,17 @@ class UpdateLogic {
     availableVersions: List<Version>,
     updateRules: UpdateRules,
   ): UpdateSuggestion? {
-    fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
+    fun checkPreRelease(): List<Pair<Version, SemanticVersion>> =
       availableVersions
         .filter { version -> updateRules.pinningStrategy.test(version) }
         .mapNotNull { version -> version.toSemVer(updateRules.versioningSchema)?.let { version to it } }
-        .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
+        .filter { it.second.prerelease.isBlank() }
+
+    fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
+      checkPreRelease()
+        .filter { filterVersionComponent(it.second) }
         .maxByOrNull { it.second }
         ?.first
-
-    fun selectByDate(): UpdateSuggestion? {
-      return library.version.toSemVer(updateRules.versioningSchema)
-        ?.takeIf { version -> version.prerelease.isBlank() }
-        ?.let { libVersion ->
-          val nextVersion = availableVersions
-            .filter { version -> updateRules.pinningStrategy.test(version) }
-            .filter { it.date != null }
-            .sortedByDescending { it.date }
-            .firstOrNull()
-          nextVersion?.let {
-            if (it != libVersion) {
-              UpdateSuggestion(library, it)
-            } else {
-              null
-            }
-          }
-        }
-    }
 
     fun selectDefault(): UpdateSuggestion? =
       library.version.toSemVer(updateRules.versioningSchema)
@@ -64,6 +49,27 @@ class UpdateLogic {
           }
           nextVersion?.let { UpdateSuggestion(library, it) }
         }
+
+    fun maxAvailableVersionByDate(): Version? =
+      checkPreRelease()
+        .map { it.first }
+        .filter { version -> updateRules.pinningStrategy.test(version) }
+        .filter { it.date != null }
+        .maxByOrNull { it.date!! }
+
+    fun selectByDate(): UpdateSuggestion? {
+      return library.version.toSemVer(updateRules.versioningSchema)
+        ?.takeIf { version -> version.prerelease.isBlank() }
+        ?.let { libVersion ->
+          maxAvailableVersionByDate()?.let {
+            if (it.value != libVersion.value) {
+              UpdateSuggestion(library, it)
+            } else {
+              null
+            }
+          }
+        }
+    }
 
     return if (updateRules.bumpingStrategy == BumpingStrategy.LatestByDate) {
       selectByDate()

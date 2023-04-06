@@ -3,7 +3,6 @@ package org.virtuslab.bazelsteward.maven
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
-import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.PythonFunctionCallHeuristic
@@ -17,7 +16,7 @@ private val logger = KotlinLogging.logger {}
 class MavenDependencyKind(
   private val mavenDataExtractor: MavenDataExtractor,
   private val mavenRepository: MavenRepository,
-) : DependencyKind<MavenCoordinates> {
+) : DependencyKind<MavenCoordinates>() {
 
   override val name: String = "maven"
 
@@ -42,6 +41,4 @@ class MavenDependencyKind(
     VersionOnlyHeuristic,
     PythonFunctionCallHeuristic,
   )
-  override val defaultUpdateRules: UpdateRules
-    get() = UpdateRules()
 }

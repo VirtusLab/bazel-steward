@@ -25,7 +25,7 @@ open class BazelRulesHeuristicUpdate(
         expectedUrl,
         expectedSha256,
         expectedVersion,
-        null,
+        date = null,
       ),
     )
 

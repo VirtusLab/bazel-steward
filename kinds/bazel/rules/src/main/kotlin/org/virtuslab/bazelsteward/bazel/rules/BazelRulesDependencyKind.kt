@@ -12,7 +12,7 @@ import java.nio.file.Path
 class BazelRulesDependencyKind(
   private val bazelRulesExtractor: BazelRulesExtractor,
   private val rulesResolver: RulesResolver,
-) : DependencyKind<RuleLibrary> {
+) : DependencyKind<RuleLibrary>() {
   override val name: String = "bazel-rules"
 
   override fun acceptsLibrary(library: Library): Boolean = library is RuleLibrary
@@ -32,6 +32,5 @@ class BazelRulesDependencyKind(
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(BazelRuleHeuristic)
 
-  override val defaultUpdateRules: UpdateRules
-    get() = UpdateRules(bumpingStrategy = BumpingStrategy.LatestByDate)
+  override val defaultUpdateRules: UpdateRules = UpdateRules(bumpingStrategy = BumpingStrategy.LatestByDate)
 }

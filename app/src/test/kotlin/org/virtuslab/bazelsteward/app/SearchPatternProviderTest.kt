@@ -37,7 +37,7 @@ class SearchPatternProviderTest {
       val libraryIdURL = "https://github.com/aaa/aaa/archive/aaa.zip"
       val library = RuleLibrary(
         RuleLibraryId.from(libraryIdURL),
-        RuleVersion.create(libraryIdURL, "aaa", "1.0.0", null),
+        RuleVersion.create(libraryIdURL, "aaa", "1.0.0", date = null),
       )
 
       val result = searchPatternProvider.resolveForLibrary(library)
