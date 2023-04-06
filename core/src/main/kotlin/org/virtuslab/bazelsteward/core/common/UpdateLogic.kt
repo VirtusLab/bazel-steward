@@ -53,7 +53,6 @@ class UpdateLogic {
     fun maxAvailableVersionByDate(): Version? =
       checkPreRelease()
         .map { it.first }
-        .filter { version -> updateRules.pinningStrategy.test(version) }
         .filter { it.date != null }
         .maxByOrNull { it.date!! }
 

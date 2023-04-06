@@ -1,7 +1,5 @@
 package org.virtuslab.bazelsteward.core.library
 
-import java.util.*
-
 data class SemanticVersion(
   val major: Int,
   val minor: Int,
