@@ -30,5 +30,4 @@ class BazelVersionDependencyKind(
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> =
     listOf(WholeLibraryHeuristic, VersionOnlyHeuristic)
-
 }
