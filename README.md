@@ -32,7 +32,7 @@ We plan to extend the support to update all bazel rules, bazel modules, http_arc
 We are also planning to support more git hosting methods, but for now, we only support GitHub.
 
 ## Configuration
-You can configure how to handle specific dependencies. Config is stored in a root of a repository.
+You can configure how to handle specific dependencies. Config is stored in a root of a repository in `bazel-steward.yaml` file.
 
 Example config:
 ```yaml
