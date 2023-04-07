@@ -37,7 +37,7 @@ data class PullRequestManager(
               CommandRunner.run(listOf("sh", "-c", it), workspaceRoot)
             }
             gitOperations.commitSelectedFiles(config.filesToCommit, config.commitMessage)
-            if (config.runFor == HookRunFor.PullRequest) {
+            if (config.runFor == HookRunFor.Commit) {
               gitOperations.squashLastTwoCommits(pr.commits.last().message)
             }
           }
