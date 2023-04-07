@@ -2,6 +2,8 @@ package org.virtuslab.bazelsteward.bazel.rules
 
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
+import org.virtuslab.bazelsteward.core.common.UpdateRules
+import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
@@ -10,7 +12,7 @@ import java.nio.file.Path
 class BazelRulesDependencyKind(
   private val bazelRulesExtractor: BazelRulesExtractor,
   private val rulesResolver: RulesResolver,
-) : DependencyKind<RuleLibrary> {
+) : DependencyKind<RuleLibrary>() {
   override val name: String = "bazel-rules"
 
   override fun acceptsLibrary(library: Library): Boolean = library is RuleLibrary
@@ -29,4 +31,6 @@ class BazelRulesDependencyKind(
   )
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(BazelRuleHeuristic)
+
+  override val defaultUpdateRules: UpdateRules = UpdateRules(bumpingStrategy = BumpingStrategy.LatestByDate)
 }

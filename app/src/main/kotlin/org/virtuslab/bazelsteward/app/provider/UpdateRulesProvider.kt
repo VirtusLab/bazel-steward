@@ -11,14 +11,11 @@ class UpdateRulesProvider(
   dependencyKinds: List<DependencyKind<*>>,
 ) {
 
-  companion object {
-    private val defaultUpdateRules = UpdateRules()
-  }
-
   private val applier = DependencyFilterApplier(configs, dependencyKinds)
 
   fun resolveForLibrary(library: Library): UpdateRules {
     val filter = applier.forLibrary(library)
+    val defaultUpdateRules = filter.kind?.defaultUpdateRules ?: UpdateRules()
     return UpdateRules(
       filter.findNotNullOrDefault(defaultUpdateRules.versioningSchema) { it.versioning },
       filter.findNotNullOrDefault(defaultUpdateRules.bumpingStrategy) { it.bumping },

@@ -16,7 +16,7 @@ private val logger = KotlinLogging.logger {}
 class MavenDependencyKind(
   private val mavenDataExtractor: MavenDataExtractor,
   private val mavenRepository: MavenRepository,
-) : DependencyKind<MavenCoordinates> {
+) : DependencyKind<MavenCoordinates>() {
 
   override val name: String = "maven"
 

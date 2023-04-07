@@ -17,7 +17,7 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
     return sha256Regex.findAll(release.body).map { it.value }.singleOrNull().let { sha ->
       val newArtifactName = ruleId.artifactName.replace(ruleId.tag, release.tagName)
       val rule = ruleId.copy(tag = release.tagName, artifactName = newArtifactName)
-      rule to RuleVersion.create(rule.downloadUrl, sha, release.tagName)
+      rule to RuleVersion.create(rule.downloadUrl, sha, release.tagName, release.published_at.toInstant())
     }
   }
 

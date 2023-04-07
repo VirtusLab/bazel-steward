@@ -20,7 +20,8 @@ data class BazelVersion(override val value: String) : Version() {
       if (bazelVersionFile.exists()) {
         bazelVersionFile.readText().takeIf { it.isNotBlank() }?.let { BazelVersion(it.trim()) }
       } else if (bazeliskRcFile.exists()) {
-        bazeliskRcFile.readLines().find { it.startsWith("USE_BAZEL_VERSION") }?.substringAfter("=")?.let { BazelVersion(it.trim()) }
+        bazeliskRcFile.readLines().find { it.startsWith("USE_BAZEL_VERSION") }?.substringAfter("=")
+          ?.let { BazelVersion(it.trim()) }
       } else {
         throw RuntimeException("Can't find Bazel version")
       }

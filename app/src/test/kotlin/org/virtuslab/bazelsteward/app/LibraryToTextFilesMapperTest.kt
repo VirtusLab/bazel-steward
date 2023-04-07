@@ -50,7 +50,7 @@ class LibraryToTextFilesMapperTest {
     val workspace = prepareWorkspace(tempDir)
     val library = RuleLibrary(
       ReleaseArtifact("", "", "", ""),
-      RuleVersion.create("", "", "5.3.0"),
+      RuleVersion.create("", "", "5.3.0", date = null),
     )
 
     val result = testForDependencyKind(library, tempDir)

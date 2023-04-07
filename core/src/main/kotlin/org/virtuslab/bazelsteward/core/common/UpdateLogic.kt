@@ -21,27 +21,59 @@ class UpdateLogic {
     availableVersions: List<Version>,
     updateRules: UpdateRules,
   ): UpdateSuggestion? {
-    fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
+    fun checkPreRelease(): List<Pair<Version, SemanticVersion>> =
       availableVersions
         .filter { version -> updateRules.pinningStrategy.test(version) }
         .mapNotNull { version -> version.toSemVer(updateRules.versioningSchema)?.let { version to it } }
-        .filter { it.second.prerelease.isBlank() && filterVersionComponent(it.second) }
+        .filter { it.second.prerelease.isBlank() }
+
+    fun maxAvailableVersion(filterVersionComponent: (a: SemanticVersion) -> Boolean): Version? =
+      checkPreRelease()
+        .filter { filterVersionComponent(it.second) }
         .maxByOrNull { it.second }
         ?.first
 
-    return library.version.toSemVer(updateRules.versioningSchema)
-      ?.takeIf { version -> version.prerelease.isBlank() }
-      ?.let { version ->
-        val maxPatch =
-          maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
-        val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
-        val maxMajor = maxAvailableVersion { a -> a.major > version.major }
-        val nextVersion = when (updateRules.bumpingStrategy) {
-          BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
-          BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
-          BumpingStrategy.Minor -> maxMinor ?: maxPatch ?: maxMajor
+    fun selectDefault(): UpdateSuggestion? =
+      library.version.toSemVer(updateRules.versioningSchema)
+        ?.takeIf { version -> version.prerelease.isBlank() }
+        ?.let { version ->
+          val maxPatch =
+            maxAvailableVersion { a -> a.major == version.major && a.minor == version.minor && a.patch > version.patch }
+          val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
+          val maxMajor = maxAvailableVersion { a -> a.major > version.major }
+          val nextVersion = when (updateRules.bumpingStrategy) {
+            BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
+            BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
+            BumpingStrategy.Minor -> maxMinor ?: maxPatch ?: maxMajor
+            else -> null
+          }
+          nextVersion?.let { UpdateSuggestion(library, it) }
         }
-        nextVersion?.let { UpdateSuggestion(library, it) }
-      }
+
+    fun maxAvailableVersionByDate(): Version? =
+      checkPreRelease()
+        .map { it.first }
+        .filter { it.date != null }
+        .maxByOrNull { it.date!! }
+
+    fun selectByDate(): UpdateSuggestion? {
+      return library.version.toSemVer(updateRules.versioningSchema)
+        ?.takeIf { version -> version.prerelease.isBlank() }
+        ?.let { libVersion ->
+          maxAvailableVersionByDate()?.let {
+            if (it.value != libVersion.value) {
+              UpdateSuggestion(library, it)
+            } else {
+              null
+            }
+          }
+        }
+    }
+
+    return if (updateRules.bumpingStrategy == BumpingStrategy.LatestByDate) {
+      selectByDate()
+    } else {
+      selectDefault()
+    }
   }
 }

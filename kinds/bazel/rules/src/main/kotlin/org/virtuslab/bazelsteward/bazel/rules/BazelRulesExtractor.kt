@@ -93,7 +93,7 @@ class BazelRulesExtractor {
               .first { url -> url.startsWith("https://github.com/") }
               .let { url -> RuleLibraryId.from(url) }
           }
-          val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256, libraryId.tag)
+          val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256, libraryId.tag, date = null)
           RuleLibrary(libraryId, ruleVersion)
         }.also { result ->
           logger.debug { "Found ${result.size} Bazel Rules. " }

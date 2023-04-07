@@ -11,7 +11,7 @@ import java.nio.file.Path
 
 class BazelVersionDependencyKind(
   private val bazelUpdater: BazelUpdater,
-) : DependencyKind<BazelLibrary> {
+) : DependencyKind<BazelLibrary>() {
 
   override val name: String = "bazel"
 

@@ -6,6 +6,7 @@ import org.virtuslab.bazelsteward.bazel.rules.RuleVersion
 import org.virtuslab.bazelsteward.core.GitHostClient
 import org.virtuslab.bazelsteward.e2e.fixture.E2EBase
 import java.nio.file.Path
+import java.time.Instant
 
 open class BazelRulesHeuristicUpdate(
   private val project: String,
@@ -25,6 +26,7 @@ open class BazelRulesHeuristicUpdate(
         expectedUrl,
         expectedSha256,
         expectedVersion,
+        date = Instant.now(),
       ),
     )
 
