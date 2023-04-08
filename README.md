@@ -70,13 +70,32 @@ search-paths:
     path-patterns:
       - ".bazelversion"
       - ".github/**/*.yaml"
-
+pull-requests:
+  - 
+    title: "[maintenance] Updated ${group}/${artifact} from ${versionFrom} to ${versionTo}"
+    kinds: maven
+  - 
+    title: "[maintenance] Updated ${dependencyId}"
+post-update-hooks:
+  - kinds: maven
+    commands:
+      - "bazel run @unpinned_maven//:pin"
+    files-to-commit:
+      - "maven_install.json"
+    run-for: commit
+  - commands: "buildifier --lint=fix -r ."
+    files-to-commit:
+      - "**/*.bzl"
+      - "**/BUILD.bazel"
+      - "WORKSPACE"
+    run-for: pull-request
+    commit-message: "Apply buildifier"
 ```
 
 When resolving which rule to use, Bazel Steward first checks rules with the dependencies key defined (in order they are declared) and then other rules (also in declaration order).
 
 When the rule is found, it can configure for a dependency the following things:
-* In update-rules section
+* In `update-rules` section
   * `versioning` (string) <br/>
   Overrides what kind of versioning schema is used for the dependency.
   Default: `loose`. Allowed values: `loose`, `semver`, `regex:...`.
@@ -91,7 +110,7 @@ When the rule is found, it can configure for a dependency the following things:
     2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
     3. `minor` - First bump to the latest minor, and then to the latest major.
 
-* In search-paths section:
+* In `search-paths` section:
   * `path-patterns` (list of strings) <br/>
     Overrides paths where Bazel Steward will look for a version to update 
     (it is used by version replacement mechanism, not version detection). 
@@ -103,6 +122,24 @@ When the rule is found, it can configure for a dependency the following things:
     All paths are relative to the Bazel workspace root. 
     The "exact:", "glob:", "regex:" prefixes are used to determine type of path pattern. 
     They can usually be omitted and correct syntax should be detected automatically.
+
+* In `pull-requests` section:
+  * `title` (string) <br/>
+    Overrides template used for generating pull request title. Variables are inected with `${}` syntax.
+    Available variables are `dependencyId`, `versionFrom`, `versionTo`, and for maven dependencies only: `group` and `artifact`.
+  * `body` (string) <br/>
+    Overrides template used for generating pull request body. Syntax and variables are the same as for the title.
+
+* In `post-update-hooks` section:
+  * `commands` (list of strings) <br/>
+    List of commands to run after applying an update. Commands are run separately under `sh -c`
+  * `files to commit` (list of strings) <br/>
+    List of path patterns of files to commit after running commands (syntax is the same as for `search-paths.path-patterns`).
+  * `run-for` (string) <br/>
+    Scope for running commands.
+    1. `commit` - runs for each commit and includes changes in the commit
+    2. `pull-request` - runs for the whole pull request, after creating all commits. It creates a separate commit with modifier file. Message can be configured with `commit-message` setting.
+    Currently each pull request has only one update since grouping is not implemented, so this setting only impact if new commit will be created or not.
 
 # Installation
 
