@@ -5,4 +5,3 @@ post-update-hooks:
     files-to-commit:
       - "**/*.txt"
     run-for: commit
-    commit-message: "Test message"

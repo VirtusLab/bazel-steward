@@ -23,15 +23,15 @@ class PostUpdateHookTest : E2EBase() {
     val git = GitClient(localRoot)
     runBlocking {
       git.checkout("bazel-steward/io.arrow-kt/arrow-core/1.1.5")
-      CommandRunner.run(
-        listOf(
-          "sh",
-          "-c",
-          """cat garbage/* rubbish/* trash/* | python3 -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
-        ),
+      val validationCommandOutput = CommandRunner.run(
         localRoot,
-      ).trim() shouldBe "45"
-      git.run("log", "-1", "--oneline") shouldContain "Updated io.arrow-kt:arrow-core to 1.1.5"
+        "sh",
+        "-c",
+        """cat garbage/* rubbish/* trash/* | python -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
+      ).trim()
+      validationCommandOutput shouldBe "45"
+      val lastCommit = git.run("log", "-1", "--oneline")
+      lastCommit shouldContain "Test message"
       git.checkout(master)
     }
 
@@ -52,15 +52,15 @@ class PostUpdateHookTest : E2EBase() {
     val git = GitClient(localRoot)
     runBlocking {
       git.checkout("bazel-steward/io.arrow-kt/arrow-core/1.1.5")
-      CommandRunner.run(
-        listOf(
-          "sh",
-          "-c",
-          """cat garbage/* rubbish/* trash/* | python -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
-        ),
+      val validationCommandOutput = CommandRunner.run(
         localRoot,
-      ).trim() shouldBe "45"
-      git.run("log", "-1", "--oneline") shouldContain "Test message"
+        "sh",
+        "-c",
+        """cat garbage/* rubbish/* trash/* | python -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
+      ).trim()
+      validationCommandOutput shouldBe "45"
+      val lastCommit = git.run("log", "-1", "--oneline")
+      lastCommit shouldContain "Updated io.arrow-kt:arrow-core to 1.1.5"
       git.checkout(master)
     }
 
