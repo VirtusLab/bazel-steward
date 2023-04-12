@@ -16,23 +16,30 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
       val currentVersion = updateSuggestion.currentLibrary.version.value
       val currentSha = ruleLibrary.version.sha256
 
-      val changes = with(updateSuggestion.suggestedVersion as RuleVersion) {
-        listOf(currentUrl, currentVersion, currentSha).zip(listOf(url, value, sha256)).flatMap { (current, suggested) ->
+      val suggestedRuleVersion = updateSuggestion.suggestedVersion as RuleVersion
+      val suggestedUrl = suggestedRuleVersion.url
+      val suggestedVersion = suggestedRuleVersion.value
+      val suggestedChecksum = suggestedRuleVersion.sha256
+
+      val changes =
+        listOf(currentUrl, currentVersion, currentSha).zip(
+          listOf(suggestedUrl, suggestedVersion, suggestedChecksum)
+        ).flatMap { (current, suggested) ->
           val regex = """(${Regex.escape(current)})""".toRegex()
-          files
-            .map { regex.findAll(it.content) to it.path }
-            .map { result ->
-              result.first.singleOrNull()?.groups?.first()?.range?.let {
+          files.flatMap { file ->
+            val matches = regex.findAll(file.content)
+            matches.map { match ->
+              match.groups.first()?.range?.let { matchRange ->
                 FileChange(
-                  result.second,
-                  it.first,
-                  it.last - it.first + 1,
+                  file.path,
+                  matchRange.first,
+                  matchRange.last - matchRange.first + 1,
                   suggested,
                 )
               }
             }
-        }
-      }.filterNotNull()
+          }
+        }.filterNotNull()
       return LibraryUpdate(updateSuggestion, changes)
     } else {
       return null
