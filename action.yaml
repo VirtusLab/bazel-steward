@@ -51,7 +51,7 @@ runs:
     - name: Run bazel steward
       run: |
         NO_REMOTE=$([[ $PUSH_TO_REMOTE == 'true' ]] && echo "" || echo "--no-remote")
-        java -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG -jar bazel-steward.jar \
+        java -Dorg.slf4j.simpleLogger.defaultLogLevel=INFO -jar bazel-steward.jar \
         --github $NO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
       shell: bash
       env:

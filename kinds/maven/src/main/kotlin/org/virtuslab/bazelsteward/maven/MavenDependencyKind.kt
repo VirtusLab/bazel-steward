@@ -24,8 +24,8 @@ class MavenDependencyKind(
 
   override suspend fun findAvailableVersions(workspaceRoot: Path): Map<MavenCoordinates, List<Version>> {
     val data = mavenDataExtractor.extract()
-    logger.debug { "Repositories " + data.repositories.toString() }
-    logger.debug { "Dependencies: " + data.dependencies.map { it.id.name + " " + it.version.value }.toString() }
+    logger.info { "Repositories " + data.repositories.toString() }
+    logger.info { "Dependencies: " + data.dependencies.map { it.id.name + " " + it.version.value }.toString() }
     return mavenRepository.findVersions(data)
   }
 
