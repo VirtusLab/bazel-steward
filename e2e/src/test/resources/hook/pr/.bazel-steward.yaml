@@ -7,3 +7,4 @@ post-update-hooks:
       - trash
       - garbage
     run-for: pull-request
+    commit-message: "Test message"
