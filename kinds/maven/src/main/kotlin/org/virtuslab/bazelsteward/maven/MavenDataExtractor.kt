@@ -1,7 +1,6 @@
 package org.virtuslab.bazelsteward.maven
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
 import org.virtuslab.bazelsteward.core.common.CommandRunner
 import java.nio.file.Path
@@ -21,7 +20,12 @@ class MavenDataExtractor(private val workspaceRoot: Path) {
   private suspend fun extractFromFile(fileName: String): List<String> = withContext(Dispatchers.IO) {
     val xml = CommandRunner.run(
       workspaceRoot,
-      "bazel", "query", "@maven//:${fileName}", "--output", "xml", "--noshow_progress"
+      "bazel",
+      "query",
+      "@maven//:$fileName",
+      "--output",
+      "xml",
+      "--noshow_progress",
     )
     val fileLocation = Regex(regexPattern.format(fileName)).find(xml)?.let { it.groups[1]?.value }
       ?: throw RuntimeException("Failed to find file: $fileName")
