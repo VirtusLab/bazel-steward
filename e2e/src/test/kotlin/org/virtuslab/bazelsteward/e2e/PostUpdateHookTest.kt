@@ -27,7 +27,7 @@ class PostUpdateHookTest : E2EBase() {
         listOf(
           "sh",
           "-c",
-          """cat garbage/* rubbish/* trash/* | python -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
+          """cat garbage/* rubbish/* trash/* | python3 -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
         ),
         localRoot,
       ).trim() shouldBe "45"
