@@ -26,16 +26,18 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
       val suggestedChecksum = try {
         suggestedRuleVersion.sha256
       } catch (e: FileNotFoundException) {
-        logger.error { "File not found under URL: '${suggestedUrl}'. " +
-          "It is likely that the URL format for this rule has changed. " +
-          "If you use the current URL ('${currentUrl}') directly in the code (instead of using templating), " +
-          "Bazel Steward should be able to replace it with the correct URL." }
+        logger.error {
+          "File not found under URL: '$suggestedUrl'. " +
+            "It is likely that the URL format for this rule has changed. " +
+            "If you use the current URL ('$currentUrl') directly in the code (instead of using templating), " +
+            "Bazel Steward should be able to replace it with the correct URL."
+        }
         return null
       }
 
       val changes =
         listOf(currentUrl, currentVersion, currentSha).zip(
-          listOf(suggestedUrl, suggestedVersion, suggestedChecksum)
+          listOf(suggestedUrl, suggestedVersion, suggestedChecksum),
         ).flatMap { (current, suggested) ->
           val regex = """(${Regex.escape(current)})""".toRegex()
           files.flatMap { file ->
