@@ -96,9 +96,9 @@ class BazelRulesExtractor {
           val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256, libraryId.tag, date = null)
           RuleLibrary(libraryId, ruleVersion)
         }.also { result ->
-          logger.debug { "Found ${result.size} Bazel Rules. " }
+          logger.info { "Found ${result.size} Bazel Rules. " }
           if (result.isNotEmpty()) {
-            logger.debug { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.id.name}:${it.version.tag}" }}" }
+            logger.info { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.id.name}:${it.version.tag}" }}" }
           }
         }
     }
