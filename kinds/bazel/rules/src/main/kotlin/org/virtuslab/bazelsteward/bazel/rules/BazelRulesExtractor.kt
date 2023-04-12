@@ -59,10 +59,10 @@ class BazelRulesExtractor {
         """.trimMargin(),
       )
       // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
-      CommandRunner.run("bazel build @all_external_repositories//:result.json".split(' '), workspaceRoot)
+      CommandRunner.run(workspaceRoot, "bazel", "build", "@all_external_repositories//:result.json")
       workspaceFilePath.writeText(originalContent)
       deleteFile(tempFileForBzl)
-      val bazelPath = CommandRunner.run("bazel info output_base".split(' '), workspaceRoot).removeSuffix("\n")
+      val bazelPath = CommandRunner.run(workspaceRoot, "bazel", "info", "output_base").trim()
       val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
       if (!resultFilePath.exists()) {
         throw RuntimeException("Failed to find a file: $resultFilePath")

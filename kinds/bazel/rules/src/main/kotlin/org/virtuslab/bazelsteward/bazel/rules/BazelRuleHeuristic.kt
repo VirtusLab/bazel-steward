@@ -1,10 +1,14 @@
 package org.virtuslab.bazelsteward.bazel.rules
 
+import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdate
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
+import java.io.FileNotFoundException
+
+private val logger = KotlinLogging.logger {}
 
 object BazelRuleHeuristic : VersionReplacementHeuristic {
   override val name: String = "bazel-rule-default"
@@ -19,7 +23,15 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
       val suggestedRuleVersion = updateSuggestion.suggestedVersion as RuleVersion
       val suggestedUrl = suggestedRuleVersion.url
       val suggestedVersion = suggestedRuleVersion.value
-      val suggestedChecksum = suggestedRuleVersion.sha256
+      val suggestedChecksum = try {
+        suggestedRuleVersion.sha256
+      } catch (e: FileNotFoundException) {
+        logger.error { "File not found under URL: '${suggestedUrl}'. " +
+          "It is likely that the URL format for this rule has changed. " +
+          "If you use the current URL ('${currentUrl}') directly in the code (instead of using templating), " +
+          "Bazel Steward should be able to replace it with the correct URL." }
+        return null
+      }
 
       val changes =
         listOf(currentUrl, currentVersion, currentSha).zip(

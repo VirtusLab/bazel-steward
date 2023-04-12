@@ -11,6 +11,10 @@ private val logger = KotlinLogging.logger {}
 class CommandRunner {
 
   companion object {
+    suspend fun run(directory: Path, vararg command: String): String {
+      return run(command.toList(), directory)
+    }
+
     suspend fun run(command: List<String>, directory: Path): String {
       logger.info { command.joinToString(" ") { if (it.contains(" ")) """"$it"""" else it } }
       return withContext(Dispatchers.IO) {
