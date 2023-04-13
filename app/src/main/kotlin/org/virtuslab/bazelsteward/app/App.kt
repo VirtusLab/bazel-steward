@@ -29,7 +29,6 @@ data class App(
 ) {
 
   suspend fun run() {
-    val workspaceRoot = workspaceRoot
     gitOperations.checkoutBaseBranch()
 
     val updates = dependencyKinds.mapNotNull { kind ->
