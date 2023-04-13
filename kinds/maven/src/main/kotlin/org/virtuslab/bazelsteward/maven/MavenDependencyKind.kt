@@ -23,7 +23,10 @@ class MavenDependencyKind(
   override fun acceptsLibrary(library: Library): Boolean = library is MavenCoordinates
 
   override suspend fun findAvailableVersions(workspaceRoot: Path): Map<MavenCoordinates, List<Version>> {
-    val data = mavenDataExtractor.extract()
+    val data = runCatching { mavenDataExtractor.extract() }
+      .onFailure {
+        logger.error { "Failed to extract used maven dependencies. Bazel Steward supports rules_jvm_external 4.0 or newer" }
+      }.getOrThrow()
     logger.info { "Repositories " + data.repositories.toString() }
     logger.info { "Dependencies: " + data.dependencies.map { it.id.name + " " + it.version.value }.toString() }
     return mavenRepository.findVersions(data)
