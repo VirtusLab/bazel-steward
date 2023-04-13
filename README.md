@@ -166,6 +166,9 @@ on:
             github-personal-token: '' # used for triggering workflows, read below
 ```
 
+Make sure to allow Github Actions to create pull requests and give it write access so that Bazel Steward can push branches. You can find these settings
+under `Settings / Actions / General / Workflow permissions`.
+
 After every run, it creates a new branch and a pull request with a bumped version for every library it detects to be outdated.
 You can merge the PR, close it, or push your changes onto the branch.
 Once a PR is opened, it will never open another one for the same version, regardless of what you do with the PR.
