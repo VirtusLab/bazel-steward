@@ -90,11 +90,12 @@ object AppBuilder {
       if (github) GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor) else GitHostClient.stub
     val bazelRulesExtractor = BazelRulesExtractor()
     val bazelUpdater = BazelUpdater()
-    val githubRulesResolver = GithubRulesResolver(
+    val gitHubClient = (
       env["GITHUB_TOKEN"]
         ?.let(GitHub::connectUsingOAuth)
-        ?: GitHub.connectAnonymously(),
-    )
+        ?: GitHub.connectAnonymously()
+      )
+    val githubRulesResolver = GithubRulesResolver(gitHubClient)
     val fileFinder = FileFinder(appConfig.workspaceRoot)
 
     val dependencyKinds = listOf(
