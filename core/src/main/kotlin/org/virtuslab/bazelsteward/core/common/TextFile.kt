@@ -10,6 +10,10 @@ interface TextFile {
   private class LazyTextFile(override val path: Path) : TextFile {
     override val content: String
       get() = path.readText()
+
+    override fun toString(): String {
+      return path.toString()
+    }
   }
 
   companion object {

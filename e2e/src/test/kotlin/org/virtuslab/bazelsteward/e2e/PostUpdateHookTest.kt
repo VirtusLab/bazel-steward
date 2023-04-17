@@ -27,7 +27,7 @@ class PostUpdateHookTest : E2EBase() {
         localRoot,
         "sh",
         "-c",
-        """cat garbage/* rubbish/* trash/* | python -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
+        """cat garbage/* rubbish/* trash/* | python3 -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
       ).trim()
       validationCommandOutput shouldBe "45"
       val lastCommit = git.run("log", "-1", "--oneline")
@@ -56,7 +56,7 @@ class PostUpdateHookTest : E2EBase() {
         localRoot,
         "sh",
         "-c",
-        """cat garbage/* rubbish/* trash/* | python -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
+        """cat garbage/* rubbish/* trash/* | python3 -c "import sys; print(sum(int(l) for l in sys.stdin))"""",
       ).trim()
       validationCommandOutput shouldBe "45"
       val lastCommit = git.run("log", "-1", "--oneline")
