@@ -7,6 +7,9 @@ import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.kohsuke.github.GitHub
+import org.kohsuke.github.GitHubBuilder
+import org.kohsuke.github.GitHubRateLimitHandler
+import org.kohsuke.github.connector.GitHubConnectorResponse
 import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.app.provider.SearchPatternProvider
@@ -28,6 +31,7 @@ import org.virtuslab.bazelsteward.github.GithubClient
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenRepository
+import java.lang.RuntimeException
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
@@ -90,11 +94,7 @@ object AppBuilder {
       if (github) GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor) else GitHostClient.stub
     val bazelRulesExtractor = BazelRulesExtractor()
     val bazelUpdater = BazelUpdater()
-    val gitHubClient = (
-      env["GITHUB_TOKEN"]
-        ?.let(GitHub::connectUsingOAuth)
-        ?: GitHub.connectAnonymously()
-      )
+    val gitHubClient = createGithubClient(env)
     val githubRulesResolver = GithubRulesResolver(gitHubClient)
     val fileFinder = FileFinder(appConfig.workspaceRoot)
 
@@ -138,5 +138,16 @@ object AppBuilder {
       pullRequestManager,
       appConfig.workspaceRoot,
     )
+  }
+
+  private fun createGithubClient(env: Environment): GitHub {
+    val builder = GitHubBuilder().withRateLimitHandler(object : GitHubRateLimitHandler() {
+      override fun onError(connectorResponse: GitHubConnectorResponse) {
+        throw RuntimeException("Github returned ${connectorResponse.statusCode()} for ${connectorResponse.request().url()}")
+      }
+    })
+    return env["GITHUB_TOKEN"]
+      ?.let { builder.withOAuthToken(it).build() }
+      ?: builder.build()
   }
 }
