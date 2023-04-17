@@ -59,9 +59,9 @@ class UpdateLogic {
     fun selectByDate(): UpdateSuggestion? {
       return library.version.toSemVer(updateRules.versioningSchema)
         ?.takeIf { version -> version.prerelease.isBlank() }
-        ?.let { libVersion ->
+        ?.let {
           maxAvailableVersionByDate()?.let {
-            if (it.value != libVersion.value) {
+            if (it.value != library.version.value) {
               UpdateSuggestion(library, it)
             } else {
               null
