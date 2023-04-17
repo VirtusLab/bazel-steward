@@ -1,9 +1,7 @@
 package org.virtuslab.bazelsteward.e2e.rules.heuristic
 
-import org.junit.jupiter.api.Disabled
 import org.virtuslab.bazelsteward.e2e.rules.fixture.BazelRulesHeuristicUpdate
 
-@Disabled("No support for strip_prefix update")
 class HeuristicUpdateStripPrefixTest : BazelRulesHeuristicUpdate(
   "rules/heuristic/heuristic_rules_strip_prefix",
   "https://github.com/bazelbuild/rules_closure/archive/0.12.0.tar.gz",
