@@ -40,7 +40,7 @@ class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
     commits.forEach { commit ->
       commit.changes.groupBy { it.file }.forEach { (path, changes) ->
         val contents = path.readText()
-        val newContents = changes.fold(Pair(contents, 0)) { (content, offset), replacement ->
+        val newContents = changes.sortedBy { it.offset }.fold(Pair(contents, 0)) { (content, offset), replacement ->
           content.replaceRange(
             replacement.offset + offset,
             replacement.offset + offset + replacement.length,

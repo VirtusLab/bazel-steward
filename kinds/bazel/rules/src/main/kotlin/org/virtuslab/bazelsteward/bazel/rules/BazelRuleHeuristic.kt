@@ -13,6 +13,18 @@ private val logger = KotlinLogging.logger {}
 object BazelRuleHeuristic : VersionReplacementHeuristic {
   override val name: String = "bazel-rule-default"
 
+  private class ReplaceRequest(
+    current: String,
+    val suggested: String,
+    forbiddenSurrounding: String? = null,
+  ) {
+    val regex = if (forbiddenSurrounding != null) {
+      """(?<!$forbiddenSurrounding)(${Regex.escape(current)})(?!$forbiddenSurrounding)""".toRegex()
+    } else {
+      """(${Regex.escape(current)})""".toRegex()
+    }
+  }
+
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
     if (updateSuggestion.currentLibrary is RuleLibrary && updateSuggestion.suggestedVersion is RuleVersion) {
       val ruleLibrary = updateSuggestion.currentLibrary as RuleLibrary
@@ -23,7 +35,7 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
       val suggestedRuleVersion = updateSuggestion.suggestedVersion as RuleVersion
       val suggestedUrl = suggestedRuleVersion.url
       val suggestedVersion = suggestedRuleVersion.value
-      val suggestedChecksum = try {
+      val suggestedSha = try {
         suggestedRuleVersion.sha256
       } catch (e: FileNotFoundException) {
         logger.error {
@@ -35,25 +47,34 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
         return null
       }
 
-      val changes =
-        listOf(currentUrl, currentVersion, currentSha).zip(
-          listOf(suggestedUrl, suggestedVersion, suggestedChecksum),
-        ).flatMap { (current, suggested) ->
-          val regex = """(${Regex.escape(current)})""".toRegex()
-          files.flatMap { file ->
-            val matches = regex.findAll(file.content)
-            matches.map { match ->
-              match.groups.first()?.range?.let { matchRange ->
-                FileChange(
-                  file.path,
-                  matchRange.first,
-                  matchRange.last - matchRange.first + 1,
-                  suggested,
-                )
-              }
+      val replaceRequests = listOf(
+        ReplaceRequest(currentUrl, suggestedUrl),
+        ReplaceRequest(currentSha, suggestedSha, "[a-z0-9]"),
+        ReplaceRequest(currentVersion, suggestedVersion, "[0-9]"),
+      )
+
+      val groupedChanges = files.map { file ->
+        replaceRequests.map { request ->
+          val matches = request.regex.findAll(file.content)
+          matches.mapNotNull { match ->
+            match.groups.first()?.range?.let { matchRange ->
+              FileChange(
+                file.path,
+                matchRange.first,
+                matchRange.last - matchRange.first + 1,
+                request.suggested,
+              )
             }
-          }
-        }.filterNotNull()
+          }.toList()
+        }.filter { it.isNotEmpty() }
+      }.filter { it.isNotEmpty() }.sortedByDescending { it.size }
+
+      if (groupedChanges.isEmpty()) {
+        return null
+      }
+
+      val selectedChanges = groupedChanges.takeWhile { it.size >= 2 }.takeUnless { it.isEmpty() } ?: groupedChanges
+      val changes = selectedChanges.flatten().flatten()
       return LibraryUpdate(updateSuggestion, changes)
     } else {
       return null
