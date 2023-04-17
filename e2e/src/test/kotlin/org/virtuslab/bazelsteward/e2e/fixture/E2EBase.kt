@@ -219,8 +219,8 @@ open class E2EBase {
   }
 
   class GithubRulesResolverMock(private val expectedVersion: Version) : RulesResolver {
-    override fun resolveRuleVersions(ruleId: RuleLibraryId): Map<RuleLibraryId, Version> {
-      return mapOf(ruleId to expectedVersion)
+    override fun resolveRuleVersions(ruleId: RuleLibraryId): List<Version> {
+      return listOf(expectedVersion)
     }
   }
 }

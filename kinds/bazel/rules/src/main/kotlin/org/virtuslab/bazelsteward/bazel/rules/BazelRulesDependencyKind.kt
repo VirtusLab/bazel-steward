@@ -20,7 +20,7 @@ class BazelRulesDependencyKind(
   override suspend fun findAvailableVersions(workspaceRoot: Path): Map<RuleLibrary, List<Version>> {
     val usedBazelRules = bazelRulesExtractor.extractCurrentRules(workspaceRoot)
     return usedBazelRules
-      .associateWith { it: RuleLibrary -> rulesResolver.resolveRuleVersions(it.id).values.toList() }
+      .associateWith { it: RuleLibrary -> rulesResolver.resolveRuleVersions(it.id) }
   }
 
   override val defaultSearchPatterns: List<PathPattern> = listOf(

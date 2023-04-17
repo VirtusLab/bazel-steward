@@ -53,6 +53,7 @@ data class App(
           "Skipping this dependency kind..."
       }
       logger.warn("Error details: ${e.message}")
+      logger.debug(e) { "Full stacktrace" }
       null
     }
   }
