@@ -1,9 +1,7 @@
 package org.virtuslab.bazelsteward.e2e.rules.heuristic
 
-import org.junit.jupiter.api.Disabled
 import org.virtuslab.bazelsteward.e2e.rules.fixture.BazelRulesHeuristicUpdate
 
-@Disabled("No support for multiple urls")
 class HeuristicUpdateMultipleUrlsTest : BazelRulesHeuristicUpdate(
   "rules/heuristic/heuristic_rules_multiple_urls",
   "https://github.com/bazelbuild/rules_closure/archive/0.12.0.tar.gz",
