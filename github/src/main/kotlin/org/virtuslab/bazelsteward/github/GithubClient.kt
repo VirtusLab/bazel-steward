@@ -104,16 +104,15 @@ class GithubClient private constructor(
 
   companion object {
     fun getClient(env: Environment, baseBranch: String, gitAuthor: GitClient.GitAuthor): GithubClient {
-      val url = env.getOrThrow("GITHUB_API_URL")
+      val url = env.getOrDefault("GITHUB_API_URL", "https://api.github.com")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
       val personalToken = env["PERSONAL_TOKEN"].let { if (it.isNullOrBlank()) null else it }
       return GithubClient(url, baseBranch, gitAuthor, repository, token, personalToken)
     }
 
-    fun getRepoPath(env: Environment): Path {
-      val workspace = env.getOrThrow("GITHUB_WORKSPACE")
-      return Path(workspace)
+    fun getRepoPath(env: Environment, fallback: Path): Path {
+      return env["GITHUB_WORKSPACE"]?.let { Path(it) } ?: fallback
     }
   }
 }
