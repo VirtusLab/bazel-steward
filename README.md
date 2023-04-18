@@ -143,9 +143,11 @@ When the rule is found, it can configure for a dependency the following things:
 
 # Installation
 
-You can download the Bazel Steward jar and run it locally or use the GitHub Action below.
+You can use Bazel Steward through our GitHub Action, run it from Maven Central or use a JAR from Github Releases.
 
 ## GitHub Actions
+> Note: Bazel Steward will run basic Bazel queries, so any non standard environment that is required for your project to bootstrap in Bazel needs to be ready before running Bazel Steward. 
+
 Create a file at  `.github/workflows/` with this content:
 ```yaml
 name: Update dependencies
@@ -196,16 +198,59 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
     # The path to Bazel Steward configuration
     # Default: "./bazel-steward.yaml"
     configuration-path: ''
-
+    
     # A token for the GitHub repository
     # Default: ${{ github.token }}
     github-token: ''
-
-    # Additional arguments to Bazel Steward jar
-    additional-args: ''
-
+    
     # An optional token for closing and reopening pull requests
     github-personal-token: ''
+    
+    # Additional arguments to Bazel Steward
+    # Example: "--base-branch dev --update-all-prs"
+    additional-args: ''    
+```
+
+## Other Environments
+
+### Environment Requirements
+* Bazel commands complete succesfully in the environment
+  * It is best to run Bazel Steward in the same environment that is used for Bazel builds on your CI. Minimally, your workspace needs to initialize correctly to allow running queries. 
+  * If your repository uses pinned maven dependecies, you will want to run `bazel run @unpinned_maven//:pin` as an `post-update-hook`. This command also needs to be able to run correctly in your environment.
+* Git write access - for pushing branches (Bazel Steward only pushes its own branches, it doesn't touch master branch for example)
+* Configure Git author in the environment (name and email) that will be used for creating branches
+* Configure `GITHUB_TOKEN` environment variable for fetching available rules versions (it can work without the token, but expect exceeding API limits)
+* Set `--github` flag - Bazel Steward now only works with GitHub as a platform. Without the flag, it will only push the branches, but is not able to check PR status or open/close them.
+  * Set `GITHUB_TOKEN` env - necessary for PR management
+  * Set `GITHUB_REPOSITORY` env to your repository location. Example value: `VirtusLab/bazel-steward` 
+
+### Command line arguments
+```
+Arguments:
+    repository [.] -> Location of the local repository to scan (optional)
+Options:
+    --github [false] -> Use GitHub as platform
+    --no-remote, -n [false] -> Do not push to remote
+    --update-all-prs, -f [false] -> Update all pull requests (force push even if PR is open and has no conflicts)
+    --base-branch -> Branch that will be set as a base in pull request (default: current branch)
+    --config-path -> Path to the config file (default: `.bazel-steward.yaml`)
+```
+
+### Maven Central
+Bazel Steward is published to Maven Central under `org.virtuslab:bazel-steward`. The main class to run it is `org.virtuslab.bazelsteward.app.Main` (it is not present in the Manifest for now).
+
+To easily run it, use [Coursier](https://get-coursier.io/docs/cli-installation).
+
+```
+coursier launch org.virtuslab:bazel-steward:0.2.11 --main org.virtuslab.bazelsteward.app.Main -- --help
+```
+
+### GitHub Releases
+Bazel Steward publishes a fat JAR under GitHub Releases. The same JAR is also used in GitHub Actions. You can simply download it and run using the `java` command.
+
+```
+wget https://github.com/VirtusLab/bazel-steward/releases/download/v0.2.11/bazel-steward.jar
+java -jar bazel-steward.jar --help
 ```
 
 # Community
@@ -222,6 +267,7 @@ A badge is available to show that Bazel Steward is helping your repository.
 ## Usage
 Bazel Steward is used by:
 * [Bazel BSP](https://github.com/JetBrains/bazel-bsp)
+* [Bazel Steward](https://github.com/VirtusLab/bazel-steward)
 
 ## Contributing
 
