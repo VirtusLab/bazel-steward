@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ "$1" == "--local" ]; then
+if [ "${1:-}" == "--local" ]; then
   bazel run --stamp \
     --define "maven_repo=file://$HOME/.m2/repository" \
     //app:maven.publish
