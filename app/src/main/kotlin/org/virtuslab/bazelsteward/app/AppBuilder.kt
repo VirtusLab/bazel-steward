@@ -63,7 +63,7 @@ object AppBuilder {
 
     parser.parse(args)
 
-    val repositoryRoot = if (github) GithubClient.getRepoPath(env) else Path(repository)
+    val repositoryRoot = Path(repository).let { if (github) GithubClient.getRepoPath(env, it) else it }
     val gitClient = GitClient(repositoryRoot)
     val baseBranchName = baseBranch ?: runBlocking {
       gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
@@ -86,16 +86,24 @@ object AppBuilder {
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()
     val gitOperations = GitOperations(appConfig.workspaceRoot, appConfig.baseBranch)
-    val gitHostClient =
-      if (github) GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor) else GitHostClient.stub
+    val gitHostClient = if (github) {
+      GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor)
+    } else {
+      logger.warn {
+        """Using stub client for git host. Pull Request management will not work correctly.
+        |Use --github flag to enable GitHub support. Other Platforms are not supported yet.
+        """.trimMargin()
+      }
+      GitHostClient.stub
+    }
     val bazelRulesExtractor = BazelRulesExtractor()
     val bazelUpdater = BazelUpdater()
-    val gitHubClient = (
+    val githubApi = (
       env["GITHUB_TOKEN"]
         ?.let(GitHub::connectUsingOAuth)
         ?: GitHub.connectAnonymously()
       )
-    val githubRulesResolver = GithubRulesResolver(gitHubClient)
+    val githubRulesResolver = GithubRulesResolver(githubApi)
     val fileFinder = FileFinder(appConfig.workspaceRoot)
 
     val dependencyKinds = listOf(

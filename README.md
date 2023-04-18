@@ -223,6 +223,7 @@ Read more about personal tokens [here](https://docs.github.com/en/authentication
 * Set `--github` flag - Bazel Steward now only works with GitHub as a platform. Without the flag, it will only push the branches, but is not able to check PR status or open/close them.
   * Set `GITHUB_TOKEN` env - necessary for PR management
   * Set `GITHUB_REPOSITORY` env to your repository location. Example value: `VirtusLab/bazel-steward` 
+  * Optionally set `GITHUB_API_URL` if you are not using the public GitHub. Default is `https://api.github.com`
 
 ### Command line arguments
 ```
