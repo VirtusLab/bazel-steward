@@ -1,8 +1,22 @@
 load("@rules_java//java:defs.bzl", "java_binary")
+load("@bazel_sonatype//:defs.bzl", "sonatype_java_export")
 
 java_binary(
     name = "app",
     main_class = "org.virtuslab.bazelsteward.app.Main",
+    visibility = ["//visibility:public"],
+    runtime_deps = [
+        "//app/src/main",
+    ],
+)
+
+sonatype_java_export(
+    name = "maven",
+    srcs = glob(["src/main/kotlin/**/*.kt"]),
+    maven_coordinates = "org.virtuslab:bazel-steward:0.0.0",
+    maven_profile = "org.virtuslab",
+    pom_template = "//tools/publish:pom-template.xml",
+    resources = glob(["src/main/resources/**"]),
     visibility = ["//visibility:public"],
     runtime_deps = [
         "//app/src/main",

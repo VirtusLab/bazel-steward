@@ -39,7 +39,7 @@ class BazelRulesExtractor {
 
   suspend fun extractCurrentRules(workspaceRoot: Path): List<RuleLibrary> =
     withContext(Dispatchers.IO) {
-      val dumpRepositoriesContent = javaClass.classLoader.getResource("dump_repositories.bzlignore")?.readText()
+      val dumpRepositoriesContent = javaClass.classLoader.getResource("dump_repositories.bzl")?.readText()
         ?: throw RuntimeException("Could not find dump_repositories template, which is required for detecting used bazel repositories")
       val tempFileForBzl = createTempFile(directory = workspaceRoot, suffix = ".bzl").toFile()
       tempFileForBzl.appendText(dumpRepositoriesContent)

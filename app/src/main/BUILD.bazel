@@ -1,8 +1,6 @@
 library(
     srcs = glob(["kotlin/**/*.kt"]),
-    resources = glob(
-        ["resources/**"],
-    ),
+    resources = glob(["resources/**"]),
     deps = [
         "//core",
         "//github",
