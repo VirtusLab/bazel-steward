@@ -63,7 +63,7 @@ data class App(
       val updateRules = updateRulesProvider.resolveForLibrary(it.key)
       updateLogic.selectUpdate(it.key, it.value, updateRules)
     }
-    logger.info { "UpdateSuggestions: " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
+    logger.info { "Update suggestions (${updateSuggestions.size}): " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
     return updateSuggestions
   }
 
