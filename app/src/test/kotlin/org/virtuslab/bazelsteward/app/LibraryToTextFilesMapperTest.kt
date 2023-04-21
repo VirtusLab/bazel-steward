@@ -17,6 +17,7 @@ import org.virtuslab.bazelsteward.fixture.loadRepoConfigFromResources
 import org.virtuslab.bazelsteward.fixture.prepareLocalWorkspace
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import java.nio.file.Path
+import java.time.Instant
 
 class LibraryToTextFilesMapperTest {
 
@@ -50,7 +51,7 @@ class LibraryToTextFilesMapperTest {
     val workspace = prepareWorkspace(tempDir)
     val library = RuleLibrary(
       ReleaseArtifact("", "", "", ""),
-      RuleVersion.create("", "", "5.3.0", date = null),
+      RuleVersion.create("", "", "5.3.0", date = Instant.MIN),
     )
 
     val result = testForDependencyKind(library, tempDir)

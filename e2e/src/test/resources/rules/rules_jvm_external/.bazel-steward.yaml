@@ -1,0 +1,3 @@
+    update-rules:
+      - dependencies: rules_jvm_external
+        pin: "exact:5.1"
