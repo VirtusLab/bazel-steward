@@ -2,8 +2,6 @@ package org.virtuslab.bazelsteward.bazel.rules
 
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.PathPattern
-import org.virtuslab.bazelsteward.core.common.UpdateRules
-import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
@@ -31,6 +29,4 @@ class BazelRulesDependencyKind(
   )
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(BazelRuleHeuristic)
-
-  override val defaultUpdateRules: UpdateRules = UpdateRules(bumpingStrategy = BumpingStrategy.LatestByDate)
 }

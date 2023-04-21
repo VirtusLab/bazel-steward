@@ -23,13 +23,41 @@ private val logger = KotlinLogging.logger { }
 
 class RepoConfigParser {
 
+  companion object {
+    private val pathCandidates = listOf(
+      ".bazel-steward.yaml",
+      "bazel-steward.yaml",
+      ".bazel-steward.yml",
+      "bazel-steward.yml",
+    )
+  }
+
   private val schema = loadSchema()
 
-  suspend fun load(path: Path): RepoConfig {
+  suspend fun load(path: Path?, repositoryRoot: Path, noInternalConfig: Boolean): RepoConfig {
+    val defaultPaths = pathCandidates.map { repositoryRoot.resolve(it) }
+    val userConfigPath = path ?: defaultPaths.firstOrNull { it.exists() }
+    if (noInternalConfig) {
+      return loadFromPath(userConfigPath)
+    } else {
+      val internalConfigContent = javaClass.classLoader.getResource("internal-config.yaml")?.readText()
+        ?: throw RuntimeException("Could not find internal-config.yaml file in resources")
+      val internalConfig = parse(internalConfigContent)
+      if (userConfigPath == null) return internalConfig
+      val userConfig = loadFromPath(userConfigPath)
+      return userConfig.withFallback(internalConfig)
+    }
+  }
+
+  suspend fun loadFromPath(path: Path?): RepoConfig {
     return withContext(Dispatchers.IO) {
       runCatching {
-        if (!path.exists()) return@withContext RepoConfig()
-        return@withContext parse(path.readText())
+        if (path?.exists() == true) {
+          logger.info { "Loading configuration from $path" }
+          return@withContext parse(path.readText())
+        } else {
+          return@withContext RepoConfig()
+        }
       }.getOrElse {
         logger.error { "Could not parse $path file." }
         throw it

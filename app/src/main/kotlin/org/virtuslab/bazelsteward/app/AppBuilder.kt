@@ -61,6 +61,11 @@ object AppBuilder {
       fullName = "config-path",
       description = "Path to the config file",
     )
+    val noInternalConfig by parser.option(
+      ArgType.Boolean,
+      fullName = "no-internal-config",
+      description = "Do not load internal default config",
+    ).default(false)
 
     parser.parse(args)
 
@@ -70,11 +75,9 @@ object AppBuilder {
       gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
     }
     val gitAuthor = runBlocking { gitClient.getAuthor() }
-    val configResolvedPath = configPath?.let { Path(it) } ?: repositoryRoot.resolve(".bazel-steward.yaml")
 
     val appConfig = AppConfig(
       repositoryRoot,
-      configResolvedPath,
       !noRemote,
       updateAllPullRequests,
       baseBranchName,
@@ -82,7 +85,7 @@ object AppBuilder {
     )
     logger.info { appConfig }
 
-    val repoConfig = runBlocking { RepoConfigParser().load(appConfig.configPath) }
+    val repoConfig = runBlocking { RepoConfigParser().load(configPath?.let { Path(it) }, repositoryRoot, noInternalConfig) }
     val mavenDataExtractor = MavenDataExtractor(appConfig.workspaceRoot)
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()

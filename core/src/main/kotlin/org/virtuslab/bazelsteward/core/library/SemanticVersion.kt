@@ -91,12 +91,19 @@ data class SemanticVersion(
       fun matchToSemanticVersion(regex: Regex): SemanticVersion? {
         return regex.matchEntire(value)?.let { matchResult ->
           val values = matchResult.groups as MatchNamedGroupCollection
+          fun extract(name: String): String? {
+            return try {
+              values[name]?.value
+            } catch (e: IllegalArgumentException) {
+              null
+            }
+          }
           SemanticVersion(
-            values["major"]?.value?.toIntOrNull() ?: 0,
-            values["minor"]?.value?.toIntOrNull() ?: 0,
-            values["patch"]?.value?.toIntOrNull() ?: 0,
-            values["preRelease"]?.value.orEmpty(),
-            values["buildMetaData"]?.value.orEmpty(),
+            extract("major")?.toIntOrNull() ?: 0,
+            extract("minor")?.toIntOrNull() ?: 0,
+            extract("patch")?.toIntOrNull() ?: 0,
+            extract("preRelease").orEmpty(),
+            extract("buildMetaData").orEmpty(),
           )
         }
       }

@@ -1,0 +1,7 @@
+update-rules:
+  - kinds: bazel-rules
+    dependencies: rules_scala
+    bumping: latest-by-date
+  - kinds: bazel-rules
+    dependencies: rules_jvm_external
+    versioning: 'regex:^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)$'

@@ -18,7 +18,16 @@ data class RepoConfig(
   val pullRequests: List<PullRequestsConfig> = emptyList(),
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   val postUpdateHooks: List<PostUpdateHooksConfig> = emptyList(),
-)
+) {
+  fun withFallback(fallback: RepoConfig): RepoConfig {
+    return RepoConfig(
+      updateRules = updateRules + fallback.updateRules,
+      searchPaths = searchPaths + fallback.searchPaths,
+      pullRequests = pullRequests + fallback.pullRequests,
+      postUpdateHooks = postUpdateHooks + fallback.postUpdateHooks,
+    )
+  }
+}
 
 data class UpdateRulesConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)

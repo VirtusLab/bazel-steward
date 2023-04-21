@@ -23,10 +23,10 @@ class PostUpdateHookProvider(
 
   companion object {
     val default = PostUpdateHookConfig(
-      emptyList(),
-      emptyList(),
-      HookRunFor.Commit,
-      "Post update hook",
+      commands = emptyList(),
+      filesToCommit = emptyList(),
+      runFor = HookRunFor.Commit,
+      commitMessage = "Post update hook",
     )
   }
 }
