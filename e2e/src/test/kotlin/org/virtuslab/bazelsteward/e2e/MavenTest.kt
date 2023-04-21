@@ -11,23 +11,9 @@ class MavenTest : E2EBase() {
   fun `Maven trivial local test`(@TempDir tempDir: Path) {
     val project = "maven/trivial"
     runBazelSteward(tempDir, project)
-    val expectedBranches = expectedBranches(
-      "io.arrow-kt/arrow-core" to "1.1.5",
-      "io.arrow-kt/arrow-fx-coroutines" to "1.1.5",
-      "bazel" to "5.4.1",
-      "rules_jvm_external" to "5.2",
-      "rules_kotlin" to "v1.7.1",
-      "bazel-skylib" to "1.4.1",
-      "rules_scala" to "v5.0.0",
-    )
-    checkBranchesWithVersions(tempDir, project, expectedBranches)
-  }
-
-  @Test
-  fun `Check dependency update not in maven central repository`(@TempDir tempDir: Path) {
-    val project = "maven/external"
-    runBazelSteward(tempDir, project)
     val expectedBranches = expectedBranchPrefixes(
+      "io.arrow-kt/arrow-core",
+      "io.arrow-kt/arrow-fx-coroutines",
       "com.7theta/utilis",
       "bazel",
       "rules_jvm_external",

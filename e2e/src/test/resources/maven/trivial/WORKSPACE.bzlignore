@@ -70,11 +70,13 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
+        "com.7theta:utilis:2.3.5",
         "io.arrow-kt:arrow-core:1.1.2",
         "io.arrow-kt:arrow-fx-coroutines:1.1.2",
     ],
     fetch_sources = False,
     repositories = [
         "https://repo1.maven.org/maven2",
+        "https://clojars.org/repo",
     ],
 )
