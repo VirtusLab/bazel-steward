@@ -12,6 +12,7 @@ import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.fixture.DependencyKindsFixture
 import org.virtuslab.bazelsteward.fixture.loadRepoConfigFromResources
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
+import java.time.Instant
 
 class SearchPatternProviderTest {
 
@@ -37,7 +38,7 @@ class SearchPatternProviderTest {
       val libraryIdURL = "https://github.com/aaa/aaa/archive/aaa.zip"
       val library = RuleLibrary(
         RuleLibraryId.from(libraryIdURL),
-        RuleVersion.create(libraryIdURL, "aaa", "1.0.0", date = null),
+        RuleVersion.create(libraryIdURL, "aaa", "1.0.0", date = Instant.MIN),
       )
 
       val result = searchPatternProvider.resolveForLibrary(library)

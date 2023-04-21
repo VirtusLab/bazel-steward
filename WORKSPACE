@@ -11,7 +11,7 @@ http_archive(
     name = "rules_jvm_external",
     sha256 = RULES_JVM_EXTERNAL_SHA,
     strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(RULES_JVM_EXTERNAL_TAG),
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/4.5.zip",
 )
 
 IO_BAZEL_KOTLIN_RULES_TAG = "v1.7.1"

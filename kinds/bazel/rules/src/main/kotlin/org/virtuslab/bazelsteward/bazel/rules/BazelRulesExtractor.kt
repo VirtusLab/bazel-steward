@@ -11,6 +11,7 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.common.CommandRunner
 import java.io.File
 import java.nio.file.Path
+import java.time.Instant
 import kotlin.io.path.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.createTempFile
@@ -93,7 +94,7 @@ class BazelRulesExtractor {
               .first { url -> url.startsWith("https://github.com/") }
               .let { url -> RuleLibraryId.from(url) }
           }
-          val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256, libraryId.tag, date = null)
+          val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256!!, libraryId.tag, date = Instant.MIN)
           RuleLibrary(libraryId, ruleVersion)
         }.also { result ->
           logger.info { "Found ${result.size} Bazel Rules. " }
