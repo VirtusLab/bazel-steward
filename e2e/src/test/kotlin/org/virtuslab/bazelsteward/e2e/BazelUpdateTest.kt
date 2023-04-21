@@ -25,7 +25,7 @@ class BazelUpdateTest : E2EBase() {
     runBazelStewardWith(tempDir, project) {
       it.withBazelVersionOnly()
     }
-    val expectedBranches = expectedBranches("bazel" to "5.4.0")
+    val expectedBranches = expectedBranches("bazel" to "5.4.1")
 
     checkBranchesWithVersions(tempDir, project, expectedBranches)
   }
@@ -36,7 +36,7 @@ class BazelUpdateTest : E2EBase() {
     runBazelStewardWith(tempDir, project) {
       it.withBazelVersionOnly()
     }
-    val expectedBranches = expectedBranches("bazel" to "5.4.0")
+    val expectedBranches = expectedBranches("bazel" to "5.4.1")
     checkBranchesWithVersions(tempDir, project, expectedBranches)
   }
 }

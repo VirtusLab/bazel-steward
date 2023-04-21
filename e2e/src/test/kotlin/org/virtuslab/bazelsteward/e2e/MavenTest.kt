@@ -14,7 +14,7 @@ class MavenTest : E2EBase() {
     val expectedBranches = expectedBranches(
       "io.arrow-kt/arrow-core" to "1.1.5",
       "io.arrow-kt/arrow-fx-coroutines" to "1.1.5",
-      "bazel" to "5.4.0",
+      "bazel" to "5.4.1",
       "rules_jvm_external" to "5.2",
       "rules_kotlin" to "v1.7.1",
       "bazel-skylib" to "1.4.1",
