@@ -76,6 +76,9 @@ pull-requests:
     kinds: maven
   - 
     title: "[maintenance] Updated ${dependencyId}"
+    limits:
+      max-open: 5
+      max-updates-per-run: 2
 post-update-hooks:
   - kinds: maven
     commands:
@@ -129,7 +132,10 @@ When the rule is found, it can configure for a dependency the following things:
     Available variables are `dependencyId`, `versionFrom`, `versionTo`, and for maven dependencies only: `group` and `artifact`.
   * `body` (string) <br/>
     Overrides template used for generating pull request body. Syntax and variables are the same as for the title.
-
+  * `limits` (object) <br/>
+      - `max-open` (number): maximum allowed number of open pull requests in the repository. Useful if you have 100 outdated dependencies and you would like to have just 10 open, merge them in your own pace, and Bazel Steward will add new pull requests up to this limit.
+      - max-updates-per-run (number): maximum number of updated pull requests per Bazel Steward run. It includes both creating new PRs and resolving conflicts on existing ones. This is useful if your CI that runs on push is costly and you would like to limit the runs.
+      
 * In `post-update-hooks` section:
   * `commands` (list of strings) <br/>
     List of commands to run after applying an update. Commands are run separately under `sh -c`
