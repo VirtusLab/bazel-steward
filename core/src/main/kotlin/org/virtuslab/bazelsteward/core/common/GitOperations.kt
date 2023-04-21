@@ -35,7 +35,7 @@ class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
     }
   }
 
-  suspend fun createBranchWithChange(branch: GitBranch, commits: List<CommitRequest>) {
+  suspend fun createBranchWithCommits(branch: GitBranch, commits: List<CommitRequest>) {
     git.checkout(branch.name, newBranch = true)
     commits.forEach { commit ->
       commit.changes.groupBy { it.file }.forEach { (path, changes) ->
@@ -59,8 +59,8 @@ class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
     git.commit(commitMessage)
   }
 
-  suspend fun squashLastTwoCommits(newMessage: String) {
-    git.run("reset", "--soft", "HEAD~2")
-    git.commit(newMessage)
+  suspend fun squashLastTwoCommits() {
+    git.run("reset", "--soft", "HEAD~1")
+    git.amend()
   }
 }

@@ -29,6 +29,10 @@ class GitClient(private val repositoryRoot: Path) {
     run("commit", quiet, "-m", message)
   }
 
+  suspend fun amend() {
+    run("commit", quiet, "--amend", "--no-edit")
+  }
+
   suspend fun push(branch: String? = null, remote: String = "origin", force: Boolean = false) {
     val args = mutableListOf("push", quiet)
     if (branch != null) {

@@ -36,6 +36,9 @@ pull-requests:
     labels: "maintenance"
     kinds: maven
   - title: "Updated ${dependencyId}"
+    limits:
+      max-open: 5
+      max-updates-per-run: 2
 post-update-hooks:
   - kinds: maven
     dependencies: "com.google:*"

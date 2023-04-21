@@ -12,7 +12,7 @@ import org.virtuslab.bazelsteward.bazel.rules.RulesResolver
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
-import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.GitPlatform
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.Version
@@ -179,13 +179,12 @@ open class E2EBase {
     )
   }
 
-  protected fun App.withGitHostClient(gitHostClient: GitHostClient, pushToRemote: Boolean = true): App {
+  protected fun App.withGitHostClient(gitPlatform: GitPlatform, pushToRemote: Boolean = true): App {
     return this.copy(
       pullRequestManager = this.pullRequestManager.copy(
-        gitHostClient,
+        gitPlatform,
         this.gitOperations,
         pushToRemote = pushToRemote,
-        updateAllPullRequests = false,
       ),
     )
   }
@@ -201,7 +200,7 @@ open class E2EBase {
     )
   }
 
-  protected fun App.withPRStatus(status: GitHostClient.PrStatus): App {
+  protected fun App.withPRStatus(status: GitPlatform.PrStatus): App {
     return this.withGitHostClient(mockGitHostClientWithStatus(status))
   }
 
@@ -212,8 +211,8 @@ open class E2EBase {
     }
   }
 
-  protected fun mockGitHostClientWithStatus(status: GitHostClient.PrStatus): CountingGitHostClient {
-    return object : CountingGitHostClient() {
+  protected fun mockGitHostClientWithStatus(status: GitPlatform.PrStatus): MockGitPlatform {
+    return object : MockGitPlatform() {
       override fun checkPrStatus(branch: GitBranch) = status
     }
   }

@@ -9,6 +9,7 @@ import mu.KotlinLogging
 import org.kohsuke.github.GitHub
 import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
+import org.virtuslab.bazelsteward.app.provider.PullRequestsLimitsProvider
 import org.virtuslab.bazelsteward.app.provider.SearchPatternProvider
 import org.virtuslab.bazelsteward.app.provider.UpdateRulesProvider
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
@@ -19,12 +20,12 @@ import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.config.repo.RepoConfigParser
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.FileFinder
-import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.GitPlatform
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
-import org.virtuslab.bazelsteward.github.GithubClient
+import org.virtuslab.bazelsteward.github.GithubPlatform
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenRepository
@@ -63,7 +64,7 @@ object AppBuilder {
 
     parser.parse(args)
 
-    val repositoryRoot = Path(repository).let { if (github) GithubClient.getRepoPath(env, it) else it }
+    val repositoryRoot = Path(repository).let { if (github) GithubPlatform.resolveRepoPath(env, it) else it }
     val gitClient = GitClient(repositoryRoot)
     val baseBranchName = baseBranch ?: runBlocking {
       gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
@@ -86,15 +87,15 @@ object AppBuilder {
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()
     val gitOperations = GitOperations(appConfig.workspaceRoot, appConfig.baseBranch)
-    val gitHostClient = if (github) {
-      GithubClient.getClient(env, appConfig.baseBranch, appConfig.gitAuthor)
+    val gitPlatform = if (github) {
+      GithubPlatform.create(env, appConfig.baseBranch, appConfig.gitAuthor)
     } else {
       logger.warn {
         """Using stub client for git host. Pull Request management will not work correctly.
         |Use --github flag to enable GitHub support. Other Platforms are not supported yet.
         """.trimMargin()
       }
-      GitHostClient.stub
+      GitPlatform.stub
     }
     val bazelRulesExtractor = BazelRulesExtractor()
     val bazelUpdater = BazelUpdater()
@@ -124,14 +125,19 @@ object AppBuilder {
       fileFinder,
     )
 
+    val pullRequestsLimitsProvider = PullRequestsLimitsProvider(
+      repoConfig.pullRequests,
+      gitPlatform,
+      appConfig.updateAllPullRequests,
+    )
     val pullRequestSuggester = PullRequestSuggester(pullRequestConfigProvider)
     val pullRequestManager = PullRequestManager(
-      gitHostClient,
+      gitPlatform,
       gitOperations,
       postUpdateHookProvider,
       appConfig.workspaceRoot,
       appConfig.pushToRemote,
-      appConfig.updateAllPullRequests,
+      pullRequestsLimitsProvider,
     )
 
     return App(

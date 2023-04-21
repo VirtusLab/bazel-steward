@@ -88,6 +88,17 @@
             "items": {
               "type": "string"
             }
+          },
+          "limits": {
+            "type": ["object", "null"],
+            "properties": {
+              "maxOpen": {
+                "type": ["integer", "null"]
+              },
+              "maxUpdatesPerRun": {
+                "type": ["integer", "null"]
+              }
+            }
           }
         }
       }
