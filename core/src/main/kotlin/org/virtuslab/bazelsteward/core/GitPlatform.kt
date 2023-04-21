@@ -9,7 +9,7 @@ data class NewPullRequest(
   val labels: List<String>,
 )
 
-interface GitHostClient {
+interface GitPlatform {
   fun checkPrStatus(branch: GitBranch): PrStatus
   fun openNewPr(pr: NewPullRequest): PullRequest
   fun getOpenPrs(): List<PullRequest>
@@ -21,7 +21,7 @@ interface GitHostClient {
   }
 
   companion object {
-    val stub = object : GitHostClient {
+    val stub = object : GitPlatform {
       override fun checkPrStatus(branch: GitBranch) = PrStatus.NONE
       override fun openNewPr(pr: NewPullRequest) = PullRequest(pr.branch)
       override fun getOpenPrs(): List<PullRequest> = emptyList()

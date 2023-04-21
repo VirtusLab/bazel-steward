@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
-import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
+import org.virtuslab.bazelsteward.core.GitPlatform.PrStatus
 import org.virtuslab.bazelsteward.core.common.GitClient
 
 /**
@@ -32,7 +32,7 @@ class GithubTest {
 
     val env = Environment.system
     val gitAuthor = GitClient.GitAuthor("github-actions[bot]", "email@github.com")
-    val gitHostClient = GithubClient.getClient(env, baseBranch = "base", gitAuthor)
+    val gitHostClient = GithubPlatform.create(env, baseBranch = "base", gitAuthor)
 
     branchToPrStatus.forEach {
       val branch = GitBranch(it.first)

@@ -105,7 +105,10 @@ class RepoConfigurationTest {
           labels = listOf("maintenance"),
           kinds = listOf("maven"),
         ),
-        PullRequestsConfig(title = "Updated \${dependencyId}"),
+        PullRequestsConfig(
+          title = "Updated \${dependencyId}",
+          limits = PullRequestLimits(maxOpen = 5, maxUpdatesPerRun = 2),
+        ),
       ),
       listOf(
         PostUpdateHooksConfig(

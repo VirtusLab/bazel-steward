@@ -1,11 +1,11 @@
 package org.virtuslab.bazelsteward.e2e.fixture
 
 import org.virtuslab.bazelsteward.core.GitBranch
-import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.GitPlatform
 import org.virtuslab.bazelsteward.core.NewPullRequest
 import org.virtuslab.bazelsteward.core.PullRequest
 
-abstract class CountingGitHostClient : GitHostClient {
+abstract class MockGitPlatform : GitPlatform {
   val openNewPrCalls: MutableList<GitBranch> = ArrayList(10)
   val closeOldPrsCalls: MutableList<GitBranch> = ArrayList(10)
 
@@ -22,5 +22,5 @@ abstract class CountingGitHostClient : GitHostClient {
     return openNewPrCalls.map { PullRequest(it) }
   }
 
-  override suspend fun onPrChange(pr: PullRequest, prStatusBefore: GitHostClient.PrStatus) {}
+  override suspend fun onPrChange(pr: PullRequest, prStatusBefore: GitPlatform.PrStatus) {}
 }

@@ -8,8 +8,8 @@ import org.kohsuke.github.GHRepository
 import org.kohsuke.github.GitHubBuilder
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
-import org.virtuslab.bazelsteward.core.GitHostClient
-import org.virtuslab.bazelsteward.core.GitHostClient.PrStatus
+import org.virtuslab.bazelsteward.core.GitPlatform
+import org.virtuslab.bazelsteward.core.GitPlatform.PrStatus
 import org.virtuslab.bazelsteward.core.NewPullRequest
 import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitClient
@@ -18,15 +18,14 @@ import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
 
-class GithubClient private constructor(
+class GithubPlatform private constructor(
   private val url: String,
   private val baseBranch: String,
   private val gitAuthor: GitClient.GitAuthor,
   private val repository: String,
   token: String,
   personalToken: String? = null,
-
-) : GitHostClient {
+) : GitPlatform {
   private val ghRepository = createClient(token)
   private val ghPatRepository = personalToken?.let { createClient(it) }
 
@@ -86,7 +85,7 @@ class GithubClient private constructor(
       PrStatus.MERGED
     } else if (pr.state == GHIssueState.CLOSED) {
       PrStatus.CLOSED
-    } else if (pr.listCommits().toList().any { it.commit.author.name != gitAuthor.name }) {
+    } else if (pr.listCommits().any { it.commit.author.name != gitAuthor.name }) {
       PrStatus.OPEN_MODIFIED
     } else {
       when (pr.mergeable) {
@@ -103,15 +102,15 @@ class GithubClient private constructor(
   }
 
   companion object {
-    fun getClient(env: Environment, baseBranch: String, gitAuthor: GitClient.GitAuthor): GithubClient {
+    fun create(env: Environment, baseBranch: String, gitAuthor: GitClient.GitAuthor): GithubPlatform {
       val url = env.getOrDefault("GITHUB_API_URL", "https://api.github.com")
       val repository = env.getOrThrow("GITHUB_REPOSITORY")
       val token = env.getOrThrow("GITHUB_TOKEN")
       val personalToken = env["PERSONAL_TOKEN"].let { if (it.isNullOrBlank()) null else it }
-      return GithubClient(url, baseBranch, gitAuthor, repository, token, personalToken)
+      return GithubPlatform(url, baseBranch, gitAuthor, repository, token, personalToken)
     }
 
-    fun getRepoPath(env: Environment, fallback: Path): Path {
+    fun resolveRepoPath(env: Environment, fallback: Path): Path {
       return env["GITHUB_WORKSPACE"]?.let { Path(it) } ?: fallback
     }
   }

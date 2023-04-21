@@ -44,6 +44,11 @@ data class SearchPatternConfig(
   val pathPatterns: List<PathPattern> = emptyList(),
 ) : DependencyFilter
 
+data class PullRequestLimits(
+  val maxOpen: Int? = null,
+  val maxUpdatesPerRun: Int? = null,
+)
+
 data class PullRequestsConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   @JsonDeserialize(using = ListOrItemDeserializer::class)
@@ -56,6 +61,7 @@ data class PullRequestsConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   @JsonDeserialize(using = ListOrItemDeserializer::class)
   val labels: List<String> = emptyList(),
+  val limits: PullRequestLimits? = null,
 ) : DependencyFilter
 
 data class PostUpdateHooksConfig(

@@ -4,7 +4,7 @@ import io.kotest.common.runBlocking
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.GitPlatform
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.e2e.fixture.E2EBase
 import java.nio.file.Path
@@ -17,30 +17,30 @@ class PrManagementTest : E2EBase() {
     val project = "maven/updating-pr"
     val workspaceRoot = prepareWorkspace(tempDir, project)
 
-    val gitHostClient = mockGitHostClientWithStatus(GitHostClient.PrStatus.NONE)
+    val gitPlatform = mockGitHostClientWithStatus(GitPlatform.PrStatus.NONE)
     val libraryName = "io.arrow-kt/arrow-core"
 
     val v1 = "1.1.0"
     runBazelStewardWith(workspaceRoot) {
-      it.withGitHostClient(gitHostClient).withMavenOnly(versions = listOf(v1))
+      it.withGitHostClient(gitPlatform).withMavenOnly(versions = listOf(v1))
     }
 
     val branchV1 = branch(libraryName, v1)
     checkBranchesWithVersions(tempDir, project, listOf(branchV1, masterRef))
 
-    Assertions.assertThat(gitHostClient.openNewPrCalls[0].name).isEqualTo(branchV1.removePrefix(heads))
-    Assertions.assertThat(gitHostClient.closeOldPrsCalls).isEmpty()
+    Assertions.assertThat(gitPlatform.openNewPrCalls[0].name).isEqualTo(branchV1.removePrefix(heads))
+    Assertions.assertThat(gitPlatform.closeOldPrsCalls).isEmpty()
 
     val v2 = "1.1.3"
     runBazelStewardWith(workspaceRoot) {
-      it.withGitHostClient(gitHostClient).withMavenOnly(versions = listOf(v2))
+      it.withGitHostClient(gitPlatform).withMavenOnly(versions = listOf(v2))
     }
 
     val branchV2 = branch(libraryName, v2)
     checkBranchesWithVersions(tempDir, project, listOf(branchV1, branchV2, masterRef))
 
-    Assertions.assertThat(gitHostClient.openNewPrCalls[1].name).isEqualTo(branchV2.removePrefix(heads))
-    Assertions.assertThat(gitHostClient.closeOldPrsCalls[0].name).isEqualTo(branchV1.removePrefix(heads))
+    Assertions.assertThat(gitPlatform.openNewPrCalls[1].name).isEqualTo(branchV2.removePrefix(heads))
+    Assertions.assertThat(gitPlatform.closeOldPrsCalls[0].name).isEqualTo(branchV1.removePrefix(heads))
   }
 
   @Test
@@ -70,14 +70,14 @@ class PrManagementTest : E2EBase() {
       localGit.push()
     }
 
-    val gitHostClient = mockGitHostClientWithStatus(GitHostClient.PrStatus.OPEN_NOT_MERGEABLE)
+    val gitPlatform = mockGitHostClientWithStatus(GitPlatform.PrStatus.OPEN_NOT_MERGEABLE)
 
     runBazelStewardWith(workspaceRoot) {
-      it.withGitHostClient(gitHostClient).withMavenOnly(versions = listOf(v1))
+      it.withGitHostClient(gitPlatform).withMavenOnly(versions = listOf(v1))
     }
 
-    Assertions.assertThat(gitHostClient.openNewPrCalls).hasSize(0)
-    Assertions.assertThat(gitHostClient.closeOldPrsCalls).hasSize(0)
+    Assertions.assertThat(gitPlatform.openNewPrCalls).hasSize(0)
+    Assertions.assertThat(gitPlatform.closeOldPrsCalls).hasSize(0)
 
     checkBranchesWithVersions(tempDir, project, listOf(branchV1, masterRef))
 
@@ -109,7 +109,7 @@ class PrManagementTest : E2EBase() {
     }
 
     runBazelStewardWith(workspaceRoot) {
-      it.withPRStatus(GitHostClient.PrStatus.OPEN_MODIFIED).withMavenOnly(versions = listOf(v1))
+      it.withPRStatus(GitPlatform.PrStatus.OPEN_MODIFIED).withMavenOnly(versions = listOf(v1))
     }
 
     checkBranchesWithVersions(tempDir, project, listOf(branchV1, masterRef), skipLocal = true)

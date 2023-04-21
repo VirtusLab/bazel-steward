@@ -3,7 +3,7 @@ package org.virtuslab.bazelsteward.e2e.rules.fixture
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.bazel.rules.RuleVersion
-import org.virtuslab.bazelsteward.core.GitHostClient
+import org.virtuslab.bazelsteward.core.GitPlatform
 import org.virtuslab.bazelsteward.e2e.fixture.E2EBase
 import java.nio.file.Path
 import java.time.Instant
@@ -20,7 +20,7 @@ open class BazelRulesHeuristicUpdate(
   fun `project with specific rules`(@TempDir tempDir: Path) {
     val workspace = prepareWorkspace(tempDir, project, extraDirs = listOf("rules/base"))
 
-    val gitHostClient = mockGitHostClientWithStatus(GitHostClient.PrStatus.NONE)
+    val gitPlatform = mockGitHostClientWithStatus(GitPlatform.PrStatus.NONE)
     val githubRulesResolverMock = GithubRulesResolverMock(
       RuleVersion.create(
         expectedUrl,
@@ -32,7 +32,7 @@ open class BazelRulesHeuristicUpdate(
 
     runBazelStewardWith(workspace) {
       it.withGitHubRulesResolver(githubRulesResolverMock)
-        .withGitHostClient(gitHostClient, pushToRemote = false)
+        .withGitHostClient(gitPlatform, pushToRemote = false)
         .withRulesOnly()
     }
 
