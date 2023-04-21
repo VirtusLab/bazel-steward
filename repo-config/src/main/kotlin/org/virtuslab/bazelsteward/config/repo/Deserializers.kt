@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.TextNode
+import net.pearx.kasechange.toPascalCase
 import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.HookRunFor
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
@@ -55,8 +56,7 @@ class PinningStrategyDeserializer : StdDeserializer<PinningStrategy?>(PinningStr
 class BumpingStrategyDeserializer : StdDeserializer<BumpingStrategy?>(BumpingStrategy::class.java) {
   override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): BumpingStrategy? {
     return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
-      val str = fieldValue.lowercase()
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+      val str = fieldValue.toPascalCase()
       BumpingStrategy.valueOf(str)
     }
   }

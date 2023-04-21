@@ -24,7 +24,7 @@ class RepoConfigurationTest {
           "update-rules[0].dependenciess: is not defined in the schema and the schema does not allow additional properties",
           "update-rules[1].versioning: does not have a value in the enumeration [loose, semver]",
           "update-rules[1].versioning: does not match the regex pattern ^regex:",
-          "update-rules[1].bumping: does not have a value in the enumeration [default, latest]",
+          "update-rules[1].bumping: does not have a value in the enumeration [default, latest, minor, latest-by-date]",
           "update-rules[2].kinds[0]: integer found, string expected",
         ).joinToString(System.lineSeparator()),
       )

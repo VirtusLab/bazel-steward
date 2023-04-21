@@ -27,7 +27,7 @@
           },
           "bumping": {
             "type": ["string", "null"],
-            "enum": ["default", "latest"]
+            "enum": ["default", "latest", "minor", "latest-by-date"]
           }
         },
         "anyOf": ["versioning", "bumping", "pin", "kinds", "dependencies"],
