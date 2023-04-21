@@ -13,9 +13,9 @@ open class PullRequestConfigProvider(
 
   open fun resolveForLibrary(library: Library): PullRequestConfig {
     val filter = applier.forLibrary(library)
-    val title = filter.findNotNull { it.title }?.title ?: default.titleTemplate
-    val body = filter.findNotNull { it.body }?.body ?: default.bodyTemplate
-    val tags = filter.findNotNull { it.labels }?.labels ?: default.labels
+    val title = filter.findNotNullOrDefault(default.titleTemplate) { it.title }
+    val body = filter.findNotNullOrDefault(default.bodyTemplate) { it.body }
+    val tags = filter.findNotNullOrDefault(default.labels) { it.labels }
     return PullRequestConfig(title, body, tags)
   }
 
