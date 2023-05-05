@@ -10,15 +10,21 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
   override val name: String = "bazel-rule-default"
 
   private class ReplaceRequest(
-    current: String,
+    private val regexes: List<Regex>,
     val suggested: String,
-    forbiddenSurrounding: String? = null,
   ) {
-    val regex = if (forbiddenSurrounding != null) {
-      """(?<!$forbiddenSurrounding)(${Regex.escape(current)})(?!$forbiddenSurrounding)""".toRegex()
-    } else {
-      """(${Regex.escape(current)})""".toRegex()
-    }
+    constructor(current: String, suggested: String, forbiddenSurrounding: String? = null) : this(
+      listOf(
+        if (forbiddenSurrounding != null) {
+          """(?<!$forbiddenSurrounding)(${Regex.escape(current)})(?!$forbiddenSurrounding)""".toRegex()
+        } else {
+          """(${Regex.escape(current)})""".toRegex()
+        },
+      ),
+      suggested,
+    )
+
+    fun allMatches(content: String): List<MatchResult> = regexes.flatMap { it.findAll(content).toList() }
   }
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
@@ -35,13 +41,19 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
 
       val replaceRequests = listOf(
         ReplaceRequest(currentUrl, suggestedUrl),
-        ReplaceRequest(currentSha, suggestedSha, "[a-z0-9]"),
-        ReplaceRequest(currentVersion, suggestedVersion, "[0-9]"),
+        ReplaceRequest(currentSha, suggestedSha, forbiddenSurrounding = "[a-z0-9]"),
+        ReplaceRequest(
+          listOf(
+            """(?<=")(${Regex.escape(currentVersion)})(?=")""".toRegex(),
+            """(?<![0-9]|[0-9]\.)(${Regex.escape(currentVersion)})(?="|\.tar\.gz|\.tgz|\.tar|\.zip)""".toRegex(),
+          ),
+          suggestedVersion,
+        ),
       )
 
       val groupedChanges = files.map { file ->
         replaceRequests.map { request ->
-          val matches = request.regex.findAll(file.content)
+          val matches = request.allMatches(file.content)
           matches.mapNotNull { match ->
             match.groups.first()?.range?.let { matchRange ->
               FileChange(

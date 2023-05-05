@@ -10,3 +10,15 @@ http_archive(
     strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
     url = "https://github.com/bazelbuild/rules_jvm_external/archive/4.5.zip",
 )
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+        "net.java.dev.jna:jna:4.5.2",
+        "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.5",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
