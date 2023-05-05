@@ -112,8 +112,8 @@ object AppBuilder {
 
     val dependencyKinds = listOf(
       BazelVersionDependencyKind(bazelUpdater),
-      MavenDependencyKind(mavenDataExtractor, mavenRepository),
       BazelRulesDependencyKind(bazelRulesExtractor, githubRulesResolver),
+      MavenDependencyKind(mavenDataExtractor, mavenRepository),
     )
 
     val libraryUpdateResolver = LibraryUpdateResolver()
