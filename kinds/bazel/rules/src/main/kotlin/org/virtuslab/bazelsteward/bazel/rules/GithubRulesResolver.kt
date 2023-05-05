@@ -23,8 +23,7 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
   }
 
   private fun toVersion(ruleId: RuleLibraryId, release: GHRelease): RuleVersion {
-    val sha = sha256Regex.findAll(release.body).map { it.value }.singleOrNull()
-    return RuleVersion.create(release.tagName, release.published_at.toInstant()) { resolveDetails(ruleId, release, sha) }
+    return RuleVersion.create(release.tagName, release.published_at.toInstant()) { resolveDetails(ruleId, release) }
   }
 
   private class RuleDetailsCandidate(
@@ -37,7 +36,9 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
     fun toDetails() = RuleVersion.Details(sha256, url)
   }
 
-  private fun resolveDetails(ruleId: RuleLibraryId, release: GHRelease, sha256: String?): RuleVersion.Details {
+  private fun resolveDetails(ruleId: RuleLibraryId, release: GHRelease): RuleVersion.Details {
+    val sha256 = release.body?.let { body -> sha256Regex.findAll(body).map { it.value }.singleOrNull() }
+
     val defaultCandidate = candidateByNameReplacement(ruleId, release)
 
     if (defaultCandidate.isUrlAccessible) {
