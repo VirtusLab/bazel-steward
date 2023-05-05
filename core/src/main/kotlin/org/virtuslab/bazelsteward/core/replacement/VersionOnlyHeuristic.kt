@@ -9,7 +9,7 @@ object VersionOnlyHeuristic : VersionReplacementHeuristic {
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
     val currentVersion = updateSuggestion.currentLibrary.version.value
-    val regex = Regex(Regex.escape(currentVersion))
+    val regex = Regex.escape(currentVersion).toRegex()
     val matchResult = files.firstNotNullOfOrNull { f ->
       regex.find(f.content)?.let {
         MatchedText(it, f.path)

@@ -3,7 +3,6 @@ package org.virtuslab.bazelsteward.bazel.rules
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,8 +22,8 @@ private val logger = KotlinLogging.logger {}
 
 class BazelRulesExtractor {
 
-  private val yamlReader: ObjectMapper by lazy {
-    ObjectMapper(YAMLFactory()).apply { registerModule(KotlinModule.Builder().build()) }
+  private val jsonReader: ObjectMapper by lazy {
+    ObjectMapper().apply { registerModule(KotlinModule.Builder().build()) }
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -40,69 +39,85 @@ class BazelRulesExtractor {
 
   suspend fun extractCurrentRules(workspaceRoot: Path): List<RuleLibrary> =
     withContext(Dispatchers.IO) {
-      val dumpRepositoriesContent = javaClass.classLoader.getResource("dump_repositories.bzl")?.readText()
-        ?: throw RuntimeException("Could not find dump_repositories template, which is required for detecting used bazel repositories")
-      val tempFileForBzl = createTempFile(directory = workspaceRoot, suffix = ".bzl").toFile()
-      tempFileForBzl.appendText(dumpRepositoriesContent)
+      val resultFilePath = dumpRulesToJson(workspaceRoot)
+      val repositories = parseJson(resultFilePath)
 
-      val workspaceFilePath = listOf("WORKSPACE.bazel", "WORKSPACE")
-        .map { workspaceRoot.resolve(it) }
-        .find { it.exists() } ?: throw RuntimeException("Could not find workspace file in $workspaceRoot")
+      repositories
+        .filter { isUserDeclaredHttpArchive(it) }
+        .mapNotNull { toRuleLibrary(it) }
+        .also { logResult(it) }
+    }
 
-      val originalContent = workspaceFilePath.readText()
-      workspaceFilePath.appendText(
-        """
+  private suspend fun dumpRulesToJson(workspaceRoot: Path): Path {
+    val dumpRepositoriesContent = javaClass.classLoader.getResource("dump_repositories.bzl")?.readText()
+      ?: throw RuntimeException("Could not find dump_repositories template, which is required for detecting used bazel repositories")
+    val tempFileForBzl = createTempFile(directory = workspaceRoot, suffix = ".bzl").toFile()
+    tempFileForBzl.appendText(dumpRepositoriesContent)
+
+    val workspaceFilePath = listOf("WORKSPACE.bazel", "WORKSPACE")
+      .map { workspaceRoot.resolve(it) }
+      .find { it.exists() } ?: throw RuntimeException("Could not find workspace file in $workspaceRoot")
+
+    val originalContent = workspaceFilePath.readText()
+    workspaceFilePath.appendText(
+      """
         |load("${tempFileForBzl.name}", "dump_all_repositories", "repositories_as_json")
         |dump_all_repositories(
         |    name = "all_external_repositories",
         |    repositories_json = repositories_as_json()
         |)
-        """.trimMargin(),
-      )
-      // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
-      CommandRunner.run(workspaceRoot, "bazel", "build", "@all_external_repositories//:result.json")
-      workspaceFilePath.writeText(originalContent)
-      deleteFile(tempFileForBzl)
-      val bazelPath = CommandRunner.run(workspaceRoot, "bazel", "info", "output_base").trim()
-      val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
-      if (!resultFilePath.exists()) {
-        throw RuntimeException("Failed to find a file: $resultFilePath")
-      }
-
-      val yamlNode = yamlReader.readTree(resultFilePath.toFile())
-      val repositories: List<Repository> = yamlNode.elements().asSequence().toList()
-        .mapNotNull {
-          try {
-            yamlReader.convertValue(it, object : TypeReference<Repository>() {})
-          } catch (e: Exception) {
-            logger.warn { e.message }
-            null
-          }
-        }
-
-      repositories
-        .filter {
-          it.kind == "http_archive" &&
-            it.generator_function.isEmpty() &&
-            (!it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()) &&
-            !it.sha256.isNullOrEmpty()
-        }.map {
-          val libraryId = if (!it.url.isNullOrEmpty()) {
-            RuleLibraryId.from(it.url)
-          } else {
-            it.urls!!
-              .first { url -> url.startsWith("https://github.com/") }
-              .let { url -> RuleLibraryId.from(url) }
-          }
-          val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256!!, libraryId.tag, date = Instant.MIN)
-          RuleLibrary(libraryId, ruleVersion)
-        }.also { result ->
-          logger.info { "Found ${result.size} Bazel Rules. " }
-          if (result.isNotEmpty()) {
-            logger.info { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.id.name}:${it.version.tag}" }}" }
-          }
-        }
+      """.trimMargin(),
+    )
+    // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
+    CommandRunner.run(workspaceRoot, "bazel", "build", "@all_external_repositories//:result.json")
+    workspaceFilePath.writeText(originalContent)
+    deleteFile(tempFileForBzl)
+    val bazelPath = CommandRunner.run(workspaceRoot, "bazel", "info", "output_base").trim()
+    val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
+    if (!resultFilePath.exists()) {
+      throw RuntimeException("Failed to find a file: $resultFilePath")
     }
+    return resultFilePath
+  }
+
+  private fun parseJson(path: Path): List<Repository> {
+    return jsonReader.readTree(path.toFile()).elements().asSequence()
+      .mapNotNull {
+        try {
+          jsonReader.convertValue(it, object : TypeReference<Repository>() {})
+        } catch (e: Exception) {
+          logger.warn { e.message }
+          null
+        }
+      }.toList()
+  }
+
+  private fun isUserDeclaredHttpArchive(it: Repository): Boolean {
+    val isUserDeclared = it.generator_function.isEmpty()
+    val hasUrl = !it.url.isNullOrEmpty() || !it.urls.isNullOrEmpty()
+    val hasChecksum = !it.sha256.isNullOrEmpty()
+    return it.kind == "http_archive" && isUserDeclared && hasUrl && hasChecksum
+  }
+
+  private fun toRuleLibrary(it: Repository): RuleLibrary? {
+    val urls = if (it.url.isNullOrEmpty()) it.urls!! else listOf(it.url)
+    val libraryId = urls.firstNotNullOfOrNull { runCatching { RuleLibraryId.from(it) }.getOrNull() }
+
+    if (libraryId == null) {
+      logger.warn { "Could not parse any of: $urls. Bazel Steward only supports https://github.com/ URLs." }
+      return null
+    }
+
+    val ruleVersion = RuleVersion.create(libraryId.downloadUrl, it.sha256!!, libraryId.tag, date = Instant.MIN)
+    return RuleLibrary(libraryId, ruleVersion)
+  }
+
+  private fun logResult(result: List<RuleLibrary>) {
+    logger.info { "Found ${result.size} Bazel Rules. " }
+    if (result.isNotEmpty()) {
+      logger.info { "Bazel Rules found: ${result.joinToString(separator = ", ") { "${it.id.name}:${it.version.tag}" }}" }
+    }
+  }
 
   private fun deleteFile(file: File) {
     runCatching {
