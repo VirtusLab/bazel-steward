@@ -11,9 +11,7 @@ class BazelUpdateTest : E2EBase() {
   @Test
   fun `Project without Bazel version`(@TempDir tempDir: Path) {
     val project = "bazel/trivial"
-    runBazelStewardWith(tempDir, project) {
-      it.withBazelVersionOnly()
-    }
+    runBazelSteward(tempDir, project)
     val expectedBranches = expectedBranches()
 
     checkBranchesWithVersions(tempDir, project, expectedBranches)
@@ -22,9 +20,7 @@ class BazelUpdateTest : E2EBase() {
   @Test
   fun `Project with Bazel version in bazeliskrc file`(@TempDir tempDir: Path) {
     val project = "bazel/bazeliskrc"
-    runBazelStewardWith(tempDir, project) {
-      it.withBazelVersionOnly()
-    }
+    runBazelSteward(tempDir, project)
     val expectedBranches = expectedBranches("bazel" to "5.4.1")
 
     checkBranchesWithVersions(tempDir, project, expectedBranches)
@@ -33,9 +29,7 @@ class BazelUpdateTest : E2EBase() {
   @Test
   fun `Project without dependencies`(@TempDir tempDir: Path) {
     val project = "bazel/bazelOnly"
-    runBazelStewardWith(tempDir, project) {
-      it.withBazelVersionOnly()
-    }
+    runBazelSteward(tempDir, project)
     val expectedBranches = expectedBranches("bazel" to "5.4.1")
     checkBranchesWithVersions(tempDir, project, expectedBranches)
   }

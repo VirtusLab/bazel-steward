@@ -27,10 +27,6 @@ class DependencyFilterApplier<T : DependencyFilter>(
         ?: filteredConfigs.firstOrNull { it.dependencies.isEmpty() }
     }
 
-    fun findNotNull(getter: (T) -> Any?): T? {
-      return find { getter(it) != null }
-    }
-
     fun <R> findNotNullOrDefault(default: R, getter: (T) -> R?): R {
       return find { getter(it) != null }?.let(getter) ?: default
     }

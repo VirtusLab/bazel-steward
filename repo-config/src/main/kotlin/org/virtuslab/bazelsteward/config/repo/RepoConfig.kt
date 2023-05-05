@@ -39,6 +39,7 @@ data class UpdateRulesConfig(
   val pin: PinningStrategy? = null,
   val versioning: VersioningSchema? = null,
   val bumping: BumpingStrategy? = null,
+  val enabled: Boolean? = null,
 ) : DependencyFilter
 
 data class SearchPatternConfig(

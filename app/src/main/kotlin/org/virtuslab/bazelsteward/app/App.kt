@@ -32,9 +32,14 @@ data class App(
     gitOperations.checkoutBaseBranch()
 
     val updates = dependencyKinds.mapNotNull { kind ->
-      val currentLibraries = resolveAvailableVersionsOfUsedLibraries(kind, workspaceRoot) ?: return@mapNotNull null
-      val updateSuggestions = resolveUpdateSuggestions(currentLibraries)
-      resolveUpdates(kind, updateSuggestions)
+      if (updateRulesProvider.isKindEnabled(kind)) {
+        val currentLibraries = resolveAvailableVersionsOfUsedLibraries(kind, workspaceRoot) ?: return@mapNotNull null
+        val updateSuggestions = resolveUpdateSuggestions(currentLibraries)
+        resolveUpdates(kind, updateSuggestions)
+      } else {
+        logger.info { "Skipping ${kind.name} because it is disabled in the config" }
+        null
+      }
     }.flatten()
 
     val pullRequestSuggestions = pullRequestSuggester.suggestPullRequests(updates)
@@ -46,7 +51,7 @@ data class App(
     workspaceRoot: Path,
   ): Map<out Library, List<Version>>? {
     return try {
-      kind.findAvailableVersions(workspaceRoot)
+      kind.findAvailableVersions(workspaceRoot, ignoreLibrary)
     } catch (e: Exception) {
       logger.warn {
         "Error happened during detecting available versions for ${kind.name}. " +
@@ -58,12 +63,23 @@ data class App(
     }
   }
 
+  private val ignoreLibrary: (Library) -> Boolean = { library ->
+    val ignore = !updateRulesProvider.resolveForLibrary(library).enabled
+    if (ignore) {
+      logger.info { "Skipping ${library.id} because it is disabled in the config" }
+    }
+    ignore
+  }
+
   private fun resolveUpdateSuggestions(currentLibraries: Map<out Library, List<Version>>): List<UpdateSuggestion> {
     val updateSuggestions = currentLibraries.mapNotNull {
       val updateRules = updateRulesProvider.resolveForLibrary(it.key)
       updateLogic.selectUpdate(it.key, it.value, updateRules)
     }
-    logger.info { "Update suggestions (${updateSuggestions.size}): " + updateSuggestions.map { it.currentLibrary.id.name + " to " + it.suggestedVersion.value } }
+    logger.info {
+      "Update suggestions (${updateSuggestions.size}): " +
+        updateSuggestions.map { "${it.currentLibrary.id} to ${it.suggestedVersion}" }
+    }
     return updateSuggestions
   }
 

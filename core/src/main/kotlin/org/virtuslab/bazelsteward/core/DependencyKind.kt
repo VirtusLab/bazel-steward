@@ -9,7 +9,7 @@ import java.nio.file.Path
 abstract class DependencyKind<Lib : Library> {
   abstract val name: String
   abstract fun acceptsLibrary(library: Library): Boolean
-  abstract suspend fun findAvailableVersions(workspaceRoot: Path): Map<Lib, List<Version>>
+  abstract suspend fun findAvailableVersions(workspaceRoot: Path, skip: (Lib) -> Boolean): Map<Lib, List<Version>>
   abstract val defaultSearchPatterns: List<PathPattern>
   abstract val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic>
   open val defaultUpdateRules: UpdateRules = UpdateRules()
