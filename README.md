@@ -53,7 +53,7 @@ update-rules:
   -
     dependencies:
       - org.jetbrains.kotlinx:*
-    versioning: loose
+    enabled: false
   -
     versioning: loose
 search-paths:
@@ -112,6 +112,10 @@ When the rule is found, it can configure for a dependency the following things:
     1. `latest` - Bump to the latest version
     2. `default` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
     3. `minor` - First bump to the latest minor, and then to the latest major.
+  * `enabled` (boolean) <br/>
+    If set to false, Bazel Steward will ignore this dependency for available versions lookup and any updates.
+    If this is set for `kinds` only filter, then it will disable the specified kind - Bazel Steward will not attempt 
+    to extract any versions used in your repository under this kind.
 
 * In `search-paths` section:
   * `path-patterns` (list of strings) <br/>
@@ -145,7 +149,7 @@ When the rule is found, it can configure for a dependency the following things:
     Scope for running commands.
     1. `commit` - runs for each commit and includes changes in the commit
     2. `pull-request` - runs for the whole pull request, after creating all commits. It creates a separate commit with modifier file. Message can be configured with `commit-message` setting.
-    Currently each pull request has only one update since grouping is not implemented, so this setting only impact if new commit will be created or not.
+    Currently, each pull request has only one update since grouping is not implemented, so this setting only impact if new commit will be created or not.
 
 # Installation
 

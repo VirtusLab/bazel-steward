@@ -28,6 +28,9 @@
           "bumping": {
             "type": ["string", "null"],
             "enum": ["default", "latest", "minor", "latest-by-date"]
+          },
+          "enabled": {
+            "type": ["boolean", "null"]
           }
         },
         "anyOf": ["versioning", "bumping", "pin", "kinds", "dependencies"],

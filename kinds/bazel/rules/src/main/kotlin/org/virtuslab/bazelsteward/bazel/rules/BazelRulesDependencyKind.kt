@@ -15,9 +15,9 @@ class BazelRulesDependencyKind(
 
   override fun acceptsLibrary(library: Library): Boolean = library is RuleLibrary
 
-  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<RuleLibrary, List<Version>> {
+  override suspend fun findAvailableVersions(workspaceRoot: Path, skip: (RuleLibrary) -> Boolean): Map<RuleLibrary, List<Version>> {
     val usedBazelRules = bazelRulesExtractor.extractCurrentRules(workspaceRoot)
-    return usedBazelRules
+    return usedBazelRules.filterNot(skip)
       .associateWith { it: RuleLibrary -> rulesResolver.resolveRuleVersions(it.id) }
   }
 

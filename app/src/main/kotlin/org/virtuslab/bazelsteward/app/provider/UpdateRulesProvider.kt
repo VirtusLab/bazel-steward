@@ -7,11 +7,21 @@ import org.virtuslab.bazelsteward.core.common.UpdateRules
 import org.virtuslab.bazelsteward.core.library.Library
 
 class UpdateRulesProvider(
-  configs: List<UpdateRulesConfig>,
+  private val configs: List<UpdateRulesConfig>,
   dependencyKinds: List<DependencyKind<*>>,
 ) {
 
   private val applier = DependencyFilterApplier(configs, dependencyKinds)
+
+  fun isKindEnabled(kind: DependencyKind<*>): Boolean {
+    val explicitRulesForKind = configs.filter { it.kinds.contains(kind.name) }
+    val hasExplicitIgnoreRuleForKind = explicitRulesForKind.any { it.enabled == false && it.dependencies.isEmpty() }
+    if (!hasExplicitIgnoreRuleForKind) {
+      return true
+    }
+    val hasNonIgnoredRuleForKind = explicitRulesForKind.any { it.enabled == true }
+    return hasNonIgnoredRuleForKind
+  }
 
   fun resolveForLibrary(library: Library): UpdateRules {
     val filter = applier.forLibrary(library)
@@ -20,6 +30,7 @@ class UpdateRulesProvider(
       filter.findNotNullOrDefault(defaultUpdateRules.versioningSchema) { it.versioning },
       filter.findNotNullOrDefault(defaultUpdateRules.bumpingStrategy) { it.bumping },
       filter.findNotNullOrDefault(defaultUpdateRules.pinningStrategy) { it.pin },
+      filter.findNotNullOrDefault(defaultUpdateRules.enabled) { it.enabled },
     )
   }
 }

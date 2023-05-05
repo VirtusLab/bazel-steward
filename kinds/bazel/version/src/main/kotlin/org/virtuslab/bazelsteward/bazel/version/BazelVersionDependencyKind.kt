@@ -17,10 +17,11 @@ class BazelVersionDependencyKind(
 
   override fun acceptsLibrary(library: Library): Boolean = library is BazelLibrary
 
-  override suspend fun findAvailableVersions(workspaceRoot: Path): Map<BazelLibrary, List<Version>> {
+  override suspend fun findAvailableVersions(workspaceRoot: Path, skip: (BazelLibrary) -> Boolean): Map<BazelLibrary, List<Version>> {
     val version = BazelVersion.extractBazelVersion(workspaceRoot)
       ?: throw RuntimeException("Could not find bazel version")
     val library = BazelLibrary(version)
+    if (skip(library)) return emptyMap()
     val versions = bazelUpdater.availableVersions(version)
     return mapOf(library to versions)
   }

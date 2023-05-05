@@ -12,6 +12,7 @@ data class UpdateRules(
   val versioningSchema: VersioningSchema = VersioningSchema.Loose,
   val bumpingStrategy: BumpingStrategy = BumpingStrategy.Minor,
   val pinningStrategy: PinningStrategy = PinningStrategy.None,
+  val enabled: Boolean = true,
 )
 
 class UpdateLogic {
@@ -69,6 +70,8 @@ class UpdateLogic {
           }
         }
     }
+
+    if (!updateRules.enabled) return null
 
     return if (updateRules.bumpingStrategy == BumpingStrategy.LatestByDate) {
       selectByDate()
