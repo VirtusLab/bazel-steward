@@ -118,7 +118,7 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0",
         "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4",
         "io.get-coursier:interface:1.0.15",
         "commons-io:commons-io:2.11.0",
