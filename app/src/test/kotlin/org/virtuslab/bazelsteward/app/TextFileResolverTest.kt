@@ -19,7 +19,7 @@ import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import java.nio.file.Path
 import java.time.Instant
 
-class LibraryToTextFilesMapperTest {
+class TextFileResolverTest {
 
   @Test
   fun `should return correct paths for MavenDependencyKind`(@TempDir tempDir: Path) {
@@ -74,10 +74,10 @@ class LibraryToTextFilesMapperTest {
     val repoConfig = loadRepoConfigFromResources("example-config.yaml")
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds.all)
 
-    val libraryToTextFilesMapper = LibraryToTextFilesMapper(
+    val textFileResolver = TextFileResolver(
       searchPatternProvider,
       fileFinder,
     )
-    return libraryToTextFilesMapper.map(library)
+    return textFileResolver.resolve(library)
   }
 }

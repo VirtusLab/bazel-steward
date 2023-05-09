@@ -123,7 +123,7 @@ object AppBuilder {
     val pullRequestConfigProvider = PullRequestConfigProvider(repoConfig.pullRequests, dependencyKinds)
     val postUpdateHookProvider = PostUpdateHookProvider(repoConfig.postUpdateHooks, dependencyKinds)
 
-    val libraryToTextFilesMapper = LibraryToTextFilesMapper(
+    val textFileResolver = TextFileResolver(
       searchPatternProvider,
       fileFinder,
     )
@@ -151,7 +151,7 @@ object AppBuilder {
       pullRequestSuggester,
       repoConfig,
       updateRulesProvider,
-      libraryToTextFilesMapper,
+      textFileResolver,
       pullRequestManager,
       appConfig.workspaceRoot,
     )
