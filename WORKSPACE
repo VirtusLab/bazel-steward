@@ -132,7 +132,7 @@ maven_install(
         "org.slf4j:slf4j-simple:2.0.7",
         "org.json:json:20230227",
         "org.apache.commons:commons-text:1.10.0",
-        "net.pearx.kasechange:kasechange-jvm:1.3.0",
+        "net.pearx.kasechange:kasechange-jvm:1.4.1",
     ],
     fetch_sources = True,
     repositories = [
