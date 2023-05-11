@@ -134,8 +134,13 @@ maven_install(
         "org.apache.commons:commons-text:1.10.0",
         "net.pearx.kasechange:kasechange-jvm:1.4.1",
     ],
+    fail_if_repin_required = True,
     fetch_sources = True,
     repositories = [
         "https://repo.maven.apache.org/maven2",
     ],
+    maven_install_json = "//:maven_install.json",
 )
+
+load("@maven//:defs.bzl", "pinned_maven_install")
+pinned_maven_install()
