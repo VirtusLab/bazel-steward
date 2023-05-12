@@ -7,6 +7,7 @@ import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.HookRunFor
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
+import org.virtuslab.bazelsteward.core.library.GroupId
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 
 data class RepoConfig(
@@ -72,6 +73,7 @@ data class PullRequestsConfig(
   @JsonDeserialize(using = ListOrItemDeserializer::class)
   val labels: List<String> = emptyList(),
   val limits: PullRequestLimits? = null,
+  val groupId: GroupId? = null,
 ) : DependencyFilter
 
 data class PostUpdateHooksConfig(

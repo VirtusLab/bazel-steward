@@ -86,6 +86,9 @@
           "body": {
             "type": ["string", "null"]
           },
+          "group-id": {
+            "type": ["string", "null"]
+          },
           "tags": {
             "type": ["array", "string", "null"],
             "items": {
@@ -95,10 +98,10 @@
           "limits": {
             "type": ["object", "null"],
             "properties": {
-              "maxOpen": {
+              "max-open": {
                 "type": ["integer", "null"]
               },
-              "maxUpdatesPerRun": {
+              "max-updates-per-run": {
                 "type": ["integer", "null"]
               }
             }

@@ -3,16 +3,28 @@ package org.virtuslab.bazelsteward.app.provider
 import org.virtuslab.bazelsteward.app.DependencyFilterApplier
 import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
+import org.virtuslab.bazelsteward.core.library.GroupId
 import org.virtuslab.bazelsteward.core.library.Library
 
-open class PullRequestConfigProvider(
+class PullRequestConfigProvider(
   configs: List<PullRequestsConfig>,
   dependencyKinds: List<DependencyKind<*>>,
 ) {
   private val applier = DependencyFilterApplier(configs, dependencyKinds)
 
-  open fun resolveForLibrary(library: Library): PullRequestConfig {
-    val filter = applier.forLibrary(library)
+  fun resolveGroup(library: Library): GroupId? {
+    return applier.forLibrary(library).findNotNullOrDefault(null) { it.groupId }
+  }
+
+  fun resolveForGroup(groupId: GroupId): PullRequestConfig {
+    return resolveFromFilter(applier.forPredicate { it.groupId == groupId })
+  }
+
+  fun resolveForLibrary(library: Library): PullRequestConfig {
+    return resolveFromFilter(applier.forLibrary(library))
+  }
+
+  private fun resolveFromFilter(filter: DependencyFilterApplier.Filtered<PullRequestsConfig>): PullRequestConfig {
     val title = filter.findNotNullOrDefault(default.titleTemplate) { it.title }
     val body = filter.findNotNullOrDefault(default.bodyTemplate) { it.body }
     val tags = filter.findNotNullOrDefault(default.labels) { it.labels }

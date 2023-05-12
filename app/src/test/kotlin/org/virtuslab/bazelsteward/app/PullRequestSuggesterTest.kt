@@ -3,10 +3,9 @@ package org.virtuslab.bazelsteward.app
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import org.virtuslab.bazelsteward.app.provider.PullRequestConfig
 import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
+import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
-import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdate
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
@@ -14,17 +13,15 @@ import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 class PullRequestSuggesterTest {
 
-  //  @Test
+  @Test
   fun `should fill placeholder values with artifact data`() {
-    val provider = object : PullRequestConfigProvider(emptyList(), emptyList()) {
-      override fun resolveForLibrary(library: Library): PullRequestConfig {
-        return PullRequestConfig(
-          "\${group} and \${artifact}",
-          "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
-          listOf("test-label"),
-        )
-      }
-    }
+    val config = PullRequestsConfig(
+      title = "\${group} and \${artifact}",
+      body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
+      labels = listOf("test-label"),
+    )
+
+    val provider = PullRequestConfigProvider(listOf(config), emptyList())
 
     val group = "group-name"
     val artifact = "artefact-name"
