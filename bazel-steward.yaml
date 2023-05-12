@@ -7,7 +7,7 @@ post-update-hooks:
     run-for: commit
   - dependencies: rules_jvm_external
     commands:
-      - "bazel run @unpinned_maven//:pin"
+      - "RULES_JVM_EXTERNAL_REPIN=1 bazel run @unpinned_maven//:pin"
     files-to-commit:
       - "maven_install.json"
     run-for: commit
