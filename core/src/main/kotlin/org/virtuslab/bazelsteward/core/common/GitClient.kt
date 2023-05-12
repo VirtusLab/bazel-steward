@@ -5,7 +5,7 @@ import java.nio.file.Path
 
 class GitClient(private val repositoryRoot: Path) {
   private val quiet = "--quiet"
-  private val git = runBlocking { CommandRunner.run(listOf("sh", "-c", "which git"), repositoryRoot).trim() }
+  private val git = runBlocking { CommandRunner.runForOutput(listOf("sh", "-c", "which git"), repositoryRoot).trim() }
 
   suspend fun checkout(target: String, newBranch: Boolean = false) {
     val b = if (newBranch) "-b" else null
@@ -76,7 +76,11 @@ class GitClient(private val repositoryRoot: Path) {
   suspend fun run(vararg gitArgs: String?): String = run(gitArgs.toList())
 
   suspend fun run(gitArgs: List<String?>): String {
-    return CommandRunner.run(listOf(git) + gitArgs.filterNotNull(), repositoryRoot)
+    return CommandRunner.runForOutput(listOf(git) + gitArgs.filterNotNull(), repositoryRoot)
+  }
+
+  suspend fun runForResult(vararg args: String): CommandRunner.Result {
+    return CommandRunner.run(listOf(git) + args, repositoryRoot)
   }
 
   data class GitAuthor(val name: String, val email: String)

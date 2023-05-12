@@ -18,7 +18,7 @@ class MavenDataExtractor(private val workspaceRoot: Path) {
   }
 
   private suspend fun extractFromFile(fileName: String): List<String> = withContext(Dispatchers.IO) {
-    val xml = CommandRunner.run(
+    val xml = CommandRunner.runForOutput(
       workspaceRoot,
       "bazel",
       "query",

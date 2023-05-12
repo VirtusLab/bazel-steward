@@ -23,7 +23,7 @@ class PostUpdateHookTest : E2EBase() {
     val git = GitClient(localRoot)
     runBlocking {
       git.checkout("bazel-steward/io.arrow-kt/arrow-core/1.1.5")
-      val validationCommandOutput = CommandRunner.run(
+      val validationCommandOutput = CommandRunner.runForOutput(
         localRoot,
         "sh",
         "-c",
@@ -52,7 +52,7 @@ class PostUpdateHookTest : E2EBase() {
     val git = GitClient(localRoot)
     runBlocking {
       git.checkout("bazel-steward/io.arrow-kt/arrow-core/1.1.5")
-      val validationCommandOutput = CommandRunner.run(
+      val validationCommandOutput = CommandRunner.runForOutput(
         localRoot,
         "sh",
         "-c",

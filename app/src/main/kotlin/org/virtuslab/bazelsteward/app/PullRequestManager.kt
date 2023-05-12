@@ -75,7 +75,7 @@ data class PullRequestManager(
       if (hook.commands.isNotEmpty()) {
         hook.commands.forEach {
           Thread.sleep(1000)
-          CommandRunner.run(listOf("sh", "-c", it), workspaceRoot)
+          CommandRunner.runForOutput(listOf("sh", "-c", it), workspaceRoot)
         }
         git.commitSelectedFiles(hook.filesToCommit, hook.commitMessage)
         if (hook.runFor == HookRunFor.Commit) {
