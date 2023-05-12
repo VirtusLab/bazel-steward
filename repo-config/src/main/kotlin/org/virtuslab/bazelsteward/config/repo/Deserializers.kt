@@ -15,6 +15,7 @@ import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.HookRunFor
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
+import org.virtuslab.bazelsteward.core.library.GroupId
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 
 class ListOrItemDeserializer : StdDeserializer<List<*>>(List::class.java), ContextualDeserializer {
@@ -58,6 +59,14 @@ class BumpingStrategyDeserializer : StdDeserializer<BumpingStrategy?>(BumpingStr
     return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
       val str = fieldValue.toPascalCase()
       BumpingStrategy.valueOf(str)
+    }
+  }
+}
+
+class GroupIdDeserializer : StdDeserializer<GroupId?>(GroupId::class.java) {
+  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): GroupId? {
+    return (jp.codec.readTree<JsonNode>(jp) as? TextNode)?.asText()?.toString()?.let { fieldValue ->
+      GroupId(fieldValue)
     }
   }
 }

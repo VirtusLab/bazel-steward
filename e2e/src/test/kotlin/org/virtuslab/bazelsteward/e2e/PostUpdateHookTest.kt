@@ -16,7 +16,7 @@ class PostUpdateHookTest : E2EBase() {
   fun `Post update hook with PR`(@TempDir tempDir: Path) {
     val project = "hook/pr"
     runBazelStewardWith(tempDir, project) {
-      it.withMavenOnly(listOf("1.1.5"))
+      it.withMockMavenVersions("1.1.5")
     }
 
     val localRoot = tempDir.resolve("local").resolve(project)
@@ -45,7 +45,7 @@ class PostUpdateHookTest : E2EBase() {
   fun `Post update hook with commit`(@TempDir tempDir: Path) {
     val project = "hook/commit"
     runBazelStewardWith(tempDir, project) {
-      it.withMavenOnly(listOf("1.1.5"))
+      it.withMockMavenVersions("1.1.5")
     }
 
     val localRoot = tempDir.resolve("local").resolve(project)

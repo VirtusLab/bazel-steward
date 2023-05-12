@@ -15,6 +15,8 @@ import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
+typealias AppResult = Map<PullRequestSuggestion, PullRequestManager.Result>
+
 data class App(
   val gitOperations: GitOperations,
   val dependencyKinds: List<DependencyKind<*>>,
@@ -28,7 +30,7 @@ data class App(
   val workspaceRoot: Path,
 ) {
 
-  suspend fun run() {
+  suspend fun run(): Map<PullRequestSuggestion, PullRequestManager.Result> {
     gitOperations.checkoutBaseBranch()
 
     val updates = dependencyKinds.filter { isKindEnabled(it) }.flatMap { kind ->
@@ -38,7 +40,7 @@ data class App(
     }
 
     val pullRequestSuggestions = pullRequestSuggester.suggestPullRequests(updates)
-    pullRequestManager.applySuggestions(pullRequestSuggestions)
+    return pullRequestManager.applySuggestions(pullRequestSuggestions)
   }
 
   private fun isKindEnabled(kind: DependencyKind<*>): Boolean {
