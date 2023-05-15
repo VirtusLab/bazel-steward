@@ -15,6 +15,14 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Cache Bazel
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE', 'WORKSPACE.bazel', 'MODULE.bazel') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
       - name: Run tests
         run: bazel test //... --keep_going --test_tag_filters=unit
         env:
@@ -27,6 +35,14 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Cache Bazel
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE', 'WORKSPACE.bazel', 'MODULE.bazel') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
       - name: Run tests
         run: bazel test //... --keep_going --test_tag_filters=integration
   klint:
@@ -37,6 +53,14 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Cache Bazel
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE', 'WORKSPACE.bazel', 'MODULE.bazel') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
       - name: Run tests
         run: bazel test //... --keep_going --test_output=errors --test_tag_filters=lint
   docker-build-test:
