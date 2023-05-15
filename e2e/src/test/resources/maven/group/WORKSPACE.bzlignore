@@ -1,0 +1,53 @@
+workspace(name = "maven-groups")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# rules_jvm_external - for maven dependencies
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+RULES_JVM_EXTERNAL_TAG = "5.2"
+RULES_JVM_EXTERNAL_SHA ="f86fd42a809e1871ca0aabe89db0d440451219c3ce46c58da240c7dcdc00125f"
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/%s/rules_jvm_external-%s.tar.gz" % (RULES_JVM_EXTERNAL_TAG, RULES_JVM_EXTERNAL_TAG)
+)
+
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
+# maven deps
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+GLASSFISH_VERSION = "2.39.1"
+
+maven_install(
+    artifacts = [
+        "com.carrotsearch:hppc:0.9.1",
+        "org.jline:jline:3.13.1",
+        "com.fasterxml.jackson.core:jackson-annotations:2.14.2",
+        "com.fasterxml.jackson.core:jackson-core:2.14.2",
+        "com.fasterxml.jackson.core:jackson-databind:2.14.2",
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2",
+        "com.fasterxml.jackson.datatype:jackson-datatype-guava:2.14.2",
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.2",
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2",
+        "org.glassfish.jersey.containers:jersey-container-grizzly2-http:" + GLASSFISH_VERSION,
+        "org.glassfish.jersey.core:jersey-client:%s" % GLASSFISH_VERSION,
+        "org.glassfish.jersey.core:jersey-common:%s" % GLASSFISH_VERSION,
+        "org.glassfish.jersey.core:jersey-server:" + GLASSFISH_VERSION,
+        "org.glassfish.jersey.inject:jersey-hk2:{0}".format(GLASSFISH_VERSION),
+        "org.glassfish.jersey.media:jersey-media-json-jackson:" + GLASSFISH_VERSION,
+    ],
+    fetch_sources = False,
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)

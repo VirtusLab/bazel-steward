@@ -1,0 +1,18 @@
+update-rules:
+  - kinds:
+      - bazel-rules
+      - bazel
+    enabled: false
+pull-requests:
+    -
+      dependencies: "com.fasterxml.jackson.core:*"
+      group-id: jackson-core
+      title: "Update jackson-core to ${versionTo}"
+      body: "Updated:\n${updates}"
+    -
+      dependencies: "com.fasterxml.jackson*:*"
+      group-id: jackson
+      title: "Update jackson to ${versionTo}"
+      body: "Updated:\n${updates}"
+    - dependencies: "org.glassfish.jersey*"
+      group-id: glassfish

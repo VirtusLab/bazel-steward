@@ -15,6 +15,8 @@ import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
+typealias AppResult = Map<PullRequestSuggestion, PullRequestManager.Result>
+
 data class App(
   val gitOperations: GitOperations,
   val dependencyKinds: List<DependencyKind<*>>,
@@ -23,33 +25,36 @@ data class App(
   val pullRequestSuggester: PullRequestSuggester,
   val repoConfig: RepoConfig,
   val updateRulesProvider: UpdateRulesProvider,
-  val libraryToTextFilesMapper: LibraryToTextFilesMapper,
+  val textFileResolver: TextFileResolver,
   val pullRequestManager: PullRequestManager,
   val workspaceRoot: Path,
 ) {
 
-  suspend fun run() {
+  suspend fun run(): Map<PullRequestSuggestion, PullRequestManager.Result> {
     gitOperations.checkoutBaseBranch()
 
-    val updates = dependencyKinds.mapNotNull { kind ->
-      if (updateRulesProvider.isKindEnabled(kind)) {
-        val currentLibraries = resolveAvailableVersionsOfUsedLibraries(kind, workspaceRoot) ?: return@mapNotNull null
-        val updateSuggestions = resolveUpdateSuggestions(currentLibraries)
-        resolveUpdates(kind, updateSuggestions)
-      } else {
-        logger.info { "Skipping ${kind.name} because it is disabled in the config" }
-        null
-      }
-    }.flatten()
+    val updates = dependencyKinds.filter { isKindEnabled(it) }.flatMap { kind ->
+      val currentLibraries = resolveAvailableVersionsOfUsedLibraries(kind, workspaceRoot)
+      val updateSuggestions = resolveUpdateSuggestions(currentLibraries)
+      resolveUpdates(kind, updateSuggestions)
+    }
 
     val pullRequestSuggestions = pullRequestSuggester.suggestPullRequests(updates)
-    pullRequestManager.applySuggestions(pullRequestSuggestions)
+    return pullRequestManager.applySuggestions(pullRequestSuggestions)
+  }
+
+  private fun isKindEnabled(kind: DependencyKind<*>): Boolean {
+    val enabled = updateRulesProvider.isKindEnabled(kind)
+    if (!enabled) {
+      logger.info { "Skipping ${kind.name} because it is disabled in the config" }
+    }
+    return enabled
   }
 
   private suspend fun resolveAvailableVersionsOfUsedLibraries(
     kind: DependencyKind<*>,
     workspaceRoot: Path,
-  ): Map<out Library, List<Version>>? {
+  ): Map<out Library, List<Version>> {
     return try {
       kind.findAvailableVersions(workspaceRoot, ignoreLibrary)
     } catch (e: Exception) {
@@ -59,7 +64,7 @@ data class App(
       }
       logger.warn("Error details: ${e.message}")
       logger.debug(e) { "Full stacktrace" }
-      null
+      emptyMap()
     }
   }
 
@@ -72,26 +77,25 @@ data class App(
   }
 
   private fun resolveUpdateSuggestions(currentLibraries: Map<out Library, List<Version>>): List<UpdateSuggestion> {
-    val updateSuggestions = currentLibraries.mapNotNull {
-      val updateRules = updateRulesProvider.resolveForLibrary(it.key)
-      updateLogic.selectUpdate(it.key, it.value, updateRules)
+    val suggestions = currentLibraries.mapNotNull { (library, versions) ->
+      val updateRules = updateRulesProvider.resolveForLibrary(library)
+      updateLogic.selectUpdate(library, versions, updateRules)
     }
     logger.info {
-      "Update suggestions (${updateSuggestions.size}): " +
-        updateSuggestions.map { "${it.currentLibrary.id} to ${it.suggestedVersion}" }
+      "Update suggestions (${suggestions.size}): " +
+        suggestions.map { "${it.currentLibrary.id} to ${it.suggestedVersion}" }
     }
-    return updateSuggestions
+    return suggestions
   }
 
   private fun resolveUpdates(
     kind: DependencyKind<*>,
-    updateSuggestions: List<UpdateSuggestion>,
+    suggestions: List<UpdateSuggestion>,
   ): List<LibraryUpdate> {
     val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
-    val updates = updateSuggestions.mapNotNull { updateSuggestion ->
-      val libraryFiles = libraryToTextFilesMapper.map(updateSuggestion.currentLibrary)
-      libraryUpdateResolver.resolve(libraryFiles, updateSuggestion, heuristics)
+    return suggestions.mapNotNull { suggestion ->
+      val potentialFilesWithLibraryVersion = textFileResolver.resolve(suggestion.currentLibrary)
+      libraryUpdateResolver.resolve(potentialFilesWithLibraryVersion, suggestion, heuristics)
     }
-    return updates
   }
 }

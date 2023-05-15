@@ -77,7 +77,12 @@ class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
 
   suspend fun commitSelectedFiles(filesToCommit: List<String>, commitMessage: String) {
     git.add(filesToCommit)
-    git.commit(commitMessage)
+    val noChanges = git.runForResult("git", "diff", "--quiet", "--exit-code", "--cached").isSuccess
+    if (noChanges) {
+      logger.warn { "No changes to commit" }
+    } else {
+      git.commit(commitMessage)
+    }
   }
 
   suspend fun squashLastTwoCommits() {

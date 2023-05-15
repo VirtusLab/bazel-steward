@@ -14,6 +14,13 @@ data class MavenLibraryId(val group: String, val artifact: String) : LibraryId()
 
   override val name: String
     get() = "$group:$artifact"
+
+  companion object {
+    fun fromString(coordinates: String): MavenLibraryId {
+      val (group, artifact) = coordinates.split(":")
+      return MavenLibraryId(group, artifact)
+    }
+  }
 }
 
 data class MavenCoordinates(
