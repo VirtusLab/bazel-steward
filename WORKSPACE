@@ -138,7 +138,6 @@ maven_install(
     repositories = [
         "https://repo.maven.apache.org/maven2",
     ],
-    fail_if_repin_required = True,
     maven_install_json = "//:maven_install.json",
 )
 
