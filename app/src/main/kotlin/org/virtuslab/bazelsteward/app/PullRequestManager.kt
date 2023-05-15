@@ -1,7 +1,6 @@
 package org.virtuslab.bazelsteward.app
 
 import mu.KotlinLogging
-import org.virtuslab.bazelsteward.app.PullRequestsLimits.Result
 import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestsLimitsProvider
 import org.virtuslab.bazelsteward.core.GitPlatform
@@ -24,17 +23,25 @@ data class PullRequestManager(
   private val pushToRemote: Boolean,
   private val limitsProvider: PullRequestsLimitsProvider,
 ) {
-  suspend fun applySuggestions(pullRequestSuggestions: List<PullRequestSuggestion>) {
+
+  sealed interface Result {
+    object Ok : Result
+    data class Skipped(val reason: String) : Result
+    data class Error(val reason: String) : Result
+  }
+
+  suspend fun applySuggestions(pullRequestSuggestions: List<PullRequestSuggestion>): Map<PullRequestSuggestion, Result> {
     val limits = limitsProvider.create()
-    pullRequestSuggestions.forEach { pr ->
+    return pullRequestSuggestions.associateWith { pr ->
       val prStatus = gitPlatform.checkPrStatus(pr.branch)
       when (val result = limits.canCreateOrUpdate(prStatus)) {
-        Result.Ok -> {
+        PullRequestsLimits.Result.Ok -> {
           createOrUpdateBranchAndPr(pr, prStatus, limits)
-          git.checkoutBaseBranch()
+            .also { git.checkoutBaseBranch() }
         }
-        is Result.Blocked -> {
+        is PullRequestsLimits.Result.Blocked -> {
           logger.info { "Skipping ${pr.branch}: ${result.reason}" }
+          Result.Skipped(result.reason)
         }
       }
     }
@@ -44,8 +51,8 @@ data class PullRequestManager(
     pr: PullRequestSuggestion,
     prStatus: PrStatus,
     limits: PullRequestsLimits,
-  ) {
-    runCatching {
+  ): Result {
+    return runCatching {
       logger.info { "Creating branch ${pr.branch}, current PR status: $prStatus" }
       git.createBranchWithCommits(pr.branch, pr.commits)
 
@@ -55,18 +62,23 @@ data class PullRequestManager(
         git.pushBranchToOrigin(pr.branch, force = prStatus != NONE)
         adjustPullRequests(prStatus, pr, limits)
       }
-    }.onFailure { logger.error(it) { "Failed to create branch ${pr.branch}" } }
+      Result.Ok
+    }.getOrElse {
+      logger.error(it) { "Failed to create branch ${pr.branch}" }
+      Result.Error(it.message ?: it.javaClass.name)
+    }
   }
 
   private suspend fun applyPostUpdateHooks(pr: PullRequestSuggestion) {
-    with(postUpdateHooks.resolveForLibrary(pr.oldLibrary)) {
-      if (commands.isNotEmpty()) {
-        commands.forEach {
+    val hooks = pr.oldLibraries.map { postUpdateHooks.resolveForLibrary(it) }.distinct()
+    hooks.forEach { hook ->
+      if (hook.commands.isNotEmpty()) {
+        hook.commands.forEach {
           Thread.sleep(1000)
-          CommandRunner.run(listOf("sh", "-c", it), workspaceRoot)
+          CommandRunner.runForOutput(listOf("sh", "-c", it), workspaceRoot)
         }
-        git.commitSelectedFiles(filesToCommit, commitMessage)
-        if (runFor == HookRunFor.Commit) {
+        git.commitSelectedFiles(hook.filesToCommit, hook.commitMessage)
+        if (hook.runFor == HookRunFor.Commit) {
           git.squashLastTwoCommits()
         }
       }

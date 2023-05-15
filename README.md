@@ -71,6 +71,9 @@ search-paths:
       - ".bazelversion"
       - ".github/**/*.yaml"
 pull-requests:
+  -   
+    dependencies: "com.fasterxml.jackson*:*"
+    group-id: jackson
   - 
     title: "[maintenance] Updated ${group}/${artifact} from ${versionFrom} to ${versionTo}"
     kinds: maven
@@ -139,7 +142,10 @@ When the rule is found, it can configure for a dependency the following things:
   * `limits` (object) <br/>
       - `max-open` (number): maximum allowed number of open pull requests in the repository. Useful if you have 100 outdated dependencies and you would like to have just 10 open, merge them in your own pace, and Bazel Steward will add new pull requests up to this limit.
       - max-updates-per-run (number): maximum number of updated pull requests per Bazel Steward run. It includes both creating new PRs and resolving conflicts on existing ones. This is useful if your CI that runs on push is costly and you would like to limit the runs.
-      
+  * `group-id` (string) <br/>
+    Enables grouping for dependencies matching filter (specified by `dependencies` and/or `kinds` keys).
+    This id will be used in branch name, pull request title and commit message.
+    Note: Use this only for dependencies that are released together under the same version. Other scenarios might have unexpected results.
 * In `post-update-hooks` section:
   * `commands` (list of strings) <br/>
     List of commands to run after applying an update. Commands are run separately under `sh -c`

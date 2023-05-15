@@ -16,14 +16,14 @@ class PostUpdateHookTest : E2EBase() {
   fun `Post update hook with PR`(@TempDir tempDir: Path) {
     val project = "hook/pr"
     runBazelStewardWith(tempDir, project) {
-      it.withMavenOnly(listOf("1.1.5"))
+      it.withMockMavenVersions("1.1.5")
     }
 
     val localRoot = tempDir.resolve("local").resolve(project)
     val git = GitClient(localRoot)
     runBlocking {
       git.checkout("bazel-steward/io.arrow-kt/arrow-core/1.1.5")
-      val validationCommandOutput = CommandRunner.run(
+      val validationCommandOutput = CommandRunner.runForOutput(
         localRoot,
         "sh",
         "-c",
@@ -45,14 +45,14 @@ class PostUpdateHookTest : E2EBase() {
   fun `Post update hook with commit`(@TempDir tempDir: Path) {
     val project = "hook/commit"
     runBazelStewardWith(tempDir, project) {
-      it.withMavenOnly(listOf("1.1.5"))
+      it.withMockMavenVersions("1.1.5")
     }
 
     val localRoot = tempDir.resolve("local").resolve(project)
     val git = GitClient(localRoot)
     runBlocking {
       git.checkout("bazel-steward/io.arrow-kt/arrow-core/1.1.5")
-      val validationCommandOutput = CommandRunner.run(
+      val validationCommandOutput = CommandRunner.runForOutput(
         localRoot,
         "sh",
         "-c",

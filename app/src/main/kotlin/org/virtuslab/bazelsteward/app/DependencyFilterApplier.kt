@@ -16,19 +16,38 @@ class DependencyFilterApplier<T : DependencyFilter>(
     return FilteredByKind(configsForKinds, library.id, kind)
   }
 
+  fun forPredicate(predicate: (T) -> Boolean): FilteredByPredicate<T> {
+    return FilteredByPredicate(configs, predicate)
+  }
+
+  interface Filtered<T : DependencyFilter> {
+    fun find(predicate: (T) -> Boolean): T?
+
+    fun <R> findNotNullOrDefault(default: R, getter: (T) -> R?): R {
+      return find { getter(it) != null }?.let(getter) ?: default
+    }
+  }
+
+  class FilteredByPredicate<T : DependencyFilter>(
+    private val configs: List<T>,
+    private val basePredicate: (T) -> Boolean,
+  ) : Filtered<T> {
+    override fun find(predicate: (T) -> Boolean): T? {
+      val filteredConfigs = configs.filter { predicate(it) }
+      return filteredConfigs.firstOrNull { basePredicate(it) }
+        ?: filteredConfigs.firstOrNull { it.dependencies.isEmpty() }
+    }
+  }
+
   class FilteredByKind<T : DependencyFilter>(
     private val configs: List<T>,
     private val libraryId: LibraryId,
     val kind: DependencyKind<*>?,
-  ) {
-    private fun find(predicate: (T) -> Boolean): T? {
+  ) : Filtered<T> {
+    override fun find(predicate: (T) -> Boolean): T? {
       val filteredConfigs = configs.filter { predicate(it) }
       return filteredConfigs.firstOrNull { it.dependencies.any { depFilter -> depFilter.test(libraryId) } }
         ?: filteredConfigs.firstOrNull { it.dependencies.isEmpty() }
-    }
-
-    fun <R> findNotNullOrDefault(default: R, getter: (T) -> R?): R {
-      return find { getter(it) != null }?.let(getter) ?: default
     }
   }
 }

@@ -4,6 +4,7 @@ import io.kotest.common.runBlocking
 import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
+import org.virtuslab.bazelsteward.app.AppResult
 import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
@@ -14,7 +15,7 @@ import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitPlatform
 import org.virtuslab.bazelsteward.core.common.GitClient
-import org.virtuslab.bazelsteward.core.library.SemanticVersion
+import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.fixture.prepareLocalWorkspace
 import org.virtuslab.bazelsteward.fixture.prepareRemoteWorkspace
@@ -22,6 +23,7 @@ import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
 import org.virtuslab.bazelsteward.maven.MavenDependencyKind
+import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -43,12 +45,12 @@ open class E2EBase {
     return libs.map { "$branchRef/$it/" } + masterRef
   }
 
-  protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = emptyList()) {
-    runBazelStewardWith(tempDir, project, args) { x -> x }
+  protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = emptyList()): AppResult {
+    return runBazelStewardWith(tempDir, project, args) { x -> x }
   }
 
-  protected fun runBazelSteward(workspaceRoot: Path, args: List<String> = emptyList()) {
-    runBazelStewardWith(workspaceRoot, args) { x -> x }
+  protected fun runBazelSteward(workspaceRoot: Path, args: List<String> = emptyList()): AppResult {
+    return runBazelStewardWith(workspaceRoot, args) { x -> x }
   }
 
   protected fun runBazelStewardWith(
@@ -56,18 +58,18 @@ open class E2EBase {
     project: String,
     args: List<String> = emptyList(),
     transform: (App) -> App,
-  ) {
+  ): AppResult {
     val file = prepareWorkspace(tempDir, project)
-    runBazelStewardWith(file, args, transform)
+    return runBazelStewardWith(file, args, transform)
   }
 
   protected fun runBazelStewardWith(
     workspaceRoot: Path,
     args: List<String> = emptyList(),
     transform: (App) -> App,
-  ) {
+  ): AppResult {
     val app = transform(AppBuilder.fromArgs(arrayOf(workspaceRoot.toString()) + args, Environment.system))
-    runBlocking {
+    return runBlocking {
       app.run()
     }
   }
@@ -156,14 +158,63 @@ open class E2EBase {
     }
   }
 
-  protected fun App.withMavenOnly(versions: List<String>): App {
+  class MockMavenRepository : MavenRepository() {
+    private var defaultVersions: List<Version>? = null
+    private val state = mutableMapOf<MavenLibraryId, List<Version>>()
+
+    fun withDefaultVersions(vararg versions: String): MockMavenRepository {
+      defaultVersions = versions.map { SimpleVersion(it) }
+      return this
+    }
+
+    fun withVersion(coordinates: String, version: String): MockMavenRepository {
+      return withVersions(MavenLibraryId.fromString(coordinates), listOf(SimpleVersion(version)))
+    }
+
+    fun withVersion(coordinates: List<String>, version: String): MockMavenRepository {
+      coordinates.forEach { withVersion(it, version) }
+      return this
+    }
+
+    private fun withVersions(library: MavenLibraryId, versions: List<Version>): MockMavenRepository {
+      if (state.containsKey(library)) {
+        state[library] = state[library]!! + versions
+      } else {
+        state[library] = versions
+      }
+      return this
+    }
+
+    override suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> {
+      return mavenData.dependencies.associateWith { coords ->
+        val configuredVersions = state[coords.id] ?: defaultVersions ?: emptyList()
+        if (!configuredVersions.contains(coords.version)) {
+          listOf(coords.version) + configuredVersions
+        } else {
+          configuredVersions
+        }
+      }
+    }
+  }
+
+  protected fun App.withMockMaven(configure: MockMavenRepository.() -> Unit): App {
     return this.copy(
       dependencyKinds = listOf(
         MavenDependencyKind(
           MavenDataExtractor(this.workspaceRoot),
-          mockMavenRepositoryWithVersion(*versions.toTypedArray()),
+          MockMavenRepository().also(configure),
         ),
       ),
+    )
+  }
+
+  protected fun App.withMockMavenVersions(vararg versions: String): App {
+    return this.withMockMaven { withDefaultVersions(*versions) }
+  }
+
+  protected fun App.withMavenOnly(): App {
+    return this.copy(
+      dependencyKinds = this.dependencyKinds.filterIsInstance<MavenDependencyKind>(),
     )
   }
 
@@ -202,13 +253,6 @@ open class E2EBase {
 
   protected fun App.withPRStatus(status: GitPlatform.PrStatus): App {
     return this.withGitHostClient(mockGitHostClientWithStatus(status))
-  }
-
-  protected fun mockMavenRepositoryWithVersion(vararg versions: String): MavenRepository {
-    return object : MavenRepository() {
-      override suspend fun findVersions(mavenData: MavenData): Map<MavenCoordinates, List<Version>> =
-        mapOf(mavenData.dependencies[0] to versions.mapNotNull { SemanticVersion.fromString(it) }.toList())
-    }
   }
 
   protected fun mockGitHostClientWithStatus(status: GitPlatform.PrStatus): MockGitPlatform {

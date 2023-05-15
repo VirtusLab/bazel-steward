@@ -14,6 +14,7 @@ import org.virtuslab.bazelsteward.core.PathPattern
 import org.virtuslab.bazelsteward.core.common.HookRunFor
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
 import org.virtuslab.bazelsteward.core.library.BumpingStrategy
+import org.virtuslab.bazelsteward.core.library.GroupId
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -95,6 +96,7 @@ class RepoConfigParser {
       addDeserializer(BumpingStrategy::class.java, BumpingStrategyDeserializer())
       addDeserializer(DependencyNameFilter::class.java, DependencyNameFilterDeserializer())
       addDeserializer(PathPattern::class.java, PathPatternDeserializer())
+      addDeserializer(GroupId::class.java, GroupIdDeserializer())
       addDeserializer(HookRunFor::class.java, HookRunForDeserializer())
     }
     return ObjectMapper(YAMLFactory()).apply {

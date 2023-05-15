@@ -9,13 +9,27 @@ import java.nio.file.Path
 private val logger = KotlinLogging.logger {}
 
 class CommandRunner {
+  data class Result(val exitCode: Int, val stdout: String, val stderr: String) {
+    val isSuccess: Boolean
+      get() = exitCode == 0
+  }
 
   companion object {
-    suspend fun run(directory: Path, vararg command: String): String {
-      return run(command.toList(), directory)
+    suspend fun runForOutput(directory: Path, vararg command: String): String {
+      return runForOutput(command.toList(), directory)
     }
 
-    suspend fun run(command: List<String>, directory: Path): String {
+    suspend fun runForOutput(command: List<String>, directory: Path): String {
+      val result = run(command, directory)
+      if (result.isSuccess) {
+        return result.stdout
+      } else {
+        val message = "${command.joinToString(" ")}\n${result.stdout}\n${result.stderr}"
+        throw RuntimeException(message)
+      }
+    }
+
+    suspend fun run(command: List<String>, directory: Path): Result {
       logger.info { command.joinToString(" ") { if (it.contains(" ")) """"$it"""" else it } }
       return withContext(Dispatchers.IO) {
         val process = ProcessBuilder(command).directory(directory.toFile()).start()
@@ -23,13 +37,7 @@ class CommandRunner {
         val stdout = process.inputStream.bufferedReader().use { it.readText() }
         val stderr = process.errorStream.bufferedReader().use { it.readText() }
 
-        if (process.exitValue() == 0) {
-          stdout
-        } else {
-          throw RuntimeException(
-            "${command.joinToString(" ")}\n$stdout\n$stderr",
-          )
-        }
+        Result(process.exitValue(), stdout, stderr)
       }
     }
   }

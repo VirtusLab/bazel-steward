@@ -22,7 +22,7 @@ class PrManagementTest : E2EBase() {
 
     val v1 = "1.1.0"
     runBazelStewardWith(workspaceRoot) {
-      it.withGitHostClient(gitPlatform).withMavenOnly(versions = listOf(v1))
+      it.withGitHostClient(gitPlatform).withMockMavenVersions(v1)
     }
 
     val branchV1 = branch(libraryName, v1)
@@ -33,7 +33,7 @@ class PrManagementTest : E2EBase() {
 
     val v2 = "1.1.3"
     runBazelStewardWith(workspaceRoot) {
-      it.withGitHostClient(gitPlatform).withMavenOnly(versions = listOf(v2))
+      it.withGitHostClient(gitPlatform).withMockMavenVersions(v2)
     }
 
     val branchV2 = branch(libraryName, v2)
@@ -53,7 +53,7 @@ class PrManagementTest : E2EBase() {
     val v1 = "1.1.0"
 
     runBazelStewardWith(workspaceRoot) {
-      it.withMavenOnly(versions = listOf(v1))
+      it.withMockMavenVersions(v1)
     }
 
     val branchV1 = branch("io.arrow-kt/arrow-core", v1)
@@ -73,7 +73,7 @@ class PrManagementTest : E2EBase() {
     val gitPlatform = mockGitHostClientWithStatus(GitPlatform.PrStatus.OPEN_NOT_MERGEABLE)
 
     runBazelStewardWith(workspaceRoot) {
-      it.withGitHostClient(gitPlatform).withMavenOnly(versions = listOf(v1))
+      it.withGitHostClient(gitPlatform).withMockMavenVersions(v1)
     }
 
     Assertions.assertThat(gitPlatform.openNewPrCalls).hasSize(0)
@@ -97,7 +97,7 @@ class PrManagementTest : E2EBase() {
     val v1 = "1.1.0"
 
     runBazelStewardWith(workspaceRoot) {
-      it.withMavenOnly(versions = listOf(v1))
+      it.withMockMavenVersions(v1)
     }
 
     val branchV1 = branch("io.arrow-kt/arrow-core", v1)
@@ -109,7 +109,7 @@ class PrManagementTest : E2EBase() {
     }
 
     runBazelStewardWith(workspaceRoot) {
-      it.withPRStatus(GitPlatform.PrStatus.OPEN_MODIFIED).withMavenOnly(versions = listOf(v1))
+      it.withPRStatus(GitPlatform.PrStatus.OPEN_MODIFIED).withMockMavenVersions(v1)
     }
 
     checkBranchesWithVersions(tempDir, project, listOf(branchV1, masterRef), skipLocal = true)
