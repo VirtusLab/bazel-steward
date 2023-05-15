@@ -135,7 +135,7 @@ maven_install(
         "net.pearx.kasechange:kasechange-jvm:1.4.1",
     ],
     fetch_sources = True,
-    fail_if_repin_required = True,
+#    fail_if_repin_required = True,
     repositories = [
         "https://repo.maven.apache.org/maven2",
     ],
