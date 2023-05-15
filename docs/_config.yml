@@ -1,0 +1,7 @@
+# This entry allows using custom themes that are hosed on Github.
+remote_theme: just-the-docs/just-the-docs
+
+# Uncomment this entry for local development
+# theme: just-the-docs
+
+logo: "/images/logo.png"
