@@ -42,15 +42,15 @@ http_archive(
 )
 
 # io_bazel_rules_scala - required to avoid cyclic init error
-IO_BAZEL_RULES_SCALA_TAG = "v5.0.0"
+IO_BAZEL_RULES_SCALA_TAG = "20220201"
 
-IO_BAZEL_RULES_SCALA_SHA = "141a3919b37c80a846796f792dcf6ea7cd6e7b7ca4297603ca961cd22750c951"
+IO_BAZEL_RULES_SCALA_SHA = "77a3b9308a8780fff3f10cdbbe36d55164b85a48123033f5e970fdae262e8eb2"
 
 http_archive(
     name = "io_bazel_rules_scala",
     sha256 = IO_BAZEL_RULES_SCALA_SHA,
-    strip_prefix = "rules_scala-5.0.0",
-    url = "https://github.com/bazelbuild/rules_scala/archive/refs/tags/{}.tar.gz".format(IO_BAZEL_RULES_SCALA_TAG),
+    strip_prefix = "rules_scala-{}".format(IO_BAZEL_RULES_SCALA_TAG),
+    url = "https://github.com/bazelbuild/rules_scala/releases/download/{}/rules_scala-{}.zip".format(IO_BAZEL_RULES_SCALA_TAG, IO_BAZEL_RULES_SCALA_TAG),
 )
 
 load("@io_bazel_rules_scala//:scala_config.bzl", "scala_config")
@@ -134,8 +134,8 @@ maven_install(
         "org.apache.commons:commons-text:1.10.0",
         "net.pearx.kasechange:kasechange-jvm:1.4.1",
     ],
-    fetch_sources = True,
     fail_if_repin_required = True,
+    fetch_sources = True,
     repositories = [
         "https://repo.maven.apache.org/maven2",
     ],
