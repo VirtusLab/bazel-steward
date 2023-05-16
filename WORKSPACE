@@ -134,7 +134,6 @@ maven_install(
         "org.apache.commons:commons-text:1.10.0",
         "net.pearx.kasechange:kasechange-jvm:1.4.1",
     ],
-    fail_if_repin_required = True,
     fetch_sources = True,
     fail_if_repin_required = True,
     repositories = [
