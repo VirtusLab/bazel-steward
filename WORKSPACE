@@ -136,11 +136,12 @@ maven_install(
     ],
     fail_if_repin_required = True,
     fetch_sources = True,
+    maven_install_json = "//:maven_install.json",
     repositories = [
         "https://repo.maven.apache.org/maven2",
     ],
-    maven_install_json = "//:maven_install.json",
 )
 
 load("@maven//:defs.bzl", "pinned_maven_install")
+
 pinned_maven_install()
