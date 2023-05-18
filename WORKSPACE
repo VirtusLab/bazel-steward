@@ -3,15 +3,15 @@ workspace(name = "bazel-steward")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # rules_jvm_external - for maven dependencies
-RULES_JVM_EXTERNAL_TAG = "4.5"
+RULES_JVM_EXTERNAL_TAG = "5.2"
 
-RULES_JVM_EXTERNAL_SHA = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6"
+RULES_JVM_EXTERNAL_SHA = "f86fd42a809e1871ca0aabe89db0d440451219c3ce46c58da240c7dcdc00125f"
 
 http_archive(
     name = "rules_jvm_external",
     sha256 = RULES_JVM_EXTERNAL_SHA,
     strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/4.5.zip",
+    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/5.2/rules_jvm_external-5.2.tar.gz",
 )
 
 IO_BAZEL_KOTLIN_RULES_TAG = "v1.7.1"
@@ -31,9 +31,9 @@ kotlin_repositories()
 register_toolchains("//:kotlin_toolchain")
 
 # bazel_skylib - starlark functions
-BAZEL_SKYLIB_TAG = "1.3.0"
+BAZEL_SKYLIB_TAG = "1.4.1"
 
-BAZEL_SKYLIB_SHA = "74d544d96f4a5bb630d465ca8bbcfe231e3594e5aae57e1edbf17a6eb3ca2506"
+BAZEL_SKYLIB_SHA = "b8a1527901774180afc798aeb28c4634bdccf19c4d98e7bdd1ce79d1fe9aaad7"
 
 http_archive(
     name = "bazel_skylib",
@@ -119,12 +119,12 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 maven_install(
     artifacts = [
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.0",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.1",
         "io.get-coursier:interface:1.0.16",
         "commons-io:commons-io:2.11.0",
-        "com.fasterxml.jackson.module:jackson-module-kotlin:2.15.0",
-        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0",
-        "com.fasterxml.jackson.core:jackson-core:2.15.0",
+        "com.fasterxml.jackson.module:jackson-module-kotlin:2.15.1",
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.1",
+        "com.fasterxml.jackson.core:jackson-core:2.15.1",
         "com.networknt:json-schema-validator:1.0.81",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
         "org.kohsuke:github-api:1.314",
@@ -136,11 +136,12 @@ maven_install(
     ],
     fail_if_repin_required = True,
     fetch_sources = True,
+    maven_install_json = "//:maven_install.json",
     repositories = [
         "https://repo.maven.apache.org/maven2",
     ],
-    maven_install_json = "//:maven_install.json",
 )
 
 load("@maven//:defs.bzl", "pinned_maven_install")
+
 pinned_maven_install()
