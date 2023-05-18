@@ -7,11 +7,7 @@ import kotlinx.cli.optional
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.kohsuke.github.GitHub
-import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
-import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
-import org.virtuslab.bazelsteward.app.provider.PullRequestsLimitsProvider
-import org.virtuslab.bazelsteward.app.provider.SearchPatternProvider
-import org.virtuslab.bazelsteward.app.provider.UpdateRulesProvider
+import org.virtuslab.bazelsteward.app.provider.*
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
@@ -128,10 +124,13 @@ object AppBuilder {
       fileFinder,
     )
 
+    val pullRequestsPrefixesProvider = PullRequestsPrefixesProvider(repoConfig.pullRequests)
+
     val pullRequestsLimitsProvider = PullRequestsLimitsProvider(
       repoConfig.pullRequests,
       gitPlatform,
       appConfig.updateAllPullRequests,
+      pullRequestsPrefixesProvider
     )
     val pullRequestSuggester = PullRequestSuggester(pullRequestConfigProvider)
     val pullRequestManager = PullRequestManager(

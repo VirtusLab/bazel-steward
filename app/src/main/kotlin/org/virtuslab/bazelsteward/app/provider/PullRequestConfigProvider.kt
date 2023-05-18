@@ -1,5 +1,6 @@
 package org.virtuslab.bazelsteward.app.provider
 
+import org.virtuslab.bazelsteward.app.BazelStewardGitBranch.Companion.bazelPrefix
 import org.virtuslab.bazelsteward.app.DependencyFilterApplier
 import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
@@ -28,7 +29,8 @@ class PullRequestConfigProvider(
     val title = filter.findNotNullOrDefault(default.titleTemplate) { it.title }
     val body = filter.findNotNullOrDefault(default.bodyTemplate) { it.body }
     val tags = filter.findNotNullOrDefault(default.labels) { it.labels }
-    return PullRequestConfig(title, body, tags)
+    val prefix = filter.findNotNullOrDefault(default.prefix) { it.prefix}
+    return PullRequestConfig(title, body, tags, prefix)
   }
 
   companion object {
@@ -36,6 +38,7 @@ class PullRequestConfigProvider(
       "Updated \${dependencyId} to \${versionTo}",
       "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
       emptyList(),
+       "$bazelPrefix/\${libraryId}/"
     )
   }
 }
@@ -44,4 +47,5 @@ data class PullRequestConfig(
   val titleTemplate: String,
   val bodyTemplate: String,
   val labels: List<String>,
+  val prefix: String
 )

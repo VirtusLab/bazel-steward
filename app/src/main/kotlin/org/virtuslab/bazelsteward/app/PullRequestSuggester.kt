@@ -62,11 +62,13 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
 
     val versionFrom = resolveVersion { it.currentLibrary.version }
     val versionTo = resolveVersion { it.suggestedVersion }
-    val branch = BazelStewardGitBranch(libraryId, versionTo)
 
     val templateApplier = prepareSubstitutions(libraryId, versionFrom, versionTo, updates)
     val title = templateApplier.apply(config.titleTemplate)
     val body = templateApplier.apply(config.bodyTemplate)
+    val prefix = templateApplier.apply(config.prefix)
+
+    val branch = BazelStewardGitBranch(prefix, versionTo)
 
     val commit = CommitRequest(title, updates.flatMap { it.fileChanges }.distinct())
 
@@ -96,6 +98,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
       "versionTo" to versionTo.value,
       "dependencyId" to libraryId.name,
       "updates" to updatesString,
+      "libraryId" to libraryId.name.replace(":", "/"),
     )
 
     if (libraryId is MavenLibraryId) {

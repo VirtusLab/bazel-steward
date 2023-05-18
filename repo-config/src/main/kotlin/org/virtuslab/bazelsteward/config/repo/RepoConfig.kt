@@ -72,6 +72,7 @@ data class PullRequestsConfig(
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   @JsonDeserialize(using = ListOrItemDeserializer::class)
   val labels: List<String> = emptyList(),
+  val prefix: String? = null,
   val limits: PullRequestLimits? = null,
   val groupId: GroupId? = null,
 ) : DependencyFilter
