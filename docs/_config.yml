@@ -4,6 +4,8 @@ remote_theme: just-the-docs/just-the-docs
 # Uncomment this entry for local development
 # theme: just-the-docs
 
+color_scheme: light_green
+
 logo: "/images/logo.png"
 
 aux_links:
