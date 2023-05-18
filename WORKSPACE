@@ -3,15 +3,15 @@ workspace(name = "bazel-steward")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # rules_jvm_external - for maven dependencies
-RULES_JVM_EXTERNAL_TAG = "4.5"
+RULES_JVM_EXTERNAL_TAG = "5.2"
 
-RULES_JVM_EXTERNAL_SHA = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6"
+RULES_JVM_EXTERNAL_SHA = "f86fd42a809e1871ca0aabe89db0d440451219c3ce46c58da240c7dcdc00125f"
 
 http_archive(
     name = "rules_jvm_external",
     sha256 = RULES_JVM_EXTERNAL_SHA,
     strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/4.5.zip",
+    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/5.2/rules_jvm_external-5.2.tar.gz",
 )
 
 IO_BAZEL_KOTLIN_RULES_TAG = "v1.7.1"
