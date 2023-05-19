@@ -43,6 +43,9 @@ search-paths:
       - ".bazelversion"
       - ".github/**/*.yaml"
 pull-requests:
+  -   
+    dependencies: "com.fasterxml.jackson*:*"
+    group-id: jackson
   - 
     title: "[maintenance] Updated ${group}/${artifact} from ${versionFrom} to ${versionTo}"
     kinds: maven
