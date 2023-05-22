@@ -124,13 +124,11 @@ object AppBuilder {
       fileFinder,
     )
 
-    val pullRequestsPrefixesProvider = PullRequestsPrefixesProvider(repoConfig.pullRequests)
-
     val pullRequestsLimitsProvider = PullRequestsLimitsProvider(
       repoConfig.pullRequests,
       gitPlatform,
       appConfig.updateAllPullRequests,
-      pullRequestsPrefixesProvider
+      pullRequestConfigProvider
     )
     val pullRequestSuggester = PullRequestSuggester(pullRequestConfigProvider)
     val pullRequestManager = PullRequestManager(

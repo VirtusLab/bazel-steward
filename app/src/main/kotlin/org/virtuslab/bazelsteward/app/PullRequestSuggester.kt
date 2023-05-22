@@ -25,11 +25,11 @@ data class PullRequestSuggestion(
 }
 
 @Suppress("NAME_SHADOWING")
-class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
+class PullRequestSuggester(private val pullRequestConfigProvider: PullRequestConfigProvider) {
 
   fun suggestPullRequests(updates: List<LibraryUpdate>): List<PullRequestSuggestion> {
     return updates
-      .groupBy { update -> provider.resolveGroup(update.suggestion.currentLibrary) }
+      .groupBy { update -> pullRequestConfigProvider.resolveGroup(update.suggestion.currentLibrary) }
       .flatMap { (group, updates) ->
         if (group != null) {
           listOf(suggestForGroup(group, updates))
@@ -41,7 +41,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
 
   private fun suggestForGroup(group: GroupId, updates: List<LibraryUpdate>): PullRequestSuggestion {
     return suggest(
-      config = provider.resolveForGroup(group),
+      config = pullRequestConfigProvider.resolveForGroup(group),
       libraryId = group,
       updates = updates,
     )
@@ -49,7 +49,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
 
   private fun suggestForLibrary(update: LibraryUpdate): PullRequestSuggestion {
     return suggest(
-      config = provider.resolveForLibrary(update.suggestion.currentLibrary),
+      config = pullRequestConfigProvider.resolveForLibrary(update.suggestion.currentLibrary),
       libraryId = update.suggestion.currentLibrary.id,
       updates = listOf(update),
     )
@@ -66,9 +66,9 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
     val templateApplier = prepareSubstitutions(libraryId, versionFrom, versionTo, updates)
     val title = templateApplier.apply(config.titleTemplate)
     val body = templateApplier.apply(config.bodyTemplate)
-    val prefix = templateApplier.apply(config.prefix)
+    val prefix = templateApplier.apply(config.branchPrefix)
 
-    val branch = BazelStewardGitBranch(prefix, versionTo)
+    val branch = BazelStewardGitBranch(prefix, libraryId, versionTo)
 
     val commit = CommitRequest(title, updates.flatMap { it.fileChanges }.distinct())
 
@@ -97,8 +97,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
       "versionFrom" to versionFrom.value,
       "versionTo" to versionTo.value,
       "dependencyId" to libraryId.name,
-      "updates" to updatesString,
-      "libraryId" to libraryId.name.replace(":", "/"),
+      "updates" to updatesString
     )
 
     if (libraryId is MavenLibraryId) {

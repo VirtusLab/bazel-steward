@@ -19,6 +19,7 @@ class PullRequestSuggesterTest {
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
       labels = listOf("test-label"),
+      branchPrefix = "test-prefix"
     )
 
     val provider = PullRequestConfigProvider(listOf(config), emptyList())
@@ -41,6 +42,7 @@ class PullRequestSuggesterTest {
     dsc.title shouldBe "$group and $artifact"
     dsc.body shouldBe "$dependencyId update $versionFrom to $versionTo, also \${not-existing}"
     dsc.labels.shouldContainExactlyInAnyOrder("test-label")
+    dsc.branch.name shouldBe "${config.branchPrefix}/$group/$artifact/$versionTo"
   }
 
   @Test
@@ -65,5 +67,6 @@ class PullRequestSuggesterTest {
     dsc.title shouldBe "Updated $dependencyId to $versionTo"
     dsc.body shouldBe "Updates $dependencyId from $versionFrom to $versionTo"
     dsc.labels.shouldContainExactlyInAnyOrder(emptyList())
+    dsc.branch.name shouldBe "bazel-steward/$group/$artifact/$versionTo"
   }
 }

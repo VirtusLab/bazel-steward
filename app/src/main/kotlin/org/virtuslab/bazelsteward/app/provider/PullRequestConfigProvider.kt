@@ -8,7 +8,7 @@ import org.virtuslab.bazelsteward.core.library.GroupId
 import org.virtuslab.bazelsteward.core.library.Library
 
 class PullRequestConfigProvider(
-  configs: List<PullRequestsConfig>,
+  private val configs: List<PullRequestsConfig>,
   dependencyKinds: List<DependencyKind<*>>,
 ) {
   private val applier = DependencyFilterApplier(configs, dependencyKinds)
@@ -29,8 +29,14 @@ class PullRequestConfigProvider(
     val title = filter.findNotNullOrDefault(default.titleTemplate) { it.title }
     val body = filter.findNotNullOrDefault(default.bodyTemplate) { it.body }
     val tags = filter.findNotNullOrDefault(default.labels) { it.labels }
-    val prefix = filter.findNotNullOrDefault(default.prefix) { it.prefix}
+    val prefix = filter.findNotNullOrDefault(default.branchPrefix) { it.branchPrefix}
     return PullRequestConfig(title, body, tags, prefix)
+  }
+
+  fun resolvePrefixes(): List<String> {
+    return configs.filter { it.branchPrefix != null }
+      .map { it.branchPrefix!! }
+      .plus(bazelPrefix)
   }
 
   companion object {
@@ -38,7 +44,7 @@ class PullRequestConfigProvider(
       "Updated \${dependencyId} to \${versionTo}",
       "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
       emptyList(),
-       "$bazelPrefix/\${libraryId}/"
+      bazelPrefix
     )
   }
 }
@@ -47,5 +53,5 @@ data class PullRequestConfig(
   val titleTemplate: String,
   val bodyTemplate: String,
   val labels: List<String>,
-  val prefix: String
+  val branchPrefix: String
 )
