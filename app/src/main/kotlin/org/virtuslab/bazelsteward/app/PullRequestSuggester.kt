@@ -25,11 +25,11 @@ data class PullRequestSuggestion(
 }
 
 @Suppress("NAME_SHADOWING")
-class PullRequestSuggester(private val pullRequestConfigProvider: PullRequestConfigProvider) {
+class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
 
   fun suggestPullRequests(updates: List<LibraryUpdate>): List<PullRequestSuggestion> {
     return updates
-      .groupBy { update -> pullRequestConfigProvider.resolveGroup(update.suggestion.currentLibrary) }
+      .groupBy { update -> provider.resolveGroup(update.suggestion.currentLibrary) }
       .flatMap { (group, updates) ->
         if (group != null) {
           listOf(suggestForGroup(group, updates))
@@ -41,7 +41,7 @@ class PullRequestSuggester(private val pullRequestConfigProvider: PullRequestCon
 
   private fun suggestForGroup(group: GroupId, updates: List<LibraryUpdate>): PullRequestSuggestion {
     return suggest(
-      config = pullRequestConfigProvider.resolveForGroup(group),
+      config = provider.resolveForGroup(group),
       libraryId = group,
       updates = updates,
     )
@@ -49,7 +49,7 @@ class PullRequestSuggester(private val pullRequestConfigProvider: PullRequestCon
 
   private fun suggestForLibrary(update: LibraryUpdate): PullRequestSuggestion {
     return suggest(
-      config = pullRequestConfigProvider.resolveForLibrary(update.suggestion.currentLibrary),
+      config = provider.resolveForLibrary(update.suggestion.currentLibrary),
       libraryId = update.suggestion.currentLibrary.id,
       updates = listOf(update),
     )
@@ -97,7 +97,7 @@ class PullRequestSuggester(private val pullRequestConfigProvider: PullRequestCon
       "versionFrom" to versionFrom.value,
       "versionTo" to versionTo.value,
       "dependencyId" to libraryId.name,
-      "updates" to updatesString
+      "updates" to updatesString,
     )
 
     if (libraryId is MavenLibraryId) {
