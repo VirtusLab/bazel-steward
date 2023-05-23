@@ -14,6 +14,7 @@ import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitPlatform
+import org.virtuslab.bazelsteward.core.PullRequest
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
@@ -36,6 +37,8 @@ open class E2EBase {
 
   protected fun branch(libraryId: String, version: String): String =
     "$branchRef/$libraryId/$version"
+
+  protected fun branch(name: String): String =  "$branchRef/$name"
 
   protected fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
     return libs.map { "$branchRef/${it.first}/${it.second}" } + masterRef
@@ -260,6 +263,13 @@ open class E2EBase {
       override fun checkPrStatus(branch: GitBranch) = status
     }
   }
+
+  protected fun mockGitHostClientWithBranches(pullRequests: List<PullRequest>, status: GitPlatform.PrStatus): MockGitPlatform {
+    return object : MockGitPlatform() {
+      override fun getOpenPrs() = pullRequests
+      override fun checkPrStatus(branch: GitBranch) = status
+    }
+    }
 
   class GithubRulesResolverMock(private val expectedVersion: Version) : RulesResolver {
     override fun resolveRuleVersions(ruleId: RuleLibraryId): List<Version> {
