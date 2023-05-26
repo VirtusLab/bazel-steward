@@ -66,7 +66,7 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
     val templateApplier = prepareSubstitutions(libraryId, versionFrom, versionTo, updates)
     val title = templateApplier.apply(config.titleTemplate)
     val body = templateApplier.apply(config.bodyTemplate)
-    val prefix = templateApplier.apply(config.branchPrefix)
+    val prefix = config.branchPrefix
 
     val branch = BazelStewardGitBranch(prefix, libraryId, versionTo)
 
