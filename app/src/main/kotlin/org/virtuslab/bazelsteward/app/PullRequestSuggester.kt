@@ -66,9 +66,9 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
     val templateApplier = prepareSubstitutions(libraryId, versionFrom, versionTo, updates)
     val title = templateApplier.apply(config.titleTemplate)
     val body = templateApplier.apply(config.bodyTemplate)
-    val prefix = config.branchPrefix
+    val branchPrefix = config.branchPrefix
 
-    val branch = BazelStewardGitBranch(prefix, libraryId, versionTo)
+    val branch = BazelStewardGitBranch(branchPrefix, libraryId, versionTo)
 
     val commit = CommitRequest(title, updates.flatMap { it.fileChanges }.distinct())
 

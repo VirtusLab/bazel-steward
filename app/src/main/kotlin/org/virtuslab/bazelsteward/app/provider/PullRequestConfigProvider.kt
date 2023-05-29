@@ -28,8 +28,8 @@ class PullRequestConfigProvider(
     val title = filter.findNotNullOrDefault(default.titleTemplate) { it.title }
     val body = filter.findNotNullOrDefault(default.bodyTemplate) { it.body }
     val tags = filter.findNotNullOrDefault(default.labels) { it.labels }
-    val prefix = filter.findNotNullOrDefault(default.branchPrefix) { it.branchPrefix }
-    return PullRequestConfig(title, body, tags, prefix)
+    val branchPrefix = filter.findNotNullOrDefault(default.branchPrefix) { it.branchPrefix }
+    return PullRequestConfig(title, body, tags, branchPrefix)
   }
 
   fun resolvePrefixes(): List<String> {

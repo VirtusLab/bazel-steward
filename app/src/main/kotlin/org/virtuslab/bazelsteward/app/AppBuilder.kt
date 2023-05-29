@@ -85,8 +85,7 @@ object AppBuilder {
     )
     logger.info { appConfig }
 
-    val repoConfig =
-      runBlocking { RepoConfigParser().load(configPath?.let { Path(it) }, repositoryRoot, noInternalConfig) }
+    val repoConfig = runBlocking { RepoConfigParser().load(configPath?.let { Path(it) }, repositoryRoot, noInternalConfig) }
     val mavenDataExtractor = MavenDataExtractor(appConfig.workspaceRoot)
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()
