@@ -17,17 +17,15 @@ class PullRequestConfigProviderTest {
     )
 
     val config2 = PullRequestsConfig(
-      dependencies = listOf(DependencyNameFilter.Default("commons-io:commons-io")),
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
       labels = listOf("test-label"),
-      branchPrefix = "test-prefix-2/",
     )
 
     val provider = PullRequestConfigProvider(listOf(config1, config2), emptyList())
 
     val resolvedPrefixes = provider.resolvePrefixes()
-    resolvedPrefixes shouldBe listOf("test-prefix-1/", "test-prefix-2/")
+    resolvedPrefixes shouldBe listOf("test-prefix-1/", "bazel-steward/")
   }
 
   @Test

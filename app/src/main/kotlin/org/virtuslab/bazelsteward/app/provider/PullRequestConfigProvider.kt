@@ -33,11 +33,12 @@ class PullRequestConfigProvider(
   }
 
   fun resolvePrefixes(): List<String> {
-    val configsWithBranchPrefixes = configs.filter { it.branchPrefix != null }
-    if (configsWithBranchPrefixes.isEmpty() && configs.all { it.acceptsAll() }) {
-      return listOf(default.branchPrefix)
+    val configsWithBranchPrefixes = configs.filter { it.branchPrefix != null }.mapNotNull { it.branchPrefix }
+    return if (configsWithBranchPrefixes.isEmpty() || configs.any { it.acceptsAll() }) {
+      configsWithBranchPrefixes.plus(default.branchPrefix)
+    } else {
+      configsWithBranchPrefixes
     }
-    return configsWithBranchPrefixes.mapNotNull { it.branchPrefix }
   }
 
   companion object {
