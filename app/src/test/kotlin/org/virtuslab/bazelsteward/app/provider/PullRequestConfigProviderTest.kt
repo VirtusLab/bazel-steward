@@ -33,7 +33,6 @@ class PullRequestConfigProviderTest {
   @Test
   fun `should correctly resolve default prefix`() {
     val config = PullRequestsConfig(
-      kinds = listOf("maven"),
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
       labels = listOf("test-label")

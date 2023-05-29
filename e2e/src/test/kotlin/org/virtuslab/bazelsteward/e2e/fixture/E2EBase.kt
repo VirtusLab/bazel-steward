@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.AppResult
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider.Companion.default
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
@@ -30,20 +31,18 @@ import kotlin.io.path.readText
 
 open class E2EBase : IntegrationTestBase() {
   protected val heads = "refs/heads/"
-  private val branchRef = "$heads\$bazel-steward"
+  private val branchRef = "$heads${default.branchPrefix}"
   protected val masterRef = "$heads$master"
 
   protected fun branch(libraryId: String, version: String): String =
     "$branchRef/$libraryId/$version"
 
-  protected fun branch(name: String): String =  "$branchRef/$name"
-
   protected fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
-    return libs.map { "$branchRef/${it.first}/${it.second}" } + masterRef
+    return libs.map { "$branchRef${it.first}/${it.second}" } + masterRef
   }
 
   protected fun expectedBranchPrefixes(vararg libs: String): List<String> {
-    return libs.map { "$branchRef/$it/" } + masterRef
+    return libs.map { "$branchRef$it/" } + masterRef
   }
 
   protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = emptyList()): AppResult {

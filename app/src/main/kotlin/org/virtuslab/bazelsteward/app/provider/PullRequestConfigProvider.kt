@@ -34,7 +34,7 @@ class PullRequestConfigProvider(
 
   fun resolvePrefixes(): List<String> {
     val configsWithBranchPrefixes = configs.filter { it.branchPrefix != null }
-    if(configsWithBranchPrefixes.isEmpty() && configs.any { it.acceptsAll() }){
+    if(configsWithBranchPrefixes.isEmpty() && configs.all { it.acceptsAll() }){
       return listOf(default.branchPrefix)
     }
     return configsWithBranchPrefixes.mapNotNull { it.branchPrefix }
