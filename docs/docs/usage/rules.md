@@ -53,7 +53,9 @@ When the rule is found, it can configure for a dependency the following things:
     Enables grouping for dependencies matching filter (specified by `dependencies` and/or `kinds` keys).
     This id will be used in branch name, pull request title and commit message.
     Note: Use this only for dependencies that are released together under the same version. Other scenarios might have unexpected results.
-	  
+  * `branch-prefix` (string) <br/>
+        Overrides template used for generating pull request branch-prefix.
+
 * In `post-update-hooks` section:
   * `commands` (list of strings) <br/>
     List of commands to run after applying an update. Commands are run separately under `sh -c`
