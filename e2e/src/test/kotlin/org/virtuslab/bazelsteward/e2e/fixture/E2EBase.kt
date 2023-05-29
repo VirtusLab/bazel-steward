@@ -35,7 +35,7 @@ open class E2EBase : IntegrationTestBase() {
   protected val masterRef = "$heads$master"
 
   protected fun branch(libraryId: String, version: String): String =
-    "$branchRef/$libraryId/$version"
+    "$branchRef$libraryId/$version"
 
   protected fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
     return libs.map { "$branchRef${it.first}/${it.second}" } + masterRef
