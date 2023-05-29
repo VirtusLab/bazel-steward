@@ -14,9 +14,9 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/5.2/rules_jvm_external-5.2.tar.gz",
 )
 
-IO_BAZEL_KOTLIN_RULES_TAG = "v1.7.1"
+IO_BAZEL_KOTLIN_RULES_TAG = "v1.8"
 
-IO_BAZEL_KOTLIN_RULES_SHA = "fd92a98bd8a8f0e1cdcb490b93f5acef1f1727ed992571232d33de42395ca9b3"
+IO_BAZEL_KOTLIN_RULES_SHA = "01293740a16e474669aba5b5a1fe3d368de5832442f164e4fbfc566815a8bc3a"
 
 http_archive(
     name = "io_bazel_rules_kotlin",
@@ -121,14 +121,14 @@ maven_install(
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1",
         "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.1",
         "io.get-coursier:interface:1.0.16",
-        "commons-io:commons-io:2.11.0",
+        "commons-io:commons-io:2.12.0",
         "com.fasterxml.jackson.module:jackson-module-kotlin:2.15.1",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.1",
         "com.fasterxml.jackson.core:jackson-core:2.15.1",
-        "com.networknt:json-schema-validator:1.0.81",
+        "com.networknt:json-schema-validator:1.0.83",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.5",
         "org.kohsuke:github-api:1.314",
-        "io.github.microutils:kotlin-logging-jvm:3.0.4",
+        "io.github.microutils:kotlin-logging-jvm:3.0.5",
         "org.slf4j:slf4j-simple:2.0.7",
         "org.json:json:20230227",
         "org.apache.commons:commons-text:1.10.0",
