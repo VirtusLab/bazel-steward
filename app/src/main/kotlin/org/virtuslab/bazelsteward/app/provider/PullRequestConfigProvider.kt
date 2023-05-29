@@ -1,6 +1,5 @@
 package org.virtuslab.bazelsteward.app.provider
 
-import org.virtuslab.bazelsteward.app.BazelStewardGitBranch.Companion.bazelPrefix
 import org.virtuslab.bazelsteward.app.DependencyFilterApplier
 import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
@@ -34,9 +33,11 @@ class PullRequestConfigProvider(
   }
 
   fun resolvePrefixes(): List<String> {
-    return configs.filter { it.branchPrefix != null }
-      .map { it.branchPrefix!! }
-      .plus(bazelPrefix)
+    val configsWithBranchPrefixes = configs.filter { it.branchPrefix != null }
+    if(configsWithBranchPrefixes.isEmpty() && configs.any { it.acceptsAll() }){
+      return listOf(default.branchPrefix)
+    }
+    return configsWithBranchPrefixes.mapNotNull { it.branchPrefix }
   }
 
   companion object {
@@ -44,7 +45,7 @@ class PullRequestConfigProvider(
       "Updated \${dependencyId} to \${versionTo}",
       "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
       emptyList(),
-      bazelPrefix
+      "bazel-steward/"
     )
   }
 }

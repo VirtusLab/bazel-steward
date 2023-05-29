@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.e2e.fixture
+package org.virtuslab.bazelsteward.fixture
 
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitPlatform
