@@ -4,8 +4,8 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Skipped
 import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Ok
+import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Skipped
 import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestsLimitsProvider
@@ -41,7 +41,7 @@ class PullRequestManagerTest : IntegrationTestBase() {
         GitBranch("test-prefix/2") to PrStatus.OPEN_MERGEABLE,
         GitBranch("test-prefix/3") to PrStatus.CLOSED,
         GitBranch("test-prefix/4") to PrStatus.CLOSED,
-      )
+      ),
     )
 
     val workspace = prepareWorkspace(tempDir, "dummy")
@@ -52,19 +52,20 @@ class PullRequestManagerTest : IntegrationTestBase() {
         GitBranch("bazel-steward/group-name/artifact-name/version-test-new"),
         "Updated group-name:artifact-name to version-test-new",
         "Updates group-name:artifact-name from version-test-old to version-test-new",
-        emptyList()
+        emptyList(),
       ),
       "bazel-steward/group-name/artifact-name/",
       listOf(
         CommitRequest(
-          "Updated group-name:artifact-name to version-test-new", listOf(
+          "Updated group-name:artifact-name to version-test-new",
+          listOf(
             FileChange(workspace.resolve("WORKSPACE"), 1122, 6, "2.15.0"),
             FileChange(workspace.resolve("WORKSPACE"), 1180, 6, "2.15.0"),
             FileChange(workspace.resolve("WORKSPACE"), 1242, 6, "2.15.0"),
-          )
-        )
+          ),
+        ),
       ),
-      listOf(MavenCoordinates(MavenLibraryId("group-name", "artifact-name"), SimpleVersion("version-test-old")))
+      listOf(MavenCoordinates(MavenLibraryId("group-name", "artifact-name"), SimpleVersion("version-test-old"))),
     )
 
     runBlocking {
@@ -75,13 +76,12 @@ class PullRequestManagerTest : IntegrationTestBase() {
 
   @Test
   fun `shouldn't create pull request when exceeds limit`(@TempDir tempDir: Path) {
-
     val config = PullRequestsConfig(
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
       labels = listOf("test-label"),
       branchPrefix = "test-prefix",
-      limits = PullRequestLimits(3, 3)
+      limits = PullRequestLimits(3, 3),
     )
 
     val gitPlatform = mockGitPlatform(
@@ -90,7 +90,7 @@ class PullRequestManagerTest : IntegrationTestBase() {
         GitBranch("test-prefix/2") to PrStatus.OPEN_MERGEABLE,
         GitBranch("test-prefix/3") to PrStatus.OPEN_MERGEABLE,
         GitBranch("test-prefix/4") to PrStatus.CLOSED,
-      )
+      ),
     )
 
     val workspace = prepareWorkspace(tempDir, "dummy")
@@ -101,19 +101,20 @@ class PullRequestManagerTest : IntegrationTestBase() {
         GitBranch("bazel-steward/group-name/artifact-name/version-test-new"),
         "Updated group-name:artifact-name to version-test-new",
         "Updates group-name:artifact-name from version-test-old to version-test-new",
-        emptyList()
+        emptyList(),
       ),
       "bazel-steward/group-name/artifact-name/",
       listOf(
         CommitRequest(
-          "Updated group-name:artifact-name to version-test-new", listOf(
+          "Updated group-name:artifact-name to version-test-new",
+          listOf(
             FileChange(workspace.resolve("WORKSPACE"), 1122, 6, "2.15.0"),
             FileChange(workspace.resolve("WORKSPACE"), 1180, 6, "2.15.0"),
             FileChange(workspace.resolve("WORKSPACE"), 1242, 6, "2.15.0"),
-          )
-        )
+          ),
+        ),
       ),
-      listOf(MavenCoordinates(MavenLibraryId("group-name", "artifact-name"), SimpleVersion("version-test-old")))
+      listOf(MavenCoordinates(MavenLibraryId("group-name", "artifact-name"), SimpleVersion("version-test-old"))),
     )
 
     runBlocking {
@@ -133,7 +134,7 @@ class PullRequestManagerTest : IntegrationTestBase() {
   private fun createPullRequestManager(
     config: PullRequestsConfig,
     gitPlatform: MockGitPlatform,
-    workspace: Path
+    workspace: Path,
   ): PullRequestManager {
     val git = GitOperations(workspace, "master")
 

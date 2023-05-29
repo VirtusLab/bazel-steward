@@ -11,7 +11,7 @@ class PullRequestsLimitsProvider(
   private val configs: List<PullRequestsConfig>,
   private val gitPlatform: GitPlatform,
   private val updateAllPullRequests: Boolean,
-  private val pullRequestsConfigProvider: PullRequestConfigProvider
+  private val pullRequestsConfigProvider: PullRequestConfigProvider,
 ) {
   fun create(): PullRequestsLimits {
     val configsWithLimits = configs.filter { it.limits != null }
@@ -33,7 +33,7 @@ class PullRequestsLimitsProvider(
 
     val openPrs = maxOpenPrs?.let {
       gitPlatform.getOpenPrs()
-      .count { pr -> prefixes.any { pr.branch.name.startsWith(it) } }
+        .count { pr -> prefixes.any { pr.branch.name.startsWith(it) } }
     } ?: 0
 
     return PullRequestsLimits(openPrs, maxOpenPrs, maxUpdates, updateAllPullRequests)

@@ -1,9 +1,9 @@
 package org.virtuslab.bazelsteward.app.provider
-import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.virtuslab.bazelsteward.config.repo.DependencyNameFilter
+import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 
 class PullRequestConfigProviderTest {
   @Test
@@ -13,7 +13,7 @@ class PullRequestConfigProviderTest {
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
       labels = listOf("test-label"),
-      branchPrefix = "test-prefix-1/"
+      branchPrefix = "test-prefix-1/",
     )
 
     val config2 = PullRequestsConfig(
@@ -21,7 +21,7 @@ class PullRequestConfigProviderTest {
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
       labels = listOf("test-label"),
-      branchPrefix = "test-prefix-2/"
+      branchPrefix = "test-prefix-2/",
     )
 
     val provider = PullRequestConfigProvider(listOf(config1, config2), emptyList())
@@ -35,7 +35,7 @@ class PullRequestConfigProviderTest {
     val config = PullRequestsConfig(
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
-      labels = listOf("test-label")
+      labels = listOf("test-label"),
     )
 
     val provider = PullRequestConfigProvider(listOf(config), emptyList())

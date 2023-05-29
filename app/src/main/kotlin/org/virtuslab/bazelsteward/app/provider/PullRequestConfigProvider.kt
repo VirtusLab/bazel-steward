@@ -28,13 +28,13 @@ class PullRequestConfigProvider(
     val title = filter.findNotNullOrDefault(default.titleTemplate) { it.title }
     val body = filter.findNotNullOrDefault(default.bodyTemplate) { it.body }
     val tags = filter.findNotNullOrDefault(default.labels) { it.labels }
-    val prefix = filter.findNotNullOrDefault(default.branchPrefix) { it.branchPrefix}
+    val prefix = filter.findNotNullOrDefault(default.branchPrefix) { it.branchPrefix }
     return PullRequestConfig(title, body, tags, prefix)
   }
 
   fun resolvePrefixes(): List<String> {
     val configsWithBranchPrefixes = configs.filter { it.branchPrefix != null }
-    if(configsWithBranchPrefixes.isEmpty() && configs.all { it.acceptsAll() }){
+    if (configsWithBranchPrefixes.isEmpty() && configs.all { it.acceptsAll() }) {
       return listOf(default.branchPrefix)
     }
     return configsWithBranchPrefixes.mapNotNull { it.branchPrefix }
@@ -45,7 +45,7 @@ class PullRequestConfigProvider(
       "Updated \${dependencyId} to \${versionTo}",
       "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
       emptyList(),
-      "bazel-steward/"
+      "bazel-steward/",
     )
   }
 }
@@ -54,5 +54,5 @@ data class PullRequestConfig(
   val titleTemplate: String,
   val bodyTemplate: String,
   val labels: List<String>,
-  val branchPrefix: String
+  val branchPrefix: String,
 )

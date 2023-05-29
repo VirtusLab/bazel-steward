@@ -19,7 +19,7 @@ class PullRequestSuggesterTest {
       title = "\${group} and \${artifact}",
       body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
       labels = listOf("test-label"),
-      branchPrefix = "test-prefix/"
+      branchPrefix = "test-prefix/",
     )
 
     val provider = PullRequestConfigProvider(listOf(config), emptyList())
