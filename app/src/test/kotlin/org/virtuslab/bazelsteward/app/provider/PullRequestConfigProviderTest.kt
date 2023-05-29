@@ -2,7 +2,6 @@ package org.virtuslab.bazelsteward.app.provider
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import org.virtuslab.bazelsteward.config.repo.DependencyNameFilter
 import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 
 class PullRequestConfigProviderTest {
