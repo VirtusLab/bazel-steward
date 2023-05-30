@@ -29,7 +29,7 @@ class PullRequestsLimitsProvider(
     val maxOpenPrs = correct.mapNotNull { it.limits?.maxOpen }.maxOrNull()
     val maxUpdates = correct.mapNotNull { it.limits?.maxUpdatesPerRun }.maxOrNull()
 
-    val prefixes = pullRequestsConfigProvider.resolvePrefixes()
+    val prefixes = pullRequestsConfigProvider.resolveBranchPrefixes()
 
     val openPrs = maxOpenPrs?.let {
       gitPlatform.getOpenPrs()

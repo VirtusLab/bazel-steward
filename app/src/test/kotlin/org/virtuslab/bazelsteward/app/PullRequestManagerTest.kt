@@ -17,17 +17,19 @@ import org.virtuslab.bazelsteward.core.NewPullRequest
 import org.virtuslab.bazelsteward.core.common.CommitRequest
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.GitOperations
-import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.fixture.IntegrationTestBase
 import org.virtuslab.bazelsteward.fixture.MockGitPlatform
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
-import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import java.nio.file.Path
 
 class PullRequestManagerTest : IntegrationTestBase() {
   @Test
   fun `should create pull request when doesn't exceed limit`(@TempDir tempDir: Path) {
-    val config = createPullRequestsConfig()
+    val branchPrefix = "test-prefix"
+    val maxOpenPrs = 3
+    val maxUpdatesPerPr = 3
+    val limits = PullRequestLimits(maxOpenPrs, maxUpdatesPerPr)
+    val config = createPullRequestsConfig(branchPrefix, limits)
 
     val gitPlatform = mockGitPlatform(
       mapOf(
@@ -41,7 +43,8 @@ class PullRequestManagerTest : IntegrationTestBase() {
     val workspace = prepareWorkspace(tempDir, "dummy")
     val pullRequestManager = createPullRequestManager(config, gitPlatform, workspace)
 
-    val prSuggestion = createPullRequestSuggestion(workspace)
+    val branchName = "test-prefix/group-name/artifact-name/version-test-new"
+    val prSuggestion = createPullRequestSuggestion(workspace, branchName)
 
     runBlocking {
       val results = pullRequestManager.applySuggestions(listOf(prSuggestion))
@@ -51,7 +54,11 @@ class PullRequestManagerTest : IntegrationTestBase() {
 
   @Test
   fun `shouldn't create pull request when exceeds limit`(@TempDir tempDir: Path) {
-    val config = createPullRequestsConfig()
+    val branchPrefix = "test-prefix"
+    val maxOpenPrs = 3
+    val maxUpdatesPerPr = 3
+    val limits = PullRequestLimits(maxOpenPrs, maxUpdatesPerPr)
+    val config = createPullRequestsConfig(branchPrefix, limits)
 
     val gitPlatform = mockGitPlatform(
       mapOf(
@@ -65,7 +72,8 @@ class PullRequestManagerTest : IntegrationTestBase() {
     val workspace = prepareWorkspace(tempDir, "dummy")
     val pullRequestManager = createPullRequestManager(config, gitPlatform, workspace)
 
-    val prSuggestion = createPullRequestSuggestion(workspace)
+    val branchName = "test-prefix/group-name/artifact-name/version-test-new"
+    val prSuggestion = createPullRequestSuggestion(workspace, branchName)
 
     runBlocking {
       val results = pullRequestManager.applySuggestions(listOf(prSuggestion))
@@ -73,9 +81,9 @@ class PullRequestManagerTest : IntegrationTestBase() {
     }
   }
 
-  private fun createPullRequestSuggestion(workspace: Path) = PullRequestSuggestion(
+  private fun createPullRequestSuggestion(workspace: Path, branchName: String) = PullRequestSuggestion(
     NewPullRequest(
-      GitBranch("bazel-steward/group-name/artifact-name/version-test-new"),
+      GitBranch(branchName),
       "Updated group-name:artifact-name to version-test-new",
       "Updates group-name:artifact-name from version-test-old to version-test-new",
       emptyList(),
@@ -86,20 +94,18 @@ class PullRequestManagerTest : IntegrationTestBase() {
         "Updated group-name:artifact-name to version-test-new",
         listOf(
           FileChange(workspace.resolve("WORKSPACE"), 1122, 6, "2.15.0"),
-          FileChange(workspace.resolve("WORKSPACE"), 1180, 6, "2.15.0"),
-          FileChange(workspace.resolve("WORKSPACE"), 1242, 6, "2.15.0"),
         ),
       ),
     ),
-    listOf(MavenCoordinates(MavenLibraryId("group-name", "artifact-name"), SimpleVersion("version-test-old"))),
+    listOf(MavenCoordinates.of("group-name", "artifact-name", "version-test-old")),
   )
 
-  private fun createPullRequestsConfig() = PullRequestsConfig(
+  private fun createPullRequestsConfig(branchPrefix: String, limits: PullRequestLimits) = PullRequestsConfig(
     title = "\${group} and \${artifact}",
     body = "\${dependencyId} update \${versionFrom} to \${versionTo}, also \${not-existing}",
     labels = listOf("test-label"),
-    branchPrefix = "test-prefix",
-    limits = PullRequestLimits(3, 3),
+    branchPrefix = branchPrefix,
+    limits = limits,
   )
 
   private fun mockGitPlatform(map: Map<GitBranch, PrStatus>): MockGitPlatform {

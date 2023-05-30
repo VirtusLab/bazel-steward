@@ -54,7 +54,7 @@ When the rule is found, it can configure for a dependency the following things:
     This id will be used in branch name, pull request title and commit message.
     Note: Use this only for dependencies that are released together under the same version. Other scenarios might have unexpected results.
   * `branch-prefix` (string) <br/>
-        Overrides template used for generating pull request branch-prefix.
+    Sets a prefix for branch name. Example: for prefix update/ and Bazel updated to 7.0.0, branch would be update/bazel/7.0.0. Default prefix is bazel-steward/. Bazel Steward uses this prefix to count number of its open pull requests for the limits feature. If. you intend to use this feature, use a unique prefix so that your other PRs don't count against this limit.
 
 * In `post-update-hooks` section:
   * `commands` (list of strings) <br/>

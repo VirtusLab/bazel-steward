@@ -23,7 +23,7 @@ class PullRequestConfigProviderTest {
 
     val provider = PullRequestConfigProvider(listOf(config1, config2), emptyList())
 
-    val resolvedPrefixes = provider.resolvePrefixes()
+    val resolvedPrefixes = provider.resolveBranchPrefixes()
     resolvedPrefixes shouldBe listOf("test-prefix-1/", "bazel-steward/")
   }
 
@@ -37,7 +37,7 @@ class PullRequestConfigProviderTest {
 
     val provider = PullRequestConfigProvider(listOf(config), emptyList())
 
-    val resolvedPrefixes = provider.resolvePrefixes()
+    val resolvedPrefixes = provider.resolveBranchPrefixes()
     resolvedPrefixes shouldBe listOf("bazel-steward/")
   }
 }
