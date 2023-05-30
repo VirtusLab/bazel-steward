@@ -33,11 +33,12 @@ class PullRequestConfigProvider(
   }
 
   fun resolveBranchPrefixes(): List<String> {
+    val branchPrefixConfiguredGlobally = configs.any { it.acceptsAll() && it.branchPrefix != null }
     val configsWithBranchPrefixes = configs.mapNotNull { it.branchPrefix }
-    return if (configsWithBranchPrefixes.isEmpty() || configs.any { it.acceptsAll() && it.branchPrefix != null }) {
-      configsWithBranchPrefixes.plus(default.branchPrefix)
-    } else {
+    return if (branchPrefixConfiguredGlobally) {
       configsWithBranchPrefixes
+    } else {
+      configsWithBranchPrefixes.plus(default.branchPrefix)
     }
   }
 
