@@ -93,7 +93,7 @@ class PullRequestManagerTest : IntegrationTestBase() {
       CommitRequest(
         "Updated group-name:artifact-name to version-test-new",
         listOf(
-          FileChange(workspace.resolve("WORKSPACE"), 1122, 6, "2.15.0"),
+          FileChange(workspace.resolve("WORKSPACE"), 0, 5, "0.9.5"),
         ),
       ),
     ),
