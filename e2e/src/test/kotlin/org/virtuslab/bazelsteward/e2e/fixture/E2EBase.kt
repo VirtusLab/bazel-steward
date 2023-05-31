@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.AppResult
-import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider.Companion.default
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
@@ -31,7 +31,7 @@ import kotlin.io.path.readText
 
 open class E2EBase : IntegrationTestBase() {
   protected val heads = "refs/heads/"
-  private val branchRef = "$heads${default.branchPrefix}"
+  private val branchRef = "$heads${PullRequestConfigProvider.default.branchPrefix}"
   protected val masterRef = "$heads$master"
 
   protected fun branch(libraryId: String, version: String): String =
