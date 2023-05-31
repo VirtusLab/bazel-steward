@@ -132,6 +132,7 @@ object AppBuilder {
       repoConfig.pullRequests,
       gitPlatform,
       appConfig.updateAllPullRequests,
+      pullRequestConfigProvider,
     )
     val pullRequestSuggester = PullRequestSuggester(pullRequestConfigProvider)
     val pullRequestManager = PullRequestManager(

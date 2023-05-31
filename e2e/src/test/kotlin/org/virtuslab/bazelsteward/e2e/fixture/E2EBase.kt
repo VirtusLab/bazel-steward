@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions
 import org.virtuslab.bazelsteward.app.App
 import org.virtuslab.bazelsteward.app.AppBuilder
 import org.virtuslab.bazelsteward.app.AppResult
-import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
+import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
@@ -14,11 +14,12 @@ import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitPlatform
+import org.virtuslab.bazelsteward.core.GitPlatform.PrStatus
 import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
-import org.virtuslab.bazelsteward.fixture.prepareLocalWorkspace
-import org.virtuslab.bazelsteward.fixture.prepareRemoteWorkspace
+import org.virtuslab.bazelsteward.fixture.IntegrationTestBase
+import org.virtuslab.bazelsteward.fixture.MockGitPlatform
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenData
 import org.virtuslab.bazelsteward.maven.MavenDataExtractor
@@ -28,21 +29,20 @@ import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.nio.file.Path
 import kotlin.io.path.readText
 
-open class E2EBase {
+open class E2EBase : IntegrationTestBase() {
   protected val heads = "refs/heads/"
-  private val branchRef = "$heads${BazelStewardGitBranch.bazelPrefix}"
-  protected val master = "master"
+  private val branchRef = "$heads${PullRequestConfigProvider.default.branchPrefix}"
   protected val masterRef = "$heads$master"
 
   protected fun branch(libraryId: String, version: String): String =
-    "$branchRef/$libraryId/$version"
+    "$branchRef$libraryId/$version"
 
   protected fun expectedBranches(vararg libs: Pair<String, String>): List<String> {
-    return libs.map { "$branchRef/${it.first}/${it.second}" } + masterRef
+    return libs.map { "$branchRef${it.first}/${it.second}" } + masterRef
   }
 
   protected fun expectedBranchPrefixes(vararg libs: String): List<String> {
-    return libs.map { "$branchRef/$it/" } + masterRef
+    return libs.map { "$branchRef$it/" } + masterRef
   }
 
   protected fun runBazelSteward(tempDir: Path, project: String, args: List<String> = emptyList()): AppResult {
@@ -72,11 +72,6 @@ open class E2EBase {
     return runBlocking {
       app.run()
     }
-  }
-
-  protected fun prepareWorkspace(tempDir: Path, resourcePath: String, extraDirs: List<String> = emptyList()): Path {
-    return prepareLocalWorkspace(tempDir, resourcePath, extraDirs)
-      .also { localWorkspace -> prepareRemoteWorkspace(tempDir, resourcePath, localWorkspace, master) }
   }
 
   protected fun checkBranchesWithVersions(
@@ -251,11 +246,11 @@ open class E2EBase {
     )
   }
 
-  protected fun App.withPRStatus(status: GitPlatform.PrStatus): App {
+  protected fun App.withPRStatus(status: PrStatus): App {
     return this.withGitHostClient(mockGitHostClientWithStatus(status))
   }
 
-  protected fun mockGitHostClientWithStatus(status: GitPlatform.PrStatus): MockGitPlatform {
+  protected fun mockGitHostClientWithStatus(status: PrStatus): MockGitPlatform {
     return object : MockGitPlatform() {
       override fun checkPrStatus(branch: GitBranch) = status
     }

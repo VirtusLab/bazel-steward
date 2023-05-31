@@ -11,7 +11,7 @@ post-update-hooks:
     files-to-commit:
       - "maven_install.json"
     run-for: commit
-    
+
 pull-requests:
   - group-id: kotlinx-coroutines
     dependencies: "org.jetbrains.kotlinx:kotlinx-coroutines*"

@@ -54,6 +54,7 @@ pull-requests:
     limits:
       max-open: 5
       max-updates-per-run: 2
+    branch-prefix: "update/"
 post-update-hooks:
   - kinds: maven
     commands:

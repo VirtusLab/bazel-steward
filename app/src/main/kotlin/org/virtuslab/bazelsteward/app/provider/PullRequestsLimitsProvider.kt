@@ -1,7 +1,6 @@
 package org.virtuslab.bazelsteward.app.provider
 
 import mu.KotlinLogging
-import org.virtuslab.bazelsteward.app.BazelStewardGitBranch
 import org.virtuslab.bazelsteward.app.PullRequestsLimits
 import org.virtuslab.bazelsteward.config.repo.PullRequestsConfig
 import org.virtuslab.bazelsteward.core.GitPlatform
@@ -12,6 +11,7 @@ class PullRequestsLimitsProvider(
   private val configs: List<PullRequestsConfig>,
   private val gitPlatform: GitPlatform,
   private val updateAllPullRequests: Boolean,
+  private val pullRequestsConfigProvider: PullRequestConfigProvider,
 ) {
   fun create(): PullRequestsLimits {
     val configsWithLimits = configs.filter { it.limits != null }
@@ -29,9 +29,11 @@ class PullRequestsLimitsProvider(
     val maxOpenPrs = correct.mapNotNull { it.limits?.maxOpen }.maxOrNull()
     val maxUpdates = correct.mapNotNull { it.limits?.maxUpdatesPerRun }.maxOrNull()
 
+    val prefixes = pullRequestsConfigProvider.resolveBranchPrefixes()
+
     val openPrs = maxOpenPrs?.let {
       gitPlatform.getOpenPrs()
-        .count { it.branch.name.startsWith(BazelStewardGitBranch.bazelPrefix) }
+        .count { pr -> prefixes.any { pr.branch.name.startsWith(it) } }
     } ?: 0
 
     return PullRequestsLimits(openPrs, maxOpenPrs, maxUpdates, updateAllPullRequests)
