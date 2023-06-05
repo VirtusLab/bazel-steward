@@ -43,7 +43,7 @@ class UpdateLogic {
           val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
           val maxMajor = maxAvailableVersion { a -> a.major > version.major }
           val nextVersion = when (updateRules.bumpingStrategy) {
-            BumpingStrategy.Default -> maxPatch ?: maxMinor ?: maxMajor
+            BumpingStrategy.Patch -> maxPatch ?: maxMinor ?: maxMajor
             BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
             BumpingStrategy.Minor -> maxMinor ?: maxPatch ?: maxMajor
             else -> null

@@ -40,7 +40,7 @@ class UpdateLogicTest {
   @MethodSource("argumentsForSelectUpdateDefault")
   fun `should selectUpdate test with default bumping strategy`(version: String, suggestion: String?) {
     val coordinates = MavenCoordinates.of("group", "artifact", version)
-    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Default)
+    val updateRules = UpdateRules(bumpingStrategy = BumpingStrategy.Patch)
     val updateSuggestion = UpdateLogic().selectUpdate(coordinates, availableVersions, updateRules)
     Assertions.assertThat(updateSuggestion?.suggestedVersion?.value).isEqualTo(suggestion)
   }
@@ -101,12 +101,12 @@ class UpdateLogicTest {
   }
 
   private fun argumentsForSelectUpdateMix(): List<Arguments> = listOf(
-    Arguments.of("g1", "a1", "2.0.0", "2.0.2", VersioningSchema.Loose, BumpingStrategy.Default),
-    Arguments.of("g1", "a4", "2.0.2+beta", "2.3.3+beta", VersioningSchema.Loose, BumpingStrategy.Default),
-    Arguments.of("g2", "a1", "2.0.2", "2.3.3+beta", VersioningSchema.SemVer, BumpingStrategy.Default),
+    Arguments.of("g1", "a1", "2.0.0", "2.0.2", VersioningSchema.Loose, BumpingStrategy.Patch),
+    Arguments.of("g1", "a4", "2.0.2+beta", "2.3.3+beta", VersioningSchema.Loose, BumpingStrategy.Patch),
+    Arguments.of("g2", "a1", "2.0.2", "2.3.3+beta", VersioningSchema.SemVer, BumpingStrategy.Patch),
     Arguments.of("g2", "a2", "3.0.1", "4.0.2", VersioningSchema.Loose, BumpingStrategy.Latest),
     Arguments.of("g3", "a1", "2.1.0+beta", "4.0.2", VersioningSchema.Loose, BumpingStrategy.Latest),
-    Arguments.of("g3", "a3", "2.3.2+beta", "2.3.3+beta", VersioningSchema.Loose, BumpingStrategy.Default),
+    Arguments.of("g3", "a3", "2.3.2+beta", "2.3.3+beta", VersioningSchema.Loose, BumpingStrategy.Patch),
     Arguments.of("g3", "a5", "3.0.0+beta", "4.0.2", VersioningSchema.Loose, BumpingStrategy.Latest),
   )
 
