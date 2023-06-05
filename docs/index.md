@@ -1,10 +1,9 @@
 ---
 layout: home
-title: "Bazel Steward: keep your Bazel dependencies up to date"
-nav_exclude: true
+title: "Overview"
+nav_order: 1
 ---
-
-# **Bazel Steward**
+![Bazel Steward](./images/logo.png)
 
 ## What it is
 A bot that helps you keep your library dependencies, Bazel and Bazel rules up-to-date. 
