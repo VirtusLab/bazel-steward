@@ -15,3 +15,12 @@ aux_links:
 nav_external_links:
   - title: Bazel Steward on GitHub
     url: "https://github.com/VirtusLab/bazel-steward"
+
+
+callouts:
+  note:
+    title: Note
+    color: blue
+  warning:
+    title: Warning
+    color: red
