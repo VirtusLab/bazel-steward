@@ -39,16 +39,28 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
       val suggestedVersion = suggestedRuleVersion.value
       val suggestedSha = suggestedRuleVersion.sha256
 
-      val replaceRequests = listOf(
-        ReplaceRequest(currentUrl, suggestedUrl),
-        ReplaceRequest(currentSha, suggestedSha, forbiddenSurrounding = "[a-z0-9]"),
+      fun replaceRequestForVersion(current: String, suggested: String) =
         ReplaceRequest(
           listOf(
-            """(?<=")(${Regex.escape(currentVersion)})(?=")""".toRegex(),
-            """(?<![0-9]|[0-9]\.)(${Regex.escape(currentVersion)})(?="|\.tar\.gz|\.tgz|\.tar|\.zip)""".toRegex(),
+            """(?<=")(${Regex.escape(current)})(?=")""".toRegex(),
+            """(?<![0-9]|[0-9]\.)(${Regex.escape(current)})(?="|\.tar\.gz|\.tgz|\.tar|\.zip)""".toRegex(),
           ),
-          suggestedVersion,
-        ),
+          suggested,
+        )
+
+      fun replaceRequestForVersionWithoutPrefix(current: String, suggested: String, prefix: String): ReplaceRequest? {
+        return if (current.startsWith(prefix) && suggested.startsWith(prefix)) {
+          replaceRequestForVersion(current.removePrefix(prefix), suggested.removePrefix(prefix))
+        } else {
+          null
+        }
+      }
+
+      val replaceRequests = listOfNotNull(
+        ReplaceRequest(currentUrl, suggestedUrl),
+        ReplaceRequest(currentSha, suggestedSha, forbiddenSurrounding = "[a-z0-9]"),
+        replaceRequestForVersion(currentVersion, suggestedVersion),
+        replaceRequestForVersionWithoutPrefix(currentVersion, suggestedVersion, "v"),
       )
 
       val groupedChanges = files.map { file ->
