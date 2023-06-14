@@ -15,9 +15,10 @@ object WholeLibraryHeuristic : VersionReplacementHeuristic {
     }
     val matchResult = regexes.firstNotNullOfOrNull { regex ->
       files.firstNotNullOfOrNull { textFile ->
-        regex.find(textFile.content)?.let {
-          MatchedText(it, textFile.path)
-        }
+        regex.findAll(textFile.content)
+          .map { MatchedText(it, textFile.path) }
+          .sortedBy { it.matchedText.length }
+          .firstOrNull()
       }
     } ?: return null
     val versionOffset = matchResult.offsetLastMatchGroup ?: return null

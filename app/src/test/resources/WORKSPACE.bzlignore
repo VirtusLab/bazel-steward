@@ -98,6 +98,8 @@ maven_install(
         _java_dep("org.slf4j", "slf4j-api", "1.7.36"),
         _java_dep("com.github.luben", "zstd-jni", "1.5.2-5"),
         _scala_dep("com.sksamuel.elastic4s", "elastic4s-client-akka", "8.5.2"),
+        "org.junit.jupiter:junit-jupiter-engine:5.8.1",
+        "org.junit.jupiter:junit-jupiter:5.8.1",
     ],
     fetch_sources = False,
     repositories = [
