@@ -18,14 +18,15 @@ import org.virtuslab.bazelsteward.maven.MavenLibraryId
 
 class VersionReplacementHeuristicTest {
 
-  val correctPositionFor235: Int = 2401
-  val correctPositionFor120: Int = 2263
-  val correctPositionFor160: Int = 2464
-  val correctPositionFor3200jre: Int = 2764
-  val correctPositionFor113: Int = 2935
-  val correctPositionFor3212: Int = 3128
-  val correctPositionFor4132: Int = 3058
-  val correctPositionFor852: Int = 3326
+  val positionOf235: Int = 2401
+  val positionOf120: Int = 2263
+  val positionOf160: Int = 2464
+  val positionOf3200jre: Int = 2764
+  val positionOf113: Int = 2935
+  val positionOf3212: Int = 3128
+  val positionOf4132: Int = 3058
+  val positionOf852: Int = 3326
+  val positionOfJunitJupiter581: Int = 3432
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -38,7 +39,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -48,7 +49,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -58,7 +59,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -68,7 +69,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion)
 
-      result?.offset shouldBe correctPositionFor120
+      result?.offset shouldBe positionOf120
     }
 
     @Test
@@ -78,7 +79,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion)
 
-      result?.offset shouldBe correctPositionFor160
+      result?.offset shouldBe positionOf160
     }
   }
 
@@ -93,7 +94,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -113,7 +114,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -133,7 +134,17 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
 
-      result?.offset shouldBe correctPositionFor160
+      result?.offset shouldBe positionOf160
+    }
+
+    @Test
+    fun `should return correct position offset when two libraries have same version and one is prefix of another`() {
+      val library = library("org.junit.jupiter", "junit-jupiter", "5.8.1")
+      val suggestedVersion = version("5.9.2")
+
+      val result = resolveUpdates(library, suggestedVersion, WholeLibraryHeuristic)
+
+      result?.offset shouldBe positionOfJunitJupiter581
     }
   }
 
@@ -148,7 +159,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -158,7 +169,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -168,7 +179,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
-      result?.offset shouldBe correctPositionFor235
+      result?.offset shouldBe positionOf235
     }
 
     @Test
@@ -178,7 +189,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
-      result?.offset shouldBe correctPositionFor120
+      result?.offset shouldBe positionOf120
     }
 
     @Test
@@ -203,7 +214,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe correctPositionFor3200jre
+      result?.offset shouldBe positionOf3200jre
     }
 
     @Test
@@ -213,7 +224,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe correctPositionFor113
+      result?.offset shouldBe positionOf113
     }
 
     @Test
@@ -223,7 +234,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe correctPositionFor3212
+      result?.offset shouldBe positionOf3212
     }
 
     @Test
@@ -243,7 +254,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe correctPositionFor4132
+      result?.offset shouldBe positionOf4132
     }
 
     @Test
@@ -253,7 +264,7 @@ class VersionReplacementHeuristicTest {
 
       val result = resolveUpdates(library, suggestedVersion, PythonFunctionCallHeuristic)
 
-      result?.offset shouldBe correctPositionFor852
+      result?.offset shouldBe positionOf852
     }
   }
 
@@ -281,7 +292,7 @@ class VersionReplacementHeuristicTest {
       val result2 = resolveUpdates(library, suggestedVersion, VersionOnlyHeuristic)
 
       result1 shouldBe null
-      result2?.offset shouldBe correctPositionFor235
+      result2?.offset shouldBe positionOf235
     }
   }
 
