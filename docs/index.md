@@ -17,6 +17,12 @@ Afterwards, it compares the version of each found dependency against the latest 
 
 If a newer version is available in the upstream, Bazel Steward opens a pull request in your repository, with a proposed change for that newer version.
 
+## Supported dependencies
+Bazel Steward supports updating:
+  * Maven dependencies from `rules_jvm_external` (requires rules version `4.0.0` or newer)
+  * Bazel rules (like rules_python, rules_docker etc.)
+  * Bazel version (defined in `.bazelversion` or `.bazeliskrc` file)
+
 # Basic Setup
 
 To get started quickly, setup a new GitHub Actions workflow in your repository.
