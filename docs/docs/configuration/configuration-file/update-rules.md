@@ -36,7 +36,10 @@ update-rules:
 Available fields:
   * `versioning` (string) <br/>
     Overrides what kind of versioning schema is used for the dependency.
-    Default: `loose`. Allowed values: `loose`, `semver`, `regex:...`.
+    Default: `loose`. Allowed values: 
+    - `loose` - always pick a newest version 
+    - `semver` - update the dependency only if new version is backward compatible with currently used version according to [Semantic versioning](https://semver.org/)
+    - `regex:...` - only update the dependency if it matches provided regex
   * `pin` (string) <br/>
     Filters versions that are allowed for the dependency.
     It can be an exact version, prefix or regular expression.
@@ -47,7 +50,7 @@ Available fields:
     1. `latest` - Always bump to the latest version.
     2. `patch` - First bump to the latest patch, then to the latest minor, and then finally to the latest major.
     3. `minor` - First bump to the latest minor, if there is no such update, bump the latest patch otheriwse bump the major.
-    4. `latest-by-date` - Always bump to the most recently released version.
+    4. `latest-by-date` - Always bump to the most recently released version even if the version is lower then currently used.
   * `enabled` (boolean) <br/>
     If set to false, Bazel Steward will ignore this dependency for available versions lookup and any updates.
     If this is set for `kinds` only filter, then it will disable the specified kind - Bazel Steward will not attempt 
