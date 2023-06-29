@@ -20,8 +20,14 @@ If a newer version is available in the upstream, Bazel Steward opens a pull requ
 ## Supported dependencies
 Bazel Steward supports updating:
   * Maven dependencies from `rules_jvm_external` (requires rules version `4.0.0` or newer)
-  * Bazel rules (like rules_python, rules_docker etc.)
+  * Bazel rules itself (like rules_python, rules_docker etc.)
   * Bazel version (defined in `.bazelversion` or `.bazeliskrc` file)
+
+## Why should I use Bazel Steward?
+
+Using up-to-date dependencies is important for security and stability of your project. It allows to use latest features and makes your team more productive. This also applies to the tools used in your project like various rules and Bazel itself. 
+
+Keeping dependencies up-to-date is often mundane and time-consuming task and Bazel Steward aims to automate most of it. Bazel Steward makes dependencies updates an incremental process that would be a part of development cycle. This approach makes it less disturbing to the development process and reduces the risk associated with updating dependencies (as changes are smaller and more frequent). Bazel Steward is based on [Scala Steward](https://github.com/scala-steward-org/scala-steward) that keeps all Scala ecosystem up-to-date and is loved by pretty much entire community. 
 
 # Basic Setup
 
