@@ -39,3 +39,6 @@ Available fields:
     All paths are relative to the Bazel workspace root. 
     The `"exact:"`, `"glob:"`, `"regex:"` prefixes are used to determine type of path pattern. 
     They can usually be omitted and correct syntax should be detected automatically.
+
+{: .note } 
+Bazel Steward cannot suggest an update of given dependency if it won't be able to trace where it is defined. 
