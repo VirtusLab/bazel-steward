@@ -35,11 +35,11 @@ update-rules:
 
 Available fields:
   * `versioning` (string) <br/>
-    Overrides what kind of versioning schema is used for the dependency.
-    Default: `loose`. Allowed values: 
-    - `loose` - always pick a newest version 
-    - `semver` - update the dependency only if new version is backward compatible with currently used version according to [Semantic versioning](https://semver.org/)
-    - `regex:...` - only update the dependency if it matches provided regex
+    Overrides what kind of versioning schema is used for the dependency. Schema determines how to parse the version in order to understand which part of the string is "major", "minor", "patch" etc.
+    Default: `loose`. Allowed values:  
+    - `semver` - parse version strictly  following [Semantic Versioning](https://semver.org/) schema
+    - `loose` - less constrained regex that will try to catch most popular versioning strategies that do not strictly conform to semver (but it works correctly with semver versions too)
+    - `regex:...` - use custom regex for parsing the version. Useful for libraries with very non standard schema.
   * `pin` (string) <br/>
     Filters versions that are allowed for the dependency.
     It can be an exact version, prefix or regular expression.
