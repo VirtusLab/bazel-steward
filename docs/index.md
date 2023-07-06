@@ -65,7 +65,7 @@ After every run, Bazel Steward creates a new branch and a pull request with a bu
 
 You can merge the PR, close it, or push your changes into the branch.
 
-Expect multiple such PRs if you didn't update your dependencies frequently. Check [configuration](/docs/configuration/configuration-file/pull-requests.html) to learn how to limit maximum number of open pull requests.
+Expect multiple such PRs if you didn't update your dependencies frequently. Check [configuration](./docs/configuration/configuration-file/pull-requests.html) to learn how to limit maximum number of open pull requests.
 
 ![Example PR - list](./images/pr-list.png)
 
