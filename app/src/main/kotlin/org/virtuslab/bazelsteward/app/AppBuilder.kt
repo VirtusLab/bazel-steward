@@ -37,7 +37,7 @@ object AppBuilder {
   fun fromArgs(args: Array<String>, env: Environment): App {
     val parser = ArgParser("bazel-steward")
     val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan")
-      .optional().default(".")
+      .optional()
     val github by parser.option(ArgType.Boolean, description = "Run as a github action").default(false)
     val noRemote by parser.option(
       ArgType.Boolean,
@@ -69,7 +69,9 @@ object AppBuilder {
 
     parser.parse(args)
 
-    val repositoryRoot = Path(repository).let { if (github) GithubPlatform.resolveRepoPath(env, it) else it }
+    val repositoryRoot = repository?.let { Path(it) } ?:
+      (if (github) GithubPlatform.resolveRepoPath(env, Path(".")) else Path("."))
+
     val gitClient = GitClient(repositoryRoot)
     val baseBranchName = baseBranch ?: runBlocking {
       gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
@@ -85,7 +87,8 @@ object AppBuilder {
     )
     logger.info { appConfig }
 
-    val repoConfig = runBlocking { RepoConfigParser().load(configPath?.let { Path(it) }, repositoryRoot, noInternalConfig) }
+    val repoConfig =
+      runBlocking { RepoConfigParser().load(configPath?.let { Path(it) }, repositoryRoot, noInternalConfig) }
     val mavenDataExtractor = MavenDataExtractor(appConfig.workspaceRoot)
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()
