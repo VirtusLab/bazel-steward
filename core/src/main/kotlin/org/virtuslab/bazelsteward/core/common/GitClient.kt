@@ -5,7 +5,10 @@ import java.nio.file.Path
 
 class GitClient(private val repositoryRoot: Path) {
   private val quiet = "--quiet"
-  private val git = runBlocking { CommandRunner.runForOutput(listOf("sh", "-c", "which git"), repositoryRoot).trim() }
+
+  companion object {
+    private val git = runBlocking { CommandRunner.runForOutput(listOf("sh", "-c", "which git")).trim() }
+  }
 
   suspend fun checkout(target: String, newBranch: Boolean = false) {
     val b = if (newBranch) "-b" else null

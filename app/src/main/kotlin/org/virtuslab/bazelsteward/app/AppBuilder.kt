@@ -92,7 +92,7 @@ object AppBuilder {
     val mavenDataExtractor = MavenDataExtractor(appConfig.workspaceRoot)
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()
-    val gitOperations = GitOperations(appConfig.workspaceRoot, appConfig.baseBranch)
+    val gitOperations = runBlocking { GitOperations.resolve(appConfig.workspaceRoot, appConfig.baseBranch) }
     val gitPlatform = if (github) {
       GithubPlatform.create(env, appConfig.baseBranch, appConfig.gitAuthor)
     } else {

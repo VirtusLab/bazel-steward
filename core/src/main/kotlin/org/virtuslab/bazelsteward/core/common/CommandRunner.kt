@@ -19,7 +19,7 @@ class CommandRunner {
       return runForOutput(command.toList(), directory)
     }
 
-    suspend fun runForOutput(command: List<String>, directory: Path): String {
+    suspend fun runForOutput(command: List<String>, directory: Path? = null): String {
       val result = run(command, directory)
       if (result.isSuccess) {
         return result.stdout
@@ -29,10 +29,13 @@ class CommandRunner {
       }
     }
 
-    suspend fun run(command: List<String>, directory: Path): Result {
+    suspend fun run(command: List<String>, directory: Path?): Result {
       logger.info { command.joinToString(" ") { if (it.contains(" ")) """"$it"""" else it } }
       return withContext(Dispatchers.IO) {
-        val process = ProcessBuilder(command).directory(directory.toFile()).start()
+        val processBuilder = ProcessBuilder(command).apply {
+          directory?.let { directory(it.toFile()) }
+        }
+        val process = processBuilder.start()
           .onExit().await()
         val stdout = process.inputStream.bufferedReader().use { it.readText() }
         val stderr = process.errorStream.bufferedReader().use { it.readText() }

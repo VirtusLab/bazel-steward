@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.GitBranch
 import java.lang.RuntimeException
 import java.nio.file.Path
+import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
@@ -21,8 +22,17 @@ data class CommitRequest(
 
 private val logger = KotlinLogging.logger {}
 
-class GitOperations(workspaceRoot: Path, private val baseBranch: String) {
-  private val git = GitClient(workspaceRoot)
+class GitOperations(repositoryRoot: Path, private val baseBranch: String) {
+
+  companion object {
+    suspend fun resolve(workspaceRoot: Path, baseBranch: String): GitOperations {
+      val initial = GitClient(workspaceRoot)
+      val repositoryRoot = initial.run("rev-parse", "--show-toplevel").trim().let { Path(it) }
+      return GitOperations(repositoryRoot, baseBranch)
+    }
+  }
+
+  private val git = GitClient(repositoryRoot)
 
   suspend fun checkoutBaseBranch() {
     git.checkout(baseBranch)
