@@ -69,8 +69,8 @@ object AppBuilder {
 
     parser.parse(args)
 
-    val repositoryRoot = repository?.let { Path(it) } ?:
-      (if (github) GithubPlatform.resolveRepoPath(env, Path(".")) else Path("."))
+    val repositoryRoot = repository?.let { Path(it) }
+      ?: (if (github) GithubPlatform.resolveRepoPath(env, Path(".")) else Path("."))
 
     val gitClient = GitClient(repositoryRoot)
     val baseBranchName = baseBranch ?: runBlocking {

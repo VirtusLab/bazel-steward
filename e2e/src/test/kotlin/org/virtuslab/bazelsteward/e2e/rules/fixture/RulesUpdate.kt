@@ -22,10 +22,15 @@ open class RulesUpdate(
       it.withRulesOnly()
     }
 
-    val expectedBranches = expectedBranches(expectedVersion)
-    checkBranchesWithVersions(tempDir, project, expectedBranches)
+    val expectedBranches = expectedBranchPrefixes(expectedVersion.first)
+    checkBranchesWithoutVersions(tempDir, project, expectedBranches)
 
-    runBlocking { GitClient(workspace).checkout(expectedBranches.first()) }
+    runBlocking {
+      val gitClient = GitClient(workspace)
+      val existingBranches = gitClient.showRef(heads = true)
+      val branch = existingBranches.find { it.contains(expectedBranches.first()) }!!
+      gitClient.checkout(branch)
+    }
 
     if (workspace.resolve("WORKSPACE.expected").exists()) {
       val expectedWorkspace = workspace.resolve("WORKSPACE.expected").readText()
