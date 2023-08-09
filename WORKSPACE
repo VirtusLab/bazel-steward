@@ -118,8 +118,8 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.2",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.3",
         "io.get-coursier:interface:1.0.18",
         "commons-io:commons-io:2.13.0",
         "com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2",
