@@ -31,9 +31,9 @@ kotlin_repositories()
 register_toolchains("//:kotlin_toolchain")
 
 # bazel_skylib - starlark functions
-BAZEL_SKYLIB_TAG = "1.4.1"
+BAZEL_SKYLIB_TAG = "1.4.2"
 
-BAZEL_SKYLIB_SHA = "b8a1527901774180afc798aeb28c4634bdccf19c4d98e7bdd1ce79d1fe9aaad7"
+BAZEL_SKYLIB_SHA = "66ffd9315665bfaafc96b52278f57c7e2dd09f5ede279ea6d39b2be471e7e3aa"
 
 http_archive(
     name = "bazel_skylib",
@@ -132,7 +132,7 @@ maven_install(
         "org.slf4j:slf4j-simple:2.0.7",
         "org.json:json:20230227",
         "org.apache.commons:commons-text:1.10.0",
-        "net.pearx.kasechange:kasechange-jvm:1.4.1",
+        "net.pearx.kasechange:kasechange-jvm:1.4.2",
     ],
     fail_if_repin_required = True,
     fetch_sources = True,
