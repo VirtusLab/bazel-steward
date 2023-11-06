@@ -131,7 +131,7 @@ maven_install(
         "io.github.microutils:kotlin-logging-jvm:3.0.5",
         "org.slf4j:slf4j-simple:2.0.9",
         "org.json:json:20230618",
-        "org.apache.commons:commons-text:1.10.0",
+        "org.apache.commons:commons-text:1.11.0",
         "net.pearx.kasechange:kasechange-jvm:1.4.1",
     ],
     fail_if_repin_required = True,
