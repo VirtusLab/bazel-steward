@@ -28,6 +28,7 @@ data class App(
   val textFileResolver: TextFileResolver,
   val pullRequestManager: PullRequestManager,
   val workspaceRoot: Path,
+  val analyzeOnly: Boolean,
 ) {
 
   suspend fun run(): Map<PullRequestSuggestion, PullRequestManager.Result> {
@@ -82,8 +83,8 @@ data class App(
       updateLogic.selectUpdate(library, versions, updateRules)
     }
     logger.info {
-      "Update suggestions (${suggestions.size}): " +
-        suggestions.map { "${it.currentLibrary.id} to ${it.suggestedVersion}" }
+      "Update suggestions (${suggestions.size}):\n" +
+        suggestions.joinToString("\n") { "${it.currentLibrary.id} ${it.currentLibrary.version} -> ${it.suggestedVersion}" }
     }
     return suggestions
   }
@@ -92,6 +93,7 @@ data class App(
     kind: DependencyKind<*>,
     suggestions: List<UpdateSuggestion>,
   ): List<LibraryUpdate> {
+    if (analyzeOnly) return emptyList()
     val heuristics = kind.defaultVersionReplacementHeuristics // TODO: read from config
     return suggestions.mapNotNull { suggestion ->
       val potentialFilesWithLibraryVersion = textFileResolver.resolve(suggestion.currentLibrary)

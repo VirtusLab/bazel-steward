@@ -45,6 +45,12 @@ object AppBuilder {
       fullName = "no-remote",
       shortName = "n",
     ).default(false)
+    val analyzeOnly by parser.option(
+      ArgType.Boolean,
+      description = "Only analyze what updates are needed",
+      fullName = "analyze-only",
+      shortName = "a",
+    ).default(false)
     val updateAllPullRequests by parser.option(
       ArgType.Boolean,
       description = "Update all pull requests",
@@ -158,6 +164,7 @@ object AppBuilder {
       textFileResolver,
       pullRequestManager,
       appConfig.workspaceRoot,
+      analyzeOnly,
     )
   }
 }

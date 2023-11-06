@@ -34,7 +34,9 @@ Keeping dependencies up-to-date is often mundane and time-consuming task and Baz
 
 # Basic Setup
 
-To get started quickly, setup a new GitHub Actions workflow in your repository.
+## On CI
+
+To get started quickly, set up a new GitHub Actions workflow in your repository.
 
 Create a file at  `.github/workflows/` with this content:
 ```yaml
@@ -69,4 +71,14 @@ Expect multiple such PRs if you didn't update your dependencies frequently. Chec
 
 ![Example PR - list](./images/pr-list.png)
 
-This was most basic guide on Bazel Steward. To learn more about configuration options and other deployment scenarios, check out the rest of the documentation.
+This was the most basic guide on Bazel Steward. To learn more about configuration options and other deployment scenarios, check out the rest of the documentation.
+
+## Locally
+
+You can give Bazel Steward a quick try by running following command from the root of your Bazel workspace:
+
+```
+coursier launch org.virtuslab:bazel-steward:1.1.0 --main org.virtuslab.bazelsteward.app.Main -- --no-remote --analyze-only
+```
+
+It will show you all outdated dependencies in your project and versions that Bazel Steward suggests to use with its default config.
