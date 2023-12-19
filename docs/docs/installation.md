@@ -26,16 +26,16 @@ on:
   schedule:
     - cron: '30 5 * * *' # runs every day at 5:30 am
 
-  jobs:
-    bazel-steward:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
-        - uses: VirtusLab/bazel-steward@latest
-          with:
-            github-personal-token: 'XXXXXXXXXXXXXXXXXX' # used for triggering workflows, read below
+jobs:
+  bazel-steward:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: VirtusLab/bazel-steward@latest
+        with:
+          github-personal-token: 'XXXXXXXXXXXXXXXXXX' # used for triggering workflows, read below
 ```
 
 Make sure to allow Github Actions to create pull requests and give it write access so that Bazel Steward can push branches. You can find these settings
