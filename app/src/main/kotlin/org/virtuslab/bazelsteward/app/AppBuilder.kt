@@ -17,6 +17,9 @@ import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
 import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
+import org.virtuslab.bazelsteward.bzlmod.BzlModDataExtractor
+import org.virtuslab.bazelsteward.bzlmod.BzlModDependencyKind
+import org.virtuslab.bazelsteward.bzlmod.BzlModRepository
 import org.virtuslab.bazelsteward.config.repo.RepoConfigParser
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.FileFinder
@@ -119,8 +122,11 @@ object AppBuilder {
     val githubRulesResolver = GithubRulesResolver(githubApi)
     val fileFinder = FileFinder(appConfig.workspaceRoot)
 
+    val bzlModDataExtractor = BzlModDataExtractor(appConfig.workspaceRoot)
+    val bzlModRepository = BzlModRepository()
     val dependencyKinds = listOf(
       BazelVersionDependencyKind(bazelUpdater),
+      BzlModDependencyKind(bzlModDataExtractor, bzlModRepository),
       BazelRulesDependencyKind(bazelRulesExtractor, githubRulesResolver),
       MavenDependencyKind(mavenDataExtractor, mavenRepository),
     )
@@ -132,10 +138,11 @@ object AppBuilder {
     val pullRequestConfigProvider = PullRequestConfigProvider(repoConfig.pullRequests, dependencyKinds)
     val postUpdateHookProvider = PostUpdateHookProvider(repoConfig.postUpdateHooks, dependencyKinds)
 
-    val textFileResolver = TextFileResolver(
+    val textFileResolver = DefaultTextFileResolver(
       searchPatternProvider,
       fileFinder,
     )
+    bzlModDataExtractor.setFileResolver(textFileResolver)
 
     val pullRequestsLimitsProvider = PullRequestsLimitsProvider(
       repoConfig.pullRequests,

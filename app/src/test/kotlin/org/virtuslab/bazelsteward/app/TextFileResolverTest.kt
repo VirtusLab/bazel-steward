@@ -74,7 +74,7 @@ class TextFileResolverTest {
     val repoConfig = loadRepoConfigFromResources("example-config.yaml")
     val searchPatternProvider = SearchPatternProvider(repoConfig.searchPaths, dependencyKinds.all)
 
-    val textFileResolver = TextFileResolver(
+    val textFileResolver = DefaultTextFileResolver(
       searchPatternProvider,
       fileFinder,
     )

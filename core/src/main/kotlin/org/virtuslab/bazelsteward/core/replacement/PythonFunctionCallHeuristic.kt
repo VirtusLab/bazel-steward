@@ -38,7 +38,7 @@ object PythonFunctionCallHeuristic : VersionReplacementHeuristic {
     return null
   }
 
-  private fun getFunctionCalls(files: List<TextFile>): List<MatchedText> {
+  fun getFunctionCalls(files: List<TextFile>): List<MatchedText> {
     val pythonMethodRegex = Regex("""\w+\([\w\n\s".\-,=]+\)""")
     return files.flatMap { textFile ->
       pythonMethodRegex.findAll(textFile.content).map { MatchedText(it, textFile.path) }

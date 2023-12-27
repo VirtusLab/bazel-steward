@@ -1,0 +1,30 @@
+module(name = "bazel_bsp", version = "")
+
+bazel_dep(name = "bazel_skylib", version = "1.4.2") # to update
+bazel_dep(name = "rules_kotlin", version = "1.9.0") # up to date
+bazel_dep(name = "rules_java", version = "7.0.6") # to update
+bazel_dep(name = "rules_cc", version = "0.0.8") # to update
+
+bazel_dep(name = "rules_jvm_external", version = "5.3")
+
+git_override(
+    module_name = "rules_jvm_external",
+    remote = "https://github.com/bazelbuild/rules_jvm_external.git",
+    commit = "679348a8da17a9f3954fb2cab10a95d5a5848c85",
+)
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven",
+    artifacts = [
+        "com.google.code.gson:gson:2.10.1",
+    ],
+    repositories = [
+        "https://repo.maven.apache.org/maven2",
+    ],
+)
+
+use_repo(
+    maven,
+    "maven"
+)

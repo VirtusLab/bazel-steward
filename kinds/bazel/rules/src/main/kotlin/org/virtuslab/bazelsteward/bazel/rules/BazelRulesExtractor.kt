@@ -54,7 +54,7 @@ class BazelRulesExtractor {
     val tempFileForBzl = createTempFile(directory = workspaceRoot, suffix = ".bzl").toFile()
     tempFileForBzl.appendText(dumpRepositoriesContent)
 
-    val workspaceFilePath = listOf("WORKSPACE.bazel", "WORKSPACE")
+    val workspaceFilePath = listOf("WORKSPACE.bzlmod", "WORKSPACE.bazel", "WORKSPACE")
       .map { workspaceRoot.resolve(it) }
       .find { it.exists() } ?: throw RuntimeException("Could not find workspace file in $workspaceRoot")
 
