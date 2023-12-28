@@ -67,7 +67,7 @@ class BzlModDataExtractor(
 
   private fun findVersionFromFiles(
     library: BazelModule,
-    name: String
+    name: String,
   ): SimpleVersion? {
     val textFiles = textFileResolver.resolve(library)
     val calls = PythonFunctionCallHeuristic.getFunctionCalls(textFiles)

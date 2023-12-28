@@ -18,5 +18,4 @@ class BzlModTest : E2EBase() {
     )
     checkBranchesWithoutVersions(tempDir, project, expectedBranches)
   }
-
 }
