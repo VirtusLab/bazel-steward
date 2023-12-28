@@ -6,6 +6,7 @@ library(
         "//github",
         "//kinds/bazel:rules",
         "//kinds/bazel:version",
+        "//kinds/bzlmod",
         "//kinds/maven",
         "//repo-config",
         "@maven//:org_apache_commons_commons_text",

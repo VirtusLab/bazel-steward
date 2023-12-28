@@ -87,6 +87,8 @@ data class SemanticVersion(
     private val looseSemVerRegex =
       Regex("""^[vV]?\.?(?<major>0|[1-9]\d*)(?:[.-](?<minor>(0|[1-9]\d*)))?(?:[.-]?(?<patch>(0|[1-9]\d*)))?(?:[-.]?(?<preRelease>((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)))?(?:\+(?<buildMetaData>([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)))?${'$'}""")
 
+    val MIN = SemanticVersion(-1, 0, 0, "", "")
+
     fun fromString(value: String, versioningScheme: VersioningSchema = VersioningSchema.SemVer): SemanticVersion? {
       fun matchToSemanticVersion(regex: Regex): SemanticVersion? {
         return regex.matchEntire(value)?.let { matchResult ->

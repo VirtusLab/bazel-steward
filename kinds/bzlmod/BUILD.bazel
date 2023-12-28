@@ -1,0 +1,5 @@
+alias(
+    name = "bzlmod",
+    actual = "//kinds/bzlmod/src/main/kotlin/org/virtuslab/bazelsteward/bzlmod",
+    visibility = ["//visibility:public"],
+)

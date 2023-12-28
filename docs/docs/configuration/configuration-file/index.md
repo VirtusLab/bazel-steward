@@ -93,7 +93,7 @@ Bazel Steward has multiple configuration sections:
  * `post-update-hooks`
 
 Each section contains a list of *rules*. Apart from fields specific to given section, each rule can contain special fields used for filtering: `kinds` and `dependencies`.
-* `kinds` - a kind of a dependency, can be one of `maven`, `bazel`, `bazel-rules`. Useful to for example specify specific search paths for all maven dependencies.
+* `kinds` - a kind of dependency, can be one of `maven`, `bazel`, `bazel-rules`, `bzlmod`. Useful to for example specify specific search paths for all maven dependencies.
 * `dependencies` - names of dependencies. Maven dependencies are in form of `"{group}:{artifact}"`. Wildcard in form of `*` is allowed. For advanced use cases it is possible to use regex for matching using `"regex:YOUR_REGEX"` syntax. Useful for library specific settings, like overriding versioning schema.
 
 These fields can be either a single string value or a list of values. In case of a list, the search predicate uses `or`.

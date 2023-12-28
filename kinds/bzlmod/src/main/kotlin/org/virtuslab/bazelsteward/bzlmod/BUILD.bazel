@@ -1,0 +1,6 @@
+library(
+    srcs = glob(["**/*.kt"]),
+    deps = [
+        "//core",
+    ],
+)

@@ -1,4 +1,4 @@
-package org.virtuslab.bazelsteward.maven
+package org.virtuslab.bazelsteward.bzlmod
 
 import mu.KotlinLogging
 import org.virtuslab.bazelsteward.core.DependencyKind
@@ -13,37 +13,30 @@ import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
-class MavenDependencyKind(
-  private val mavenDataExtractor: MavenDataExtractor,
-  private val mavenRepository: MavenRepository,
-) : DependencyKind<MavenCoordinates>() {
+class BzlModDependencyKind(
+  private val bzlModDataExtractor: BzlModDataExtractor,
+  private val bzlModRepository: BzlModRepository,
+) : DependencyKind<BazelModule>() {
 
-  override val name: String = "maven"
+  override val name: String = "bzlmod"
 
-  override fun acceptsLibrary(library: Library): Boolean = library is MavenCoordinates
+  override fun acceptsLibrary(library: Library): Boolean = library is BazelModule
 
-  override suspend fun findAvailableVersions(workspaceRoot: Path, skip: (MavenCoordinates) -> Boolean): Map<MavenCoordinates, List<Version>> {
-    val data = runCatching { mavenDataExtractor.extract().filterNot(skip) }
-      .onFailure {
-        logger.error { "Failed to extract used maven dependencies. Bazel Steward supports rules_jvm_external 4.0 or newer" }
-      }.getOrThrow()
+  override suspend fun findAvailableVersions(workspaceRoot: Path, skip: (BazelModule) -> Boolean): Map<BazelModule, List<Version>> {
+    val data = bzlModDataExtractor.extract().filterNot(skip)
     logger.info { "Repositories " + data.repositories.toString() }
     logger.info { "Dependencies: " + data.dependencies.map { "${it.id} ${it.version}" }.toString() }
-    return mavenRepository.findVersions(data)
+    return bzlModRepository.findVersions(data)
   }
 
   override val defaultSearchPatterns: List<PathPattern> = listOf(
-    PathPattern.Glob("**/BUILD{,.bazel}"),
-    PathPattern.Glob("**/*.bzl"),
     PathPattern.Exact("MODULE.bazel"),
-    PathPattern.Exact("WORKSPACE.bzlmod"),
-    PathPattern.Exact("WORKSPACE.bazel"),
-    PathPattern.Exact("WORKSPACE"),
+    PathPattern.Exact("MODULE"),
   )
 
   override val defaultVersionReplacementHeuristics: List<VersionReplacementHeuristic> = listOf(
+    PythonFunctionCallHeuristic,
     WholeLibraryHeuristic,
     VersionOnlyHeuristic,
-    PythonFunctionCallHeuristic,
   )
 }

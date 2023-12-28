@@ -9,6 +9,9 @@ import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.GithubRulesResolver
 import org.virtuslab.bazelsteward.bazel.version.BazelUpdater
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
+import org.virtuslab.bazelsteward.bzlmod.BzlModDataExtractor
+import org.virtuslab.bazelsteward.bzlmod.BzlModDependencyKind
+import org.virtuslab.bazelsteward.bzlmod.BzlModRepository
 import org.virtuslab.bazelsteward.config.repo.RepoConfigParser
 import org.virtuslab.bazelsteward.core.DependencyKind
 import org.virtuslab.bazelsteward.core.common.PinningStrategy
@@ -81,6 +84,7 @@ class UpdateRulesProviderTest {
     return listOf(
       BazelVersionDependencyKind(BazelUpdater()),
       MavenDependencyKind(MavenDataExtractor(workspaceRoot), MavenRepository()),
+      BzlModDependencyKind(BzlModDataExtractor(workspaceRoot), BzlModRepository()),
       BazelRulesDependencyKind(BazelRulesExtractor(), GithubRulesResolver(GitHub.connectAnonymously())),
     )
   }

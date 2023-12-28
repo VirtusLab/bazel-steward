@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import org.virtuslab.bazelsteward.app.provider.UpdateRulesProvider
 import org.virtuslab.bazelsteward.config.repo.RepoConfig
 import org.virtuslab.bazelsteward.core.DependencyKind
+import org.virtuslab.bazelsteward.core.TextFileResolver
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.core.common.UpdateLogic
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
