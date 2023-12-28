@@ -21,7 +21,7 @@ If a newer version is available in the upstream, Bazel Steward opens a pull requ
 
 Bazel Steward supports updating:
   * Maven dependencies from `rules_jvm_external` (requires rules version `4.0.0` or newer)
-  * Bazel rules itself (like rules_python, rules_docker etc.)
+  * Bazel rules (like rules_python, rules_docker etc.) both in WORKSPACE and MODULE files.
   * Bazel version (defined in `.bazelversion` or `.bazeliskrc` file)
 
 Please let us know if you would like to use Bazel Steward with other kinds of dependencies.
@@ -47,14 +47,14 @@ on:
   schedule:
     - cron: '30 5 * * *' # runs every day at 5:30 am
 
-  jobs:
-    bazel-steward:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
-        - uses: VirtusLab/bazel-steward@latest
+jobs:
+  bazel-steward:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: VirtusLab/bazel-steward@latest
 ```
 
 {: .note } 

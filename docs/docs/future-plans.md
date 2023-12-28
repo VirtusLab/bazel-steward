@@ -9,9 +9,9 @@ nav_order: 5
 Currently Bazel Steward supports:
 * Bazel version - defined in .bazelversion or .bazeliskrc file.
 * Maven dependencies added through the rules_jvm_external
-* Bazel rules
+* Bazel rules (and bazel modules)
 
-We plan to extend the support to update bazel modules, http_archives and languages like Go, Python or JavaScript and more.
+We plan to extend the support to update http_archives and languages like Go, Python or JavaScript and more.
 
 We are also planning to support more git hosting methods, but for now, we only support GitHub.
 
