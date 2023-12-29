@@ -32,7 +32,7 @@ class UpdateRulesProviderTest {
 
     val result = rulesProvider.resolveForLibrary(library)
 
-    result.bumpingStrategy shouldBe BumpingStrategy.Patch
+    result.bumpingStrategy shouldBe BumpingStrategy.Minimal
   }
 
   @Test
@@ -66,7 +66,7 @@ class UpdateRulesProviderTest {
     fun shouldApplyGeneralRules(library: Library) {
       val rules = rulesProvider.resolveForLibrary(library)
       rules.pinningStrategy shouldBe PinningStrategy.None
-      rules.bumpingStrategy shouldBe BumpingStrategy.Patch
+      rules.bumpingStrategy shouldBe BumpingStrategy.Minimal
       rules.versioningSchema shouldBe VersioningSchema.SemVer
     }
 

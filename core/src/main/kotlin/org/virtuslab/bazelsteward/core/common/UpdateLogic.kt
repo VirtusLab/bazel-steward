@@ -10,7 +10,7 @@ data class UpdateSuggestion(val currentLibrary: Library, val suggestedVersion: V
 
 data class UpdateRules(
   val versioningSchema: VersioningSchema = VersioningSchema.Loose,
-  val bumpingStrategy: BumpingStrategy = BumpingStrategy.Minor,
+  val bumpingStrategy: BumpingStrategy = BumpingStrategy.MinorPatchMajor,
   val pinningStrategy: PinningStrategy = PinningStrategy.None,
   val enabled: Boolean = true,
 )
@@ -43,9 +43,12 @@ class UpdateLogic {
           val maxMinor = maxAvailableVersion { a -> a.major == version.major && a.minor > version.minor }
           val maxMajor = maxAvailableVersion { a -> a.major > version.major }
           val nextVersion = when (updateRules.bumpingStrategy) {
-            BumpingStrategy.Patch -> maxPatch ?: maxMinor ?: maxMajor
+            BumpingStrategy.Minimal -> maxPatch ?: maxMinor ?: maxMajor
             BumpingStrategy.Latest -> maxMajor ?: maxMinor ?: maxPatch
-            BumpingStrategy.Minor -> maxMinor ?: maxPatch ?: maxMajor
+            BumpingStrategy.MinorPatchMajor -> maxMinor ?: maxPatch ?: maxMajor
+            BumpingStrategy.PatchOnly -> maxPatch
+            BumpingStrategy.PatchMinor -> maxPatch ?: maxMinor
+            BumpingStrategy.MinorPatch -> maxMinor ?: maxPatch
             else -> null
           }
           nextVersion?.let { UpdateSuggestion(library, it) }

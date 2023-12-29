@@ -10,7 +10,7 @@ update-rules:
     kinds: maven
     versioning: semver
   -
-    bumping: patch
+    bumping: minimal
 search-paths:
   -
     dependencies:

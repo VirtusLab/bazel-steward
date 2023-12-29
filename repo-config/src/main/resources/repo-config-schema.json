@@ -27,7 +27,7 @@
           },
           "bumping": {
             "type": ["string", "null"],
-            "enum": ["patch", "latest", "minor", "latest-by-date"]
+            "enum": ["minimal", "latest", "minor-patch-major", "latest-by-date", "patch-only", "patch-minor", "minor-patch"]
           },
           "enabled": {
             "type": ["boolean", "null"]
