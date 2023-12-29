@@ -1,5 +1,5 @@
 package org.virtuslab.bazelsteward.core.library
 
 enum class BumpingStrategy {
-  Patch, Latest, Minor, LatestByDate
+  Minimal, Latest, MinorPatchMajor, LatestByDate, PatchOnly, PatchMinor, MinorPatch
 }

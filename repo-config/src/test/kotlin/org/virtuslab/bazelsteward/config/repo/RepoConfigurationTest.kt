@@ -24,7 +24,7 @@ class RepoConfigurationTest {
           "update-rules[0].dependenciess: is not defined in the schema and the schema does not allow additional properties",
           "update-rules[1].versioning: does not have a value in the enumeration [loose, semver]",
           "update-rules[1].versioning: does not match the regex pattern ^regex:",
-          "update-rules[1].bumping: does not have a value in the enumeration [patch, latest, minor, latest-by-date]",
+          "update-rules[1].bumping: does not have a value in the enumeration [minimal, latest, minor-patch-major, latest-by-date, patch-only, patch-minor, minor-patch]",
           "update-rules[2].kinds[0]: integer found, string expected",
         ).joinToString(System.lineSeparator()),
       )
@@ -46,7 +46,7 @@ class RepoConfigurationTest {
           kinds = listOf("maven"),
           dependencies = listOf(DependencyNameFilter.Default("commons-io:commons-io")),
           versioning = VersioningSchema.Loose,
-          bumping = BumpingStrategy.Patch,
+          bumping = BumpingStrategy.Minimal,
           pin = PinningStrategy.Prefix("2.0."),
         ),
         UpdateRulesConfig(

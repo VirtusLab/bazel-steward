@@ -3,7 +3,7 @@ update-rules:
     kinds: maven
     dependencies: commons-io:commons-io
     versioning: loose
-    bumping: patch
+    bumping: minimal
     pin: 2.0.
   -
     dependencies: io.get-coursier:interface
