@@ -62,9 +62,9 @@ def resources(**kwargs):
 def test_library(**kwargs):
     kwargs["testonly"] = True
     ensure_deps(kwargs, [
-        "@io_kotest_kotest_common_jvm//jar",
-        "@org_assertj_assertj_core//jar",
-        "@org_junit_jupiter_junit_jupiter_api//jar",
+        "@maven//:io_kotest_kotest_common_jvm",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_junit_jupiter_junit_jupiter_api",
     ])
     library(**kwargs)
 

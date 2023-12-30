@@ -17,3 +17,9 @@ pull-requests:
     dependencies: "org.jetbrains.kotlinx:kotlinx-coroutines*"
   - group-id: jackson
     dependencies: "com.fasterxml.jackson*"
+  - group-id: junit5-platform
+    dependencies: "org.junit.platform:*"
+  - group-id: junit5-jupiter
+    dependencies: "org.junit.jupiter:*"
+  - group-id: kotest
+    dependencies: "io.kotest:*"

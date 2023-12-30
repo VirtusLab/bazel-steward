@@ -102,17 +102,6 @@ load("@bazel_sonatype//:defs.bzl", "sonatype_dependencies")
 
 sonatype_dependencies()
 
-# junit5
-load("//tools/build_rules:junit5.bzl", "junit_jupiter_java_repositories", "junit_platform_java_repositories")
-
-JUNIT_JUPITER_VERSION = "5.8.2"
-
-JUNIT_PLATFORM_VERSION = "1.8.2"
-
-junit_jupiter_java_repositories(version = JUNIT_JUPITER_VERSION)
-
-junit_platform_java_repositories(version = JUNIT_PLATFORM_VERSION)
-
 # maven deps
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
@@ -133,6 +122,22 @@ maven_install(
         "org.json:json:20230618",
         "org.apache.commons:commons-text:1.11.0",
         "net.pearx.kasechange:kasechange-jvm:1.4.1",
+        # tests
+        "org.junit.platform:junit-platform-commons:1.8.2",
+        "org.junit.platform:junit-platform-console:1.8.2",
+        "org.junit.platform:junit-platform-engine:1.8.2",
+        "org.junit.platform:junit-platform-launcher:1.8.2",
+        "org.junit.platform:junit-platform-suite-api:1.8.2",
+        "org.junit.jupiter:junit-jupiter-api:5.8.2",
+        "org.junit.jupiter:junit-jupiter-engine:5.8.2",
+        "org.junit.jupiter:junit-jupiter-params:5.8.2",
+        "org.apiguardian:apiguardian-api:1.0.0",
+        "org.opentest4j:opentest4j:1.1.1",
+        "org.assertj:assertj-core:3.22.0",
+        "io.kotest:kotest-assertions-api-jvm:5.2.2",
+        "io.kotest:kotest-assertions-core-jvm:5.2.2",
+        "io.kotest:kotest-assertions-shared-jvm:5.2.2",
+        "io.kotest:kotest-common-jvm:5.2.2",
     ],
     fail_if_repin_required = True,
     fetch_sources = True,
