@@ -118,7 +118,7 @@ maven_install(
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.6",
         "org.kohsuke:github-api:1.316",
         "io.github.microutils:kotlin-logging-jvm:3.0.5",
-        "org.slf4j:slf4j-simple:2.0.9",
+        "org.slf4j:slf4j-simple:2.0.11",
         "org.json:json:20230618",
         "org.apache.commons:commons-text:1.11.0",
         "net.pearx.kasechange:kasechange-jvm:1.4.1",
