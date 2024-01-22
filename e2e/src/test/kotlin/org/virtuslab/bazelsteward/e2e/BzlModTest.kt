@@ -12,6 +12,7 @@ class BzlModTest : E2EBase() {
     val project = "bzlmod/example"
     runBazelSteward(tempDir, project)
     val expectedBranches = expectedBranchPrefixes(
+      "bazel",
       "bazel_skylib",
       "rules_java",
       "rules_cc",
