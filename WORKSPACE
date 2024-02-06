@@ -133,7 +133,7 @@ maven_install(
         "org.junit.jupiter:junit-jupiter-params:5.10.2",
         "org.apiguardian:apiguardian-api:1.1.2",
         "org.opentest4j:opentest4j:1.3.0",
-        "org.assertj:assertj-core:3.25.2",
+        "org.assertj:assertj-core:3.25.3",
         "io.kotest:kotest-assertions-api-jvm:5.8.0",
         "io.kotest:kotest-assertions-core-jvm:5.8.0",
         "io.kotest:kotest-assertions-shared-jvm:5.8.0",
