@@ -29,13 +29,14 @@ class GithubPlatform private constructor(
   private val ghRepository = createClient(token)
   private val ghPatRepository = personalToken?.let { createClient(it) }
 
-  private val bazelPRs: List<GHPullRequest> =
-    ghRepository.queryPullRequests().state(GHIssueState.ALL).list().toList()
+  private val cachedOpenPRs: List<GHPullRequest> =
+    ghRepository.queryPullRequests().state(GHIssueState.OPEN).list().toList()
 
-  private val branchToGHPR: Map<String, GHPullRequest> = bazelPRs.associateBy { it.head.ref }
+  private val branchToGHPR: Map<String, GHPullRequest> = cachedOpenPRs.associateBy { it.head.ref }
 
   override fun checkPrStatus(branch: GitBranch): PrStatus {
-    return checkPrStatus(branchToGHPR[branch.name])
+    val pr = branchToGHPR[branch.name] ?: ghRepository.queryPullRequests().head(branch.name).list().firstOrNull()
+    return checkPrStatus(pr)
   }
 
   override fun openNewPr(pr: NewPullRequest): PullRequest {
@@ -54,14 +55,14 @@ class GithubPlatform private constructor(
 
   override fun getOpenPrs(): List<PullRequest> {
     val openStatuses = setOf(PrStatus.OPEN_MERGEABLE, PrStatus.OPEN_NOT_MERGEABLE)
-    return bazelPRs
+    return cachedOpenPRs
       .filter { checkPrStatus(it) in openStatuses }
       .map { PullRequest(GitBranch(it.head.ref)) }
   }
 
   override fun closePrs(pullRequests: List<PullRequest>) {
-    val names = pullRequests.map { it.branch.name }
-    bazelPRs.filter { it.head.ref in names }.forEach { it.close() }
+    val branchNames = pullRequests.map { it.branch.name }
+    cachedOpenPRs.filter { it.head.ref in branchNames }.forEach { it.close() }
   }
 
   override suspend fun onPrChange(pr: PullRequest, prStatusBefore: PrStatus) {
