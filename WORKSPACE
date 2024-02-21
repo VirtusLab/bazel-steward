@@ -116,7 +116,7 @@ maven_install(
         "com.fasterxml.jackson.core:jackson-core:2.16.1",
         "com.networknt:json-schema-validator:1.3.1",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.6",
-        "org.kohsuke:github-api:1.318",
+        "org.kohsuke:github-api:1.319",
         "io.github.microutils:kotlin-logging-jvm:3.0.5",
         "org.slf4j:slf4j-simple:2.0.12",
         "org.json:json:20240205",
