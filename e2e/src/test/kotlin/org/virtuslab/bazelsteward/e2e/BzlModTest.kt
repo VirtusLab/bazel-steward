@@ -15,6 +15,7 @@ class BzlModTest : E2EBase() {
       "bazel",
       "bazel_skylib",
       "rules_java",
+      "rules_kotlin",
       "rules_cc",
     )
     checkBranchesWithoutVersions(tempDir, project, expectedBranches)
