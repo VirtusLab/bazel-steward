@@ -42,14 +42,14 @@ http_archive(
 )
 
 # io_bazel_rules_scala - required to avoid cyclic init error
-IO_BAZEL_RULES_SCALA_TAG = "v6.1.0"
+IO_BAZEL_RULES_SCALA_TAG = "v6.4.0"
 
-IO_BAZEL_RULES_SCALA_SHA = "cc590e644b2d5c6a87344af5e2c683017fdc85516d9d64b37f15d33badf2e84c"
+IO_BAZEL_RULES_SCALA_SHA = "9a23058a36183a556a9ba7229b4f204d3e68c8c6eb7b28260521016b38ef4e00"
 
 http_archive(
     name = "io_bazel_rules_scala",
     sha256 = IO_BAZEL_RULES_SCALA_SHA,
-    strip_prefix = "rules_scala-6.1.0",
+    strip_prefix = "rules_scala-6.4.0",
     url = "https://github.com/bazelbuild/rules_scala/archive/refs/tags/{}.tar.gz".format(IO_BAZEL_RULES_SCALA_TAG),
 )
 
