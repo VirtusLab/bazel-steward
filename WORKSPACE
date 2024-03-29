@@ -110,7 +110,7 @@ maven_install(
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0",
         "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.8.0",
         "io.get-coursier:interface:1.0.19",
-        "commons-io:commons-io:2.15.1",
+        "commons-io:commons-io:2.16.0",
         "com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.1",
         "com.fasterxml.jackson.core:jackson-core:2.16.1",
