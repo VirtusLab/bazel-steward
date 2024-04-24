@@ -1,0 +1,6 @@
+targets:
+  //...
+
+derive_targets_from_directories: false
+produce_trace_log: false
+build_manual_targets: false
