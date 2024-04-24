@@ -4,17 +4,27 @@ import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 
-object VersionOnlyHeuristic : VersionReplacementHeuristic {
-  override val name: String = "version-only"
+object VersionOnlyHeuristic : BaseVersionOnlyHeuristic("version-only") {
+  override fun versionToRegex(currentVersion: String): Regex =
+    Regex.escape(currentVersion).toRegex()
+}
+
+object VersionOnlyInStringLiteralHeuristic : BaseVersionOnlyHeuristic("version-only-in-string-literal") {
+  override fun versionToRegex(currentVersion: String): Regex =
+    """(?<=["'])(${Regex.escape(currentVersion)})(?=["'])""".toRegex()
+}
+
+abstract class BaseVersionOnlyHeuristic(override val name: String) : VersionReplacementHeuristic {
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
     val currentVersion = updateSuggestion.currentLibrary.version.value
-    val regex = Regex.escape(currentVersion).toRegex()
+    val regex = versionToRegex(currentVersion)
     val matchResult = files.firstNotNullOfOrNull { f ->
       regex.find(f.content)?.let {
         MatchedText(it, f.path)
       }
     } ?: return null
+
     matchResult.match.next()?.let { return null }
     val versionOffset = matchResult.offsetLastMatchGroup ?: return null
 
@@ -30,4 +40,6 @@ object VersionOnlyHeuristic : VersionReplacementHeuristic {
       ),
     )
   }
+
+  protected abstract fun versionToRegex(currentVersion: String): Regex
 }
