@@ -100,9 +100,14 @@ maven_install(
         _scala_dep("com.sksamuel.elastic4s", "elastic4s-client-akka", "8.5.2"),
         "org.junit.jupiter:junit-jupiter-engine:5.8.1",
         "org.junit.jupiter:junit-jupiter:5.8.1",
+        # "org.virtuslab:bazel-steward:1.99.99",
+        "org.virtuslab:bazel-steward:1.99.99",
     ],
     fetch_sources = False,
     repositories = [
         "https://clojars.org/repo",
     ],
 )
+
+TEST_VERSION = "9.9.9"
+TEST_VERSION_2 = "9.9.9"

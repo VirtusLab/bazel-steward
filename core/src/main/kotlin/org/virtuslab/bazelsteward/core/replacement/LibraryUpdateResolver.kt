@@ -9,8 +9,18 @@ class LibraryUpdateResolver {
     updateSuggestion: UpdateSuggestion,
     heuristics: List<VersionReplacementHeuristic>,
   ): LibraryUpdate? {
+    val preProcessedFiles = files.map { file -> file.map { stripComments(it) } }
     return heuristics.firstNotNullOfOrNull { heuristic ->
-      heuristic.apply(files, updateSuggestion)
+      heuristic.apply(preProcessedFiles, updateSuggestion)
+    }
+  }
+
+  private fun stripComments(s: String): String {
+    val regex = "#.*".toRegex()
+    return s.lines().joinToString("\n") { line ->
+      regex.replace(line) { match ->
+        " ".repeat(match.value.length)
+      }
     }
   }
 }
