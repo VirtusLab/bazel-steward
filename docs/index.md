@@ -78,7 +78,7 @@ This was the most basic guide on Bazel Steward. To learn more about configuratio
 You can give Bazel Steward a quick try by running following command from the root of your Bazel workspace:
 
 ```
-coursier launch org.virtuslab:bazel-steward:1.4.0 --main org.virtuslab.bazelsteward.app.Main -- --no-remote --analyze-only
+coursier launch org.virtuslab:bazel-steward:1.5.0 --main org.virtuslab.bazelsteward.app.Main -- --no-remote --analyze-only
 ```
 
 It will show you all outdated dependencies in your project and versions that Bazel Steward suggests to use with its default config.
