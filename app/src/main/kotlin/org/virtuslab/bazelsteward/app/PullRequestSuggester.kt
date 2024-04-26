@@ -34,7 +34,13 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
         if (group != null) {
           listOf(suggestForGroup(group, updates))
         } else {
-          updates.map { suggestForLibrary(it) }
+          updates.groupBy { it.suggestion.currentLibrary.id.name }.map { (group, updates) ->
+            if (updates.size == 1) {
+              suggestForLibrary(updates.single())
+            } else {
+              suggestForGroupedLibrary(GroupId(group), updates)
+            }
+          }
         }
       }
   }
@@ -55,9 +61,17 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
     )
   }
 
+  private fun suggestForGroupedLibrary(group: GroupId, updates: List<LibraryUpdate>): PullRequestSuggestion {
+    return suggest(
+      config = provider.resolveForLibrary(updates.first().suggestion.currentLibrary),
+      libraryId = group,
+      updates = updates,
+    )
+  }
+
   private fun suggest(config: PullRequestConfig, libraryId: LibraryId, updates: List<LibraryUpdate>): PullRequestSuggestion {
     fun resolveVersion(f: (UpdateSuggestion) -> Version): Version {
-      return updates.map { f(it.suggestion) }.distinct().singleOrNull() ?: SimpleVersion("mixed")
+      return updates.map { f(it.suggestion) }.distinctBy { it.value }.singleOrNull() ?: SimpleVersion("mixed")
     }
 
     val versionFrom = resolveVersion { it.currentLibrary.version }
