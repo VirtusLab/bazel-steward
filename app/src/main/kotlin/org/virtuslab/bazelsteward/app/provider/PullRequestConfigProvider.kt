@@ -10,18 +10,18 @@ class PullRequestConfigProvider(
   private val configs: List<PullRequestsConfig>,
   dependencyKinds: List<DependencyKind<*>>,
 ) {
-  private val applier = DependencyFilterApplier(configs, dependencyKinds)
+  private val filter = DependencyFilterApplier(configs, dependencyKinds)
 
   fun resolveGroup(library: Library): GroupId? {
-    return applier.forLibrary(library).findNotNullOrDefault(null) { it.groupId }
+    return filter.forLibrary(library).findNotNullOrDefault(null) { it.groupId }
   }
 
   fun resolveForGroup(groupId: GroupId): PullRequestConfig {
-    return resolveFromFilter(applier.forPredicate { it.groupId == groupId })
+    return resolveFromFilter(filter.forPredicate { it.groupId == groupId })
   }
 
   fun resolveForLibrary(library: Library): PullRequestConfig {
-    return resolveFromFilter(applier.forLibrary(library))
+    return resolveFromFilter(filter.forLibrary(library))
   }
 
   private fun resolveFromFilter(filter: DependencyFilterApplier.Filtered<PullRequestsConfig>): PullRequestConfig {
