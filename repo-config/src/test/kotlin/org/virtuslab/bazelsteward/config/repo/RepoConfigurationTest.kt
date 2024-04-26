@@ -21,7 +21,7 @@ class RepoConfigurationTest {
     Assertions.assertThatThrownBy { loadConfig(tempDir) }
       .hasMessage(
         listOf(
-          "update-rules[0].dependenciess: is not defined in the schema and the schema does not allow additional properties",
+          "update-rules[0]: property 'dependenciess' is not defined in the schema and the schema does not allow additional properties",
           "update-rules[1].versioning: does not have a value in the enumeration [loose, semver]",
           "update-rules[1].versioning: does not match the regex pattern ^regex:",
           "update-rules[1].bumping: does not have a value in the enumeration [minimal, latest, minor-patch-major, latest-by-date, patch-only, patch-minor, minor-patch]",
