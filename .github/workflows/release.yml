@@ -11,7 +11,7 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: bazel build //app:app_deploy.jar
         name: Build project and jar
       - run: mv bazel-bin/app/app_deploy.jar bazel-steward.jar
@@ -28,7 +28,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.ref_type == 'tag'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5
         with:
@@ -47,7 +47,7 @@ jobs:
     if: github.ref_type == 'tag'
     needs: tagged-release
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - run: |
