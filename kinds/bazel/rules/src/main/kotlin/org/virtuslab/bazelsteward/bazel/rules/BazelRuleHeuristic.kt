@@ -24,7 +24,8 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
       suggested,
     )
 
-    fun allMatches(content: String): List<MatchResult> = regexes.flatMap { it.findAll(content).toList() }
+    fun allMatches(content: String): List<MatchResult> =
+      regexes.map { it.findAll(content).toList() }.firstOrNull { it.isNotEmpty() } ?: emptyList()
   }
 
   override fun apply(files: List<TextFile>, updateSuggestion: UpdateSuggestion): LibraryUpdate? {
@@ -43,7 +44,7 @@ object BazelRuleHeuristic : VersionReplacementHeuristic {
         ReplaceRequest(
           listOf(
             """(?<=")(${Regex.escape(current)})(?=")""".toRegex(),
-            """(?<![0-9]|[0-9]\.)(${Regex.escape(current)})(?="|\.tar\.gz|\.tgz|\.tar|\.zip)""".toRegex(),
+            """(?<![0-9]|[0-9]\.|:)(${Regex.escape(current)})(?="|\.tar\.gz|\.tgz|\.tar|\.zip)""".toRegex(),
           ),
           suggested,
         )
