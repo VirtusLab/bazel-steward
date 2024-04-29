@@ -1,6 +1,6 @@
 # based on JetBrains/bazel-bsp integration
 
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
 
 # External dependencies & java_junit5_test rule
 
