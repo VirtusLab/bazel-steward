@@ -1,5 +1,5 @@
-load("@io_bazel_rules_kotlin//kotlin:core.bzl", "define_kt_toolchain")
-load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_config")
+load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain")
+load("@rules_kotlin//kotlin:lint.bzl", "ktlint_config")
 
 define_kt_toolchain(
     name = "kotlin_toolchain",
