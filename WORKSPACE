@@ -31,9 +31,9 @@ kotlin_repositories()
 register_toolchains("//:kotlin_toolchain")
 
 # bazel_skylib - starlark functions
-BAZEL_SKYLIB_TAG = "1.6.1"
+BAZEL_SKYLIB_TAG = "1.7.1"
 
-BAZEL_SKYLIB_SHA = "9f38886a40548c6e96c106b752f242130ee11aaa068a56ba7e56f4511f33e4f2"
+BAZEL_SKYLIB_SHA = "bc283cdfcd526a52c3201279cda4bc298652efa898b10b4db0837dc51652756f"
 
 http_archive(
     name = "bazel_skylib",
