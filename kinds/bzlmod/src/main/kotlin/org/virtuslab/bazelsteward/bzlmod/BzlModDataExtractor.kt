@@ -39,15 +39,15 @@ class BzlModDataExtractor(
     val lockFile = workspaceRoot.resolve("MODULE.bazel.lock")
     val defaultRepo = "https://bcr.bazel.build"
     val repositories = if (lockFile.exists()) {
-        val jsonNode = jsonReader.readTree(lockFile.toFile())
-        val cmdRegistries = jsonNode.path("flags").path("cmdRegistries")
-        if (cmdRegistries.isArray && !cmdRegistries.isEmpty) {
-            cmdRegistries.map { it.asText() }
-        } else {
-            listOf(defaultRepo)
-        }
+      val jsonNode = jsonReader.readTree(lockFile.toFile())
+      val cmdRegistries = jsonNode.path("flags").path("cmdRegistries")
+      if (cmdRegistries.isArray && !cmdRegistries.isEmpty) {
+          cmdRegistries.map { it.asText() }
+      } else {
+          listOf(defaultRepo)
+      }
     } else {
-        listOf(defaultRepo)
+      listOf(defaultRepo)
     }
     return repositories.map { it.removeSuffix("/") }
   }
