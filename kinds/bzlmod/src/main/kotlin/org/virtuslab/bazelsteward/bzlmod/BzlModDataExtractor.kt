@@ -42,9 +42,9 @@ class BzlModDataExtractor(
       val jsonNode = jsonReader.readTree(lockFile.toFile())
       val cmdRegistries = jsonNode.path("flags").path("cmdRegistries")
       if (cmdRegistries.isArray && !cmdRegistries.isEmpty) {
-          cmdRegistries.map { it.asText() }
+        cmdRegistries.map { it.asText() }
       } else {
-          listOf(defaultRepo)
+        listOf(defaultRepo)
       }
     } else {
       listOf(defaultRepo)
