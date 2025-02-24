@@ -196,7 +196,7 @@ open class E2EBase : IntegrationTestBase() {
     return this.copy(
       dependencyKinds = listOf(
         MavenDependencyKind(
-          MavenDataExtractor(this.workspaceRoot),
+          MavenDataExtractor(this.workspaceRoot, "maven"),
           MockMavenRepository().also(configure),
         ),
       ),

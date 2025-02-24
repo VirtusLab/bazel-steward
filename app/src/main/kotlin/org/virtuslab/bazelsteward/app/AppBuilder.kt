@@ -20,6 +20,7 @@ import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
 import org.virtuslab.bazelsteward.bzlmod.BzlModDataExtractor
 import org.virtuslab.bazelsteward.bzlmod.BzlModDependencyKind
 import org.virtuslab.bazelsteward.bzlmod.BzlModRepository
+import org.virtuslab.bazelsteward.config.repo.MavenConfig
 import org.virtuslab.bazelsteward.config.repo.RepoConfigParser
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.FileFinder
@@ -98,7 +99,8 @@ object AppBuilder {
 
     val repoConfig =
       runBlocking { RepoConfigParser().load(configPath?.let { Path(it) }, repositoryRoot, noInternalConfig) }
-    val mavenDataExtractor = MavenDataExtractor(appConfig.workspaceRoot)
+    val mavenConfig = repoConfig.maven ?: MavenConfig()
+    val mavenDataExtractor = MavenDataExtractor(appConfig.workspaceRoot, mavenConfig.repositoryName)
     val mavenRepository = MavenRepository()
     val updateLogic = UpdateLogic()
     val gitOperations = runBlocking { GitOperations.resolve(appConfig.workspaceRoot, appConfig.baseBranch) }

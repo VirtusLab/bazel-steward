@@ -83,7 +83,7 @@ class UpdateRulesProviderTest {
     val workspaceRoot = Paths.get(".")
     return listOf(
       BazelVersionDependencyKind(BazelUpdater()),
-      MavenDependencyKind(MavenDataExtractor(workspaceRoot), MavenRepository()),
+      MavenDependencyKind(MavenDataExtractor(workspaceRoot, "maven"), MavenRepository()),
       BzlModDependencyKind(BzlModDataExtractor(workspaceRoot), BzlModRepository()),
       BazelRulesDependencyKind(BazelRulesExtractor(), GithubRulesResolver(GitHub.connectAnonymously())),
     )

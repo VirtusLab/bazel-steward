@@ -83,6 +83,8 @@ post-update-hooks:
       - "WORKSPACE"
     run-for: pull-request
     commit-message: "Apply buildifier"
+maven:
+  repository-name: maven
 ```
 
 ## Rule Resolution
