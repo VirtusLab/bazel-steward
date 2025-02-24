@@ -19,6 +19,8 @@ data class RepoConfig(
   val pullRequests: List<PullRequestsConfig> = emptyList(),
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   val postUpdateHooks: List<PostUpdateHooksConfig> = emptyList(),
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  val maven: MavenConfig? = null,
 ) {
   fun withFallback(fallback: RepoConfig): RepoConfig {
     return RepoConfig(
@@ -26,6 +28,7 @@ data class RepoConfig(
       searchPaths = searchPaths + fallback.searchPaths,
       pullRequests = pullRequests + fallback.pullRequests,
       postUpdateHooks = postUpdateHooks + fallback.postUpdateHooks,
+      maven = maven ?: fallback.maven,
     )
   }
 }
@@ -93,3 +96,8 @@ data class PostUpdateHooksConfig(
   val runFor: HookRunFor? = null,
   val commitMessage: String? = null,
 ) : DependencyFilter
+
+data class MavenConfig(
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  val repositoryName: String = "maven",
+)

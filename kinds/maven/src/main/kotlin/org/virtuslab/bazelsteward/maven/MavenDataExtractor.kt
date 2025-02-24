@@ -5,8 +5,8 @@ import kotlinx.coroutines.withContext
 import org.virtuslab.bazelsteward.core.common.CommandRunner
 import java.nio.file.Path
 
-class MavenDataExtractor(private val workspaceRoot: Path) {
-  private val regexPattern = """<source-file location="(.*):1:1" name="@maven//:%s">"""
+class MavenDataExtractor(private val workspaceRoot: Path, private val bazelRepositoryName: String) {
+  private val regexPattern = """<source-file location="(.*):1:1" name="@$bazelRepositoryName//:%s">"""
 
   suspend fun extract(): MavenData {
     val repositories = extractFromFile("outdated.repositories")
@@ -22,7 +22,7 @@ class MavenDataExtractor(private val workspaceRoot: Path) {
       workspaceRoot,
       "bazel",
       "query",
-      "@maven//:$fileName",
+      "@$bazelRepositoryName//:$fileName",
       "--output",
       "xml",
       "--noshow_progress",

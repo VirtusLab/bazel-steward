@@ -18,7 +18,7 @@ import java.nio.file.Paths
 class DependencyKindsFixture(workspaceRoot: Path = Paths.get(".")) {
 
   val bazelVersion = BazelVersionDependencyKind(BazelUpdater())
-  val maven = MavenDependencyKind(MavenDataExtractor(workspaceRoot), MavenRepository())
+  val maven = MavenDependencyKind(MavenDataExtractor(workspaceRoot, "maven"), MavenRepository())
   val bzlmod = BzlModDependencyKind(BzlModDataExtractor(workspaceRoot), BzlModRepository())
   val bazelRules = BazelRulesDependencyKind(
     BazelRulesExtractor(),
