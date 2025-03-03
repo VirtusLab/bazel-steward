@@ -21,6 +21,7 @@ A badge is available to show that Bazel Steward is helping your repository.
 Bazel Steward is already used by these projects:
 * [Bazel BSP](https://github.com/JetBrains/bazel-bsp)
 * [Bazel Steward](https://github.com/VirtusLab/bazel-steward)
+* [Enola.dev](https://github.com/enola-dev/enola/)
 
 ## Contributing
 
