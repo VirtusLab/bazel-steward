@@ -19,8 +19,16 @@ class CommandRunner {
       return runForOutput(command.toList(), directory)
     }
 
-    suspend fun runForOutput(command: List<String>, directory: Path? = null): String {
+    suspend fun runForOutput(command: List<String>, directory: Path? = null, continueOnFailure: Boolean = false): String {
       val result = run(command, directory)
+
+      if (continueOnFailure) {
+        if (!result.isSuccess) {
+          logger.warn("Ignoring failure (code ${result.exitCode}) of:\n${command.joinToString(" ")}\n${result.stderr}")
+        }
+        return result.stdout
+      }
+
       if (result.isSuccess) {
         return result.stdout
       } else {
