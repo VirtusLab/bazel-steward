@@ -36,6 +36,9 @@ class RepoConfigParser {
   private val schema = loadSchema()
 
   suspend fun load(path: Path?, repositoryRoot: Path, noInternalConfig: Boolean): RepoConfig {
+    if (path?.exists() == false) {
+      throw RuntimeException("Requested config file '$path' does not exist")
+    }
     val defaultPaths = pathCandidates.map { repositoryRoot.resolve(it) }
     val userConfigPath = path ?: defaultPaths.firstOrNull { it.exists() }
     if (noInternalConfig) {
