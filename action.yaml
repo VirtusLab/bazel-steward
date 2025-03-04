@@ -39,6 +39,7 @@ runs:
         else
           TAG_NAME=$TAG_PATTERN
         fi
+        echo $TAG_NAME
         gh release download $TAG_NAME --pattern bazel-steward.jar --repo $REPOSITORY
       env:
         GH_TOKEN: ${{ github.token }}
