@@ -22,7 +22,7 @@ post-update-hooks:
     files-to-commit:
       - "**/*.bzl"
       - "**/BUILD.bazel"
-      - "WORKSPACE"
+      - "WORKSPACE.bazel"
     run-for: pull-request
     commit-message: "Apply buildifier"
 ```
