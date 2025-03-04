@@ -14,7 +14,7 @@ Bazel Steward is able to run arbitrary commands and commit their effects into it
 post-update-hooks:
   - kinds: maven
     commands:
-      - "REPIN=1 bazel run @unpinned_maven//:pin"
+      - "REPIN=1 bazelisk run @unpinned_maven//:pin"
     files-to-commit:
       - "maven_install.json"
     run-for: commit
