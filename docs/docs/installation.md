@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: VirtusLab/bazel-steward@latest
+      - uses: VirtusLab/bazel-steward@...
         with:
           github-personal-token: 'XXXXXXXXXXXXXXXXXX' # used for triggering workflows, read below
 ```
