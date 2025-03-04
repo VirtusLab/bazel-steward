@@ -49,7 +49,7 @@ runs:
       if: ${{ inputs.use-release != 'true' }}
       uses: ./.github
     - name: Setup git user
-      uses: fregante/setup-git-user@v1
+      uses: fregante/setup-git-user@v2
     - name: Run bazel steward
       run: |
         NO_REMOTE=$([[ $PUSH_TO_REMOTE == 'true' ]] && echo "" || echo "--no-remote")
