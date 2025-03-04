@@ -36,32 +36,7 @@ Keeping dependencies up-to-date is often mundane and time-consuming task and Baz
 
 ## On CI
 
-To get started quickly, set up a new GitHub Actions workflow in your repository.
-
-Create a file at  `.github/workflows/` with this content:
-```yaml
-name: Bazel Steward
-
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '30 5 * * *' # runs every day at 5:30 am
-
-jobs:
-  bazel-steward:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: VirtusLab/bazel-steward@latest
-```
-
-{: .note } 
-Make sure to allow Github Actions to create pull requests and give it write access so that Bazel Steward can push branches. You can find these settings
-under `Settings / Actions / General / Workflow permissions`.
-
-After every run, Bazel Steward creates a new branch and a pull request with a bumped version for every library it detects to be outdated.
+To get started quickly, [set up a new GitHub Actions workflow in your repository](installation.md), which will give you:
 
 ![Example PR - diff](./images/pr-diff.png)
 
