@@ -51,7 +51,17 @@ runs:
     - name: Move obtained bazel-steward.jar
       run: mv bazel-steward.jar /tmp/bazel-steward.jar
       shell: bash
-    - name: Setup git user
+    - name: Check if git user is set
+      id: check_git_user
+      run: |
+        if git config user.name; then
+          echo "user_exists=true" >> $GITHUB_ENV
+        else
+          echo "user_exists=false" >> $GITHUB_ENV
+        fi
+      shell: bash
+    - name: Setup git user if missing
+      if: env.user_exists == 'false'
       uses: fregante/setup-git-user@v2
     - name: Run bazel steward
       run: |
