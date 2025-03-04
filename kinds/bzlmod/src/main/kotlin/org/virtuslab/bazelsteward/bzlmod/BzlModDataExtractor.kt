@@ -53,7 +53,11 @@ class BzlModDataExtractor(
   }
 
   private suspend fun findDependencies(): List<BazelModule> = withContext(Dispatchers.IO) {
-    val output = CommandRunner.runForOutput(workspaceRoot, "bazel", "mod", "graph", "--depth=1")
+    val output = CommandRunner.runForOutput(
+      listOf("bazel", "mod", "graph", "--depth=1"),
+      workspaceRoot,
+      continueOnFailure = true,
+    )
     return@withContext regexPattern.findAll(output).mapNotNull {
       val name = it.groups[1]!!.value.trim()
       val version = it.groups[2]!!.value.trim()
