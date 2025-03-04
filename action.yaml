@@ -1,4 +1,4 @@
-name: "Bazel steward"
+name: "Bazel Steward"
 description: "Automatically searches bazel repositories for dependencies and updates them"
 author: ""
 inputs:
@@ -48,12 +48,15 @@ runs:
     - name: Build jar file
       if: ${{ inputs.use-release != 'true' }}
       uses: ./.github
+    - name: Move obtained bazel-steward.jar
+      run: mv bazel-steward.jar /tmp/bazel-steward.jar
+      shell: bash
     - name: Setup git user
       uses: fregante/setup-git-user@v2
     - name: Run bazel steward
       run: |
         NO_REMOTE=$([[ $PUSH_TO_REMOTE == 'true' ]] && echo "" || echo "--no-remote")
-        java -Dorg.slf4j.simpleLogger.defaultLogLevel=INFO -jar bazel-steward.jar \
+        java -Dorg.slf4j.simpleLogger.defaultLogLevel=INFO -jar /tmp/bazel-steward.jar \
         --github $NO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
       shell: bash
       env:
