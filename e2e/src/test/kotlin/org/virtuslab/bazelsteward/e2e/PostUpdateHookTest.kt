@@ -60,7 +60,7 @@ class PostUpdateHookTest : E2EBase() {
       ).trim()
       validationCommandOutput shouldBe "45"
       val lastCommit = git.run("log", "-1", "--oneline")
-      lastCommit shouldContain "Updated io.arrow-kt:arrow-core to 1.1.5"
+      lastCommit shouldContain "Update io.arrow-kt:arrow-core to 1.1.5"
       git.checkout(master)
     }
 
