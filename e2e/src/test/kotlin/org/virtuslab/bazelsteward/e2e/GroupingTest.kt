@@ -60,7 +60,7 @@ class GroupingTest : E2EBase() {
         branchPrefix = "bazel-steward/com.carrotsearch/hppc/",
         commits = listOf(
           CommitRequest(
-            "Updated com.carrotsearch:hppc to 0.9.5",
+            "Update com.carrotsearch:hppc to 0.9.5",
             listOf(FileChange(workspace.resolve("WORKSPACE"), 1024, 5, "0.9.5")),
           ),
         ),
@@ -76,7 +76,7 @@ class GroupingTest : E2EBase() {
         branchPrefix = "bazel-steward/org.jline/jline/",
         commits = listOf(
           CommitRequest(
-            "Updated org.jline:jline to 3.21.0",
+            "Update org.jline:jline to 3.21.0",
             listOf(FileChange(workspace.resolve("WORKSPACE"), 1057, 6, "3.21.0")),
           ),
         ),
@@ -151,7 +151,7 @@ class GroupingTest : E2EBase() {
         branchPrefix = "bazel-steward/glassfish/",
         commits = listOf(
           CommitRequest(
-            "Updated glassfish to 2.40.0",
+            "Update glassfish to 2.40.0",
             listOf(
               FileChange(workspace.resolve("WORKSPACE"), 951, 6, "2.40.0"),
             ),

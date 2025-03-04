@@ -72,6 +72,7 @@ data class PullRequestsConfig(
   override val dependencies: List<DependencyNameFilter> = emptyList(),
   val title: String? = null,
   val body: String? = null,
+  val commitMessage: String? = null,
   @JsonSetter(nulls = Nulls.AS_EMPTY)
   @JsonDeserialize(using = ListOrItemDeserializer::class)
   val labels: List<String> = emptyList(),

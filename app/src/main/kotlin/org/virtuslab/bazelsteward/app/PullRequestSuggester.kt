@@ -80,11 +80,12 @@ class PullRequestSuggester(private val provider: PullRequestConfigProvider) {
     val templateApplier = prepareSubstitutions(libraryId, versionFrom, versionTo, updates)
     val title = templateApplier.apply(config.titleTemplate)
     val body = templateApplier.apply(config.bodyTemplate)
+    val commitMessage = templateApplier.apply(config.commitMessageTemplate)
     val branchPrefix = config.branchPrefix
 
     val branch = BazelStewardGitBranch(branchPrefix, libraryId, versionTo)
 
-    val commit = CommitRequest(title, updates.flatMap { it.fileChanges }.distinct())
+    val commit = CommitRequest(commitMessage, updates.flatMap { it.fileChanges }.distinct())
 
     return PullRequestSuggestion(
       NewPullRequest(branch.gitBranch, title, body, config.labels),

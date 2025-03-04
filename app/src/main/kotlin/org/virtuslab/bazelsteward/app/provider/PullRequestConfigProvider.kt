@@ -27,9 +27,10 @@ class PullRequestConfigProvider(
   private fun resolveFromFilter(filter: DependencyFilterApplier.Filtered<PullRequestsConfig>): PullRequestConfig {
     val title = filter.findNotNullOrDefault(default.titleTemplate) { it.title }
     val body = filter.findNotNullOrDefault(default.bodyTemplate) { it.body }
+    val commitMessage = filter.findNotNullOrDefault(default.commitMessageTemplate) { it.commitMessage }
     val tags = filter.findNotNullOrDefault(default.labels) { it.labels }
     val branchPrefix = filter.findNotNullOrDefault(default.branchPrefix) { it.branchPrefix }
-    return PullRequestConfig(title, body, tags, branchPrefix)
+    return PullRequestConfig(title, body, commitMessage, tags, branchPrefix)
   }
 
   fun resolveBranchPrefixes(): List<String> {
@@ -44,10 +45,11 @@ class PullRequestConfigProvider(
 
   companion object {
     val default = PullRequestConfig(
-      "Updated \${dependencyId} to \${versionTo}",
-      "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
-      emptyList(),
-      "bazel-steward/",
+      titleTemplate = "Updated \${dependencyId} to \${versionTo}",
+      bodyTemplate = "Updates \${dependencyId} from \${versionFrom} to \${versionTo}",
+      commitMessageTemplate = "Update \${dependencyId} to \${versionTo}",
+      labels = emptyList(),
+      branchPrefix = "bazel-steward/",
     )
   }
 }
@@ -55,6 +57,7 @@ class PullRequestConfigProvider(
 data class PullRequestConfig(
   val titleTemplate: String,
   val bodyTemplate: String,
+  val commitMessageTemplate: String,
   val labels: List<String>,
   val branchPrefix: String,
 )
