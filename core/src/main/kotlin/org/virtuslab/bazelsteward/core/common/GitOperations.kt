@@ -87,7 +87,7 @@ class GitOperations(repositoryRoot: Path, private val baseBranch: String) {
 
   suspend fun commitSelectedFiles(filesToCommit: List<String>, commitMessage: String) {
     git.add(filesToCommit)
-    val noChanges = git.runForResult("git", "diff", "--quiet", "--exit-code", "--cached").isSuccess
+    val noChanges = git.runForResult("diff", "--quiet", "--exit-code", "--cached").isSuccess
     if (noChanges) {
       logger.warn { "No changes to commit" }
     } else {
