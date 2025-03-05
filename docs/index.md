@@ -36,7 +36,7 @@ Keeping dependencies up-to-date is often mundane and time-consuming task and Baz
 
 ## On CI
 
-To get started quickly, [set up a new GitHub Actions workflow in your repository](installation.md), which will give you:
+To get started quickly, [set up a new GitHub Actions workflow in your repository](./docs/installation.html), which will give you:
 
 ![Example PR - diff](./images/pr-diff.png)
 
