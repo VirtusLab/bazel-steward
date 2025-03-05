@@ -4,7 +4,8 @@ author: ""
 inputs:
   configuration-path:
     description: "The path to bazel steward configuration"
-    default: "./bazel-steward.yaml"
+    required: false
+    default: ""
   github-token:
     description: "A token for the Github repository"
     default: ${{ github.token }}
@@ -49,7 +50,7 @@ runs:
       if: ${{ inputs.use-release != 'true' }}
       uses: ./.github
     - name: Move obtained bazel-steward.jar
-      run: mv bazel-steward.jar /tmp/bazel-steward.jar
+      run: mv ./bazel-steward.jar /tmp/bazel-steward.jar
       shell: bash
     - name: Check if git user is set
       id: check_git_user
@@ -66,8 +67,9 @@ runs:
     - name: Run bazel steward
       run: |
         NO_REMOTE=$([[ $PUSH_TO_REMOTE == 'true' ]] && echo "" || echo "--no-remote")
+        CONFIG_PATH_ARG=$([[ -n "${{ inputs.configuration-path }}" ]] && echo "--config-path '${{ inputs.configuration-path }}'" || echo "")
         java -Dorg.slf4j.simpleLogger.defaultLogLevel=INFO -jar /tmp/bazel-steward.jar \
-        --github $NO_REMOTE --config-path '${{ inputs.configuration-path }}' ${{ inputs.additional-args }}
+        --github $NO_REMOTE $CONFIG_PATH_ARG ${{ inputs.additional-args }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
