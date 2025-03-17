@@ -67,7 +67,7 @@ runs:
     - name: Run bazel steward
       run: |
         NO_REMOTE=$([[ $PUSH_TO_REMOTE == 'true' ]] && echo "" || echo "--no-remote")
-        CONFIG_PATH_ARG=$([[ -n "${{ inputs.configuration-path }}" ]] && echo "--config-path '${{ inputs.configuration-path }}'" || echo "")
+        CONFIG_PATH_ARG=$([[ -n "${{ inputs.configuration-path }}" ]] && echo "--config-path ${{ inputs.configuration-path }}" || echo "")
         java -Dorg.slf4j.simpleLogger.defaultLogLevel=INFO -jar /tmp/bazel-steward.jar \
         --github $NO_REMOTE $CONFIG_PATH_ARG ${{ inputs.additional-args }}
       shell: bash
