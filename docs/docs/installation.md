@@ -109,7 +109,7 @@ Bazel Steward is published to Maven Central under `org.virtuslab:bazel-steward`.
 To easily run it, use [Coursier](https://get-coursier.io/docs/cli-installation).
 
 ```
-coursier launch org.virtuslab:bazel-steward:1.7.0 --main org.virtuslab.bazelsteward.app.Main -- --help
+coursier launch org.virtuslab:bazel-steward:1.7.1 --main org.virtuslab.bazelsteward.app.Main -- --help
 ```
 
 ## GitHub Releases
