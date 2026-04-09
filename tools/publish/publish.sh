@@ -17,7 +17,7 @@ else
   fi
 
   bazel run --stamp \
-    --define "maven_repo=https://oss.sonatype.org/service/local" \
+    --define "maven_repo=https://ossrh-staging-api.central.sonatype.com/service/local/" \
     --define "maven_user=$SONATYPE_USERNAME" \
     --define "maven_password=$SONATYPE_PASSWORD" \
     //app:maven.publish
