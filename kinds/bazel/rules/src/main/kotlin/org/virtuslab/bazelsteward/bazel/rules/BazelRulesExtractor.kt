@@ -68,6 +68,8 @@ class BazelRulesExtractor {
         |)
       """.trimMargin(),
     )
+    val bazelPath = CommandRunner.runForOutput(workspaceRoot, "bazel", "info", "output_base").trim()
+    logger.info { "Bazel output_base for workspace $workspaceRoot: $bazelPath" }
     // solution from https://github.com/bazelbuild/bazel/issues/6377#issuecomment-1237791008
     try {
       CommandRunner.runForOutput(workspaceRoot, "bazel", "build", "@all_external_repositories//:result.json")
@@ -75,7 +77,6 @@ class BazelRulesExtractor {
       workspaceFilePath.writeText(originalContent)
       deleteFile(tempFileForBzl)
     }
-    val bazelPath = CommandRunner.runForOutput(workspaceRoot, "bazel", "info", "output_base").trim()
     val resultFilePath = Path(bazelPath).resolve("external/all_external_repositories/result.json")
     if (!resultFilePath.exists()) {
       throw RuntimeException("Failed to find a file: $resultFilePath")

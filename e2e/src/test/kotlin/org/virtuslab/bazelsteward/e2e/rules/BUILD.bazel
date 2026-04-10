@@ -1,5 +1,5 @@
 integration_test_suite(
-    size = "small",
+    size = "large",
     resources = ["//e2e/src/test/resources/rules"],
     test_package = "org.virtuslab.bazelsteward.e2e.rules",
     deps = [
