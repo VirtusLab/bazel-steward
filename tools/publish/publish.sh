@@ -63,23 +63,47 @@ else
 
   AUTH_TOKEN=$(printf '%s:%s' "$SONATYPE_USERNAME" "$SONATYPE_PASSWORD" | base64 -w0)
 
+  CENTRAL_API="https://central.sonatype.com/api/v1/publisher"
+  AUTH_HEADER="Authorization: Bearer ${AUTH_TOKEN}"
+
   echo "Uploading ${GROUP_ID}:${ARTIFACT_ID}:${VERSION} to Maven Central..."
 
-  DEPLOYMENT_ID=$(curl --fail --silent --show-error \
+  UPLOAD_RESPONSE=$(mktemp)
+  HTTP_CODE=$(curl --silent --show-error --output "$UPLOAD_RESPONSE" --write-out '%{http_code}' \
     --request POST \
-    --header "Authorization: Bearer ${AUTH_TOKEN}" \
-    --form "bundle=@${BUNDLE_ZIP};filename=central-bundle.zip;type=application/octet-stream" \
-    "https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC&name=${GROUP_ID}:${ARTIFACT_ID}:${VERSION}")
+    --header "$AUTH_HEADER" \
+    --form "bundle=@${BUNDLE_ZIP};type=application/octet-stream" \
+    "${CENTRAL_API}/upload?publishingType=AUTOMATIC&name=${GROUP_ID}%3A${ARTIFACT_ID}%3A${VERSION}")
 
+  if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+    echo "Upload failed with HTTP ${HTTP_CODE}:"
+    cat "$UPLOAD_RESPONSE"
+    rm -f "$UPLOAD_RESPONSE"
+    exit 1
+  fi
+
+  DEPLOYMENT_ID=$(cat "$UPLOAD_RESPONSE")
+  rm -f "$UPLOAD_RESPONSE"
   echo "Deployment ID: ${DEPLOYMENT_ID}"
 
   for _ in $(seq 1 60); do
     sleep 10
 
-    STATUS_JSON=$(curl --fail --silent --show-error \
+    STATUS_RESPONSE=$(mktemp)
+    HTTP_CODE=$(curl --silent --show-error --output "$STATUS_RESPONSE" --write-out '%{http_code}' \
       --request POST \
-      --header "Authorization: Bearer ${AUTH_TOKEN}" \
-      "https://central.sonatype.com/api/v1/publisher/status?id=${DEPLOYMENT_ID}")
+      --header "$AUTH_HEADER" \
+      "${CENTRAL_API}/status?id=${DEPLOYMENT_ID}")
+
+    if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+      echo "Status check failed with HTTP ${HTTP_CODE}:"
+      cat "$STATUS_RESPONSE"
+      rm -f "$STATUS_RESPONSE"
+      exit 1
+    fi
+
+    STATUS_JSON=$(cat "$STATUS_RESPONSE")
+    rm -f "$STATUS_RESPONSE"
 
     STATE=$(echo "$STATUS_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin)['deploymentState'])")
     echo "Deployment state: ${STATE}"
