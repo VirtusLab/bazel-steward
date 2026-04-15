@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euxo pipefail
 
 if [ "${1:-}" == "--local" ]; then
   bazel run --stamp \
@@ -69,11 +69,11 @@ else
   echo "Uploading ${GROUP_ID}:${ARTIFACT_ID}:${VERSION} to Maven Central..."
 
   UPLOAD_RESPONSE=$(mktemp)
-  HTTP_CODE=$(curl --silent --show-error --output "$UPLOAD_RESPONSE" --write-out '%{http_code}' \
+  HTTP_CODE=$(curl --show-error --output "$UPLOAD_RESPONSE" --write-out '%{http_code}' \
     --request POST \
     --header "$AUTH_HEADER" \
-    --form "bundle=@${BUNDLE_ZIP};type=application/octet-stream" \
-    "${CENTRAL_API}/upload?publishingType=AUTOMATIC&name=${GROUP_ID}%3A${ARTIFACT_ID}%3A${VERSION}")
+    --form bundle=@"${BUNDLE_ZIP}" \
+    "${CENTRAL_API}/upload?publishingType=AUTOMATIC")
 
   if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
     echo "Upload failed with HTTP ${HTTP_CODE}:"
