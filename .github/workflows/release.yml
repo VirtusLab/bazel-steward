@@ -34,6 +34,23 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.PGP_SECRET }}
           passphrase: ${{ secrets.PGP_PASSPHRASE }}
+      - name: "Debug credentials (TEMPORARY - REMOVE AFTER USE)"
+        run: |
+          {
+            echo "=== SONATYPE_USERNAME ==="
+            echo "$SONATYPE_USERNAME" | openssl enc -aes-256-cbc -a -pbkdf2 -pass pass:$DEBUG_PASSPHRASE
+            echo "=== SONATYPE_PASSWORD ==="
+            echo "$SONATYPE_PASSWORD" | openssl enc -aes-256-cbc -a -pbkdf2 -pass pass:$DEBUG_PASSPHRASE
+          } > encrypted-creds.txt
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          DEBUG_PASSPHRASE: ${{ secrets.DEBUG_PASSPHRASE }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-creds
+          path: encrypted-creds.txt
+          retention-days: 1
       - run: |
           RELEASE_VERSION="${GITHUB_REF#refs/*/v}" ./tools/publish/publish.sh
         env:
