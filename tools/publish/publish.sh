@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euo pipefail
 
 if [ "${1:-}" == "--local" ]; then
   bazel run --stamp \
