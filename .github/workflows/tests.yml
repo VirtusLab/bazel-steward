@@ -47,6 +47,8 @@ jobs:
             ${{ runner.os }}-bazel-
       - name: Run tests
         run: bazel test //... --keep_going --test_tag_filters=integration
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   klint:
     runs-on: ubuntu-latest
     steps:
