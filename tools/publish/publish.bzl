@@ -45,14 +45,14 @@ def _maven_central_artifacts_impl(ctx):
     ctx.actions.write(
         output = manifest,
         content = json.encode({
-            "workspace": ws,
-            "group_id": group_id,
             "artifact_id": artifact_id,
-            "version": version,
+            "group_id": group_id,
             "jar": named_jar.short_path,
-            "sources": named_sources.short_path,
             "javadoc": named_javadoc.short_path,
             "pom": versioned_pom.short_path,
+            "sources": named_sources.short_path,
+            "version": version,
+            "workspace": ws,
         }),
     )
 
@@ -67,11 +67,11 @@ def _maven_central_artifacts_impl(ctx):
 maven_central_artifacts = rule(
     implementation = _maven_central_artifacts_impl,
     attrs = {
-        "artifact_jar": attr.label(allow_single_file = True, mandatory = True),
-        "source_jar": attr.label(allow_single_file = True, mandatory = True),
-        "docs_jar": attr.label(allow_single_file = True, mandatory = True),
-        "pom": attr.label(allow_single_file = True, mandatory = True),
-        "group_id": attr.string(mandatory = True),
         "artifact_id": attr.string(mandatory = True),
+        "artifact_jar": attr.label(allow_single_file = True, mandatory = True),
+        "docs_jar": attr.label(allow_single_file = True, mandatory = True),
+        "group_id": attr.string(mandatory = True),
+        "pom": attr.label(allow_single_file = True, mandatory = True),
+        "source_jar": attr.label(allow_single_file = True, mandatory = True),
     },
 )

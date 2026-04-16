@@ -1,21 +1,22 @@
-load("//tools/publish:publish.bzl", "maven_central_artifacts")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/publish:publish.bzl", "maven_central_artifacts")
 
 exports_files(["pom-template.xml"])
 
 maven_central_artifacts(
     name = "artifacts",
-    artifact_jar = "//app:maven-maven-artifact",
-    source_jar = "//app:maven-maven-source",
-    docs_jar = "//app:maven-docs",
-    pom = "//app:maven-pom",
-    group_id = "org.virtuslab",
     artifact_id = "bazel-steward",
+    artifact_jar = "//app:maven-maven-artifact",
+    docs_jar = "//app:maven-docs",
+    group_id = "org.virtuslab",
+    pom = "//app:maven-pom",
+    source_jar = "//app:maven-maven-source",
 )
 
 py_binary(
     name = "maven_central",
     srcs = ["upload.py"],
+    args = ["$(rlocationpath :artifacts_manifest.json)"],
     data = [
         ":artifacts",
         # Listed explicitly so $(rlocationpath) below can expand it;
@@ -23,5 +24,4 @@ py_binary(
         ":artifacts_manifest.json",
     ],
     deps = ["@rules_python//python/runfiles"],
-    args = ["$(rlocationpath :artifacts_manifest.json)"],
 )
