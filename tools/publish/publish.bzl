@@ -59,6 +59,8 @@ def _maven_central_artifacts_impl(ctx):
     all_files = maven_artifacts + [manifest]
     runfiles = ctx.runfiles(files = all_files)
 
+    # DefaultInfo.files must remain a single file (the manifest) so that
+    # $(rlocationpath :artifacts) in the py_binary args expands unambiguously.
     return [DefaultInfo(
         files = depset([manifest]),
         runfiles = runfiles,

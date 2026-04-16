@@ -16,12 +16,11 @@ maven_central_artifacts(
 py_binary(
     name = "maven_central",
     srcs = ["upload.py"],
-    args = ["$(rlocationpath :artifacts_manifest.json)"],
-    data = [
-        ":artifacts",
-        # Listed explicitly so $(rlocationpath) below can expand it;
-        # :artifacts already carries this file as a runfile.
-        ":artifacts_manifest.json",
-    ],
+    # maven_central_artifacts returns DefaultInfo(files=depset([manifest])),
+    # so $(rlocationpath :artifacts) expands to exactly the manifest's rlocation.
+    # The rule must keep its DefaultInfo.files a single file for this to hold.
+    args = ["$(rlocationpath :artifacts)"],
+    data = [":artifacts"],
+    main = "upload.py",
     deps = ["@rules_python//python/runfiles"],
 )

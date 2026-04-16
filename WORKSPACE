@@ -41,10 +41,13 @@ http_archive(
     url = "https://github.com/bazelbuild/bazel-skylib/releases/download/{}/bazel-skylib-{}.tar.gz".format(BAZEL_SKYLIB_TAG, BAZEL_SKYLIB_TAG),
 )
 
-# rules_python - hermetic Python toolchain for publishing
-RULES_PYTHON_TAG = "1.0.0"
+# rules_python - provides py_binary and the runfiles library for publishing.
+# Pinned to 0.31.0 (last release with explicit Bazel 6 support): the Starlark
+# Python implementation (which requires rules_cc 0.1.0) is only enabled for
+# Bazel 7+, so this version does not conflict with @remote_java_tools on Bazel 6.
+RULES_PYTHON_TAG = "0.31.0"
 
-RULES_PYTHON_SHA = "4f7e2aa1eb9aa722d96498f5ef514f426c1f55161c3c9ae628c857a7128ceb07"
+RULES_PYTHON_SHA = "c68bdc4fbec25de5b5493b8819cfc877c4ea299c0dcb15c244c5a00208cde311"
 
 http_archive(
     name = "rules_python",
@@ -53,14 +56,9 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_python/releases/download/{0}/rules_python-{0}.tar.gz".format(RULES_PYTHON_TAG),
 )
 
-load("@rules_python//python:repositories.bzl", "py_repositories", "python_register_toolchains")
+load("@rules_python//python:repositories.bzl", "py_repositories")
 
 py_repositories()
-
-python_register_toolchains(
-    name = "python_3_11",
-    python_version = "3.11",
-)
 
 # io_bazel_rules_scala - required to avoid cyclic init error
 IO_BAZEL_RULES_SCALA_TAG = "v6.5.0"
@@ -88,6 +86,9 @@ scala_repositories()
 
 # maven deps
 load("@rules_jvm_external//:defs.bzl", "maven_install")
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
 
 maven_install(
     artifacts = [
@@ -134,3 +135,7 @@ maven_install(
 load("@maven//:defs.bzl", "pinned_maven_install")
 
 pinned_maven_install()
+
+load("@rules_jvm_external_deps//:defs.bzl", pinned_rules_jvm_external_deps_install = "pinned_maven_install")
+
+pinned_rules_jvm_external_deps_install()
