@@ -34,8 +34,7 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.PGP_SECRET }}
           passphrase: ${{ secrets.PGP_PASSPHRASE }}
-      - run: |
-          RELEASE_VERSION="${GITHUB_REF#refs/*/v}" ./tools/publish/publish.sh
+      - run: bazel run --stamp --define "MAVEN_VERSION=${GITHUB_REF#refs/*/v}" //tools/publish:maven_central
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
