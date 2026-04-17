@@ -4,7 +4,7 @@ RUN apt-get update \
       build-essential \
       ca-certificates \
       curl \
-      openjdk-21-jdk-headless \
+      openjdk-11-jdk-headless \
  && rm -rf /var/lib/apt/lists/*
 RUN curl -fsSLo /usr/local/bin/bazelisk \
       "https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64" \
