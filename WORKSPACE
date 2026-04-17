@@ -41,6 +41,25 @@ http_archive(
     url = "https://github.com/bazelbuild/bazel-skylib/releases/download/{}/bazel-skylib-{}.tar.gz".format(BAZEL_SKYLIB_TAG, BAZEL_SKYLIB_TAG),
 )
 
+# rules_python - provides py_binary and the runfiles library for publishing.
+# Pinned to 0.31.0 (last release with explicit Bazel 6 support): the Starlark
+# Python implementation (which requires rules_cc 0.1.0) is only enabled for
+# Bazel 7+, so this version does not conflict with @remote_java_tools on Bazel 6.
+RULES_PYTHON_TAG = "0.31.0"
+
+RULES_PYTHON_SHA = "c68bdc4fbec25de5b5493b8819cfc877c4ea299c0dcb15c244c5a00208cde311"
+
+http_archive(
+    name = "rules_python",
+    sha256 = RULES_PYTHON_SHA,
+    strip_prefix = "rules_python-{}".format(RULES_PYTHON_TAG),
+    url = "https://github.com/bazelbuild/rules_python/releases/download/{0}/rules_python-{0}.tar.gz".format(RULES_PYTHON_TAG),
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
 # io_bazel_rules_scala - required to avoid cyclic init error
 IO_BAZEL_RULES_SCALA_TAG = "v6.5.0"
 
@@ -65,45 +84,11 @@ load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
 
 scala_repositories()
 
-# rules_proto for sonatype
-
-RULES_PROTO_TAG = "4.0.0-3.20.0"
-
-RULES_PROTO_SHA = "e017528fd1c91c5a33f15493e3a398181a9e821a804eb7ff5acdd1d2d6c2b18d"
-
-http_archive(
-    name = "rules_proto",
-    sha256 = RULES_PROTO_SHA,
-    strip_prefix = "rules_proto-{}".format(RULES_PROTO_TAG),
-    urls = [
-        "https://github.com/bazelbuild/rules_proto/archive/refs/tags/{}.tar.gz".format(RULES_PROTO_TAG),
-    ],
-)
-
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-
-rules_proto_dependencies()
-
-rules_proto_toolchains()
-
-# sonatype for publishing
-BAZEL_SONATYPE_TAG = "1.1.1"
-
-BAZEL_SONATYPE_SHA = "6d1bc7da15dae958274df944eb46e9757e14187cda6decd66fc1aeeb1ea21758"
-
-http_archive(
-    name = "bazel_sonatype",
-    sha256 = BAZEL_SONATYPE_SHA,
-    strip_prefix = "bazel-sonatype-{}".format(BAZEL_SONATYPE_TAG),
-    url = "https://github.com/JetBrains/bazel-sonatype/archive/v{}.zip".format(BAZEL_SONATYPE_TAG),
-)
-
-load("@bazel_sonatype//:defs.bzl", "sonatype_dependencies")
-
-sonatype_dependencies()
-
 # maven deps
 load("@rules_jvm_external//:defs.bzl", "maven_install")
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
 
 maven_install(
     artifacts = [
@@ -150,3 +135,7 @@ maven_install(
 load("@maven//:defs.bzl", "pinned_maven_install")
 
 pinned_maven_install()
+
+load("@rules_jvm_external_deps//:defs.bzl", pinned_rules_jvm_external_deps_install = "pinned_maven_install")
+
+pinned_rules_jvm_external_deps_install()

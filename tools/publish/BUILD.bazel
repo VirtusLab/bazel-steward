@@ -1,3 +1,26 @@
-exports_files([
-    "pom-template.xml",
-])
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/publish:publish.bzl", "maven_central_artifacts")
+
+exports_files(["pom-template.xml"])
+
+maven_central_artifacts(
+    name = "artifacts",
+    artifact_id = "bazel-steward",
+    artifact_jar = "//app:maven-maven-artifact",
+    docs_jar = "//app:maven-docs",
+    group_id = "org.virtuslab",
+    pom = "//app:maven-pom",
+    source_jar = "//app:maven-maven-source",
+)
+
+py_binary(
+    name = "maven_central",
+    srcs = ["upload.py"],
+    # maven_central_artifacts returns DefaultInfo(files=depset([manifest])),
+    # so $(rlocationpath :artifacts) expands to exactly the manifest's rlocation.
+    # The rule must keep its DefaultInfo.files a single file for this to hold.
+    args = ["$(rlocationpath :artifacts)"],
+    data = [":artifacts"],
+    main = "upload.py",
+    deps = ["@rules_python//python/runfiles"],
+)
