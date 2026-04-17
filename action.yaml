@@ -36,7 +36,7 @@ runs:
         TAG_PATTERN=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
         if [[ $TAG_PATTERN == v* ]] ;
         then
-          TAG_NAME=$(gh release list -L 100 --repo $REPOSITORY | grep -Eo '^'"$TAG_PATTERN"'[\.0-9]*' | sort -Vr | head -n 1)
+          TAG_NAME=$(gh release list -L 100 --repo $REPOSITORY | grep -Eo '^'"$TAG_PATTERN"'[\.0-9]*$' | sort -Vr | head -n 1)
         else
           TAG_NAME=$TAG_PATTERN
         fi
