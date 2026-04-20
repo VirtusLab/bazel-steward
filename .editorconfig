@@ -2,7 +2,7 @@
 indent_size = 2
 
 # The following ktlint rules are part of the standard ruleset bundled with
-# newer ktlint (pulled in by rules_kotlin 2.x) but were not enforced by the
+# a newer ktlint (pulled in by rules_kotlin 2.x) but were not enforced by the
 # older ktlint used with Bazel 6 + rules_kotlin 1.x. They are disabled here
 # to keep the scope of the Bazel 8 / bzlmod migration focused on build-system
 # changes; fixing the violations can be handled in a follow-up formatting
