@@ -9,17 +9,79 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 private val logger = KotlinLogging.logger {}
 
 @Suppress("DEPRECATION")
-class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
+class GithubRulesResolver(
+  private val gitHubClient: GitHub,
+  private val perRepoTimeoutSeconds: Long = DEFAULT_PER_REPO_TIMEOUT_SECONDS,
+  private val maxRetries: Int = DEFAULT_MAX_RETRIES,
+) : RulesResolver {
 
   override fun resolveRuleVersions(ruleId: RuleLibraryId): List<RuleVersion> {
     val repositoryId = "${ruleId.repoName}/${ruleId.ruleName}"
-    val repository = gitHubClient.getRepository(repositoryId)
-    val releases = repository.listReleases()
-    return releases.map { toVersion(ruleId, it) }.toList()
+    return retryWithBackoff(repositoryId) {
+      fetchReleasesWithTimeout(ruleId, repositoryId)
+    }
+  }
+
+  private fun fetchReleasesWithTimeout(ruleId: RuleLibraryId, repositoryId: String): List<RuleVersion> {
+    try {
+      val future = CompletableFuture.supplyAsync {
+        val repository = gitHubClient.getRepository(repositoryId)
+        repository.listReleases().map { toVersion(ruleId, it) }.toList()
+      }
+      return future.get(perRepoTimeoutSeconds, TimeUnit.SECONDS)
+    } catch (e: TimeoutException) {
+      logger.warn { "Timed out fetching releases for $repositoryId after ${perRepoTimeoutSeconds}s" }
+      throw e
+    }
+  }
+
+  private fun retryWithBackoff(repositoryId: String, action: () -> List<RuleVersion>): List<RuleVersion> {
+    var lastException: Exception? = null
+    for (attempt in 0..maxRetries) {
+      if (attempt > 0) {
+        val backoffMs = INITIAL_BACKOFF_MS * (1L shl (attempt - 1))
+        logger.info { "Retrying $repositoryId (attempt ${attempt + 1}/${maxRetries + 1}) after ${backoffMs}ms" }
+        Thread.sleep(backoffMs)
+      }
+      try {
+        return action()
+      } catch (e: Exception) {
+        lastException = e
+        val isRateLimit = isRateLimitError(e)
+        if (isRateLimit) {
+          logger.warn { "GitHub API rate limit hit for $repositoryId. ${rateLimitInfo()}" }
+          break
+        }
+        if (attempt == maxRetries) break
+        logger.warn { "Failed to fetch releases for $repositoryId: ${e.message}" }
+      }
+    }
+    logger.error { "Giving up on fetching releases for $repositoryId after ${maxRetries + 1} attempts: ${lastException?.message}" }
+    return emptyList()
+  }
+
+  private fun isRateLimitError(e: Exception): Boolean {
+    val message = (e.cause ?: e).message ?: return false
+    return message.contains("rate limit", ignoreCase = true) ||
+      message.contains("API rate limit exceeded", ignoreCase = true) ||
+      message.contains("403") ||
+      message.contains("429")
+  }
+
+  private fun rateLimitInfo(): String {
+    return try {
+      val rateLimit = gitHubClient.rateLimit
+      "Remaining: ${rateLimit.remaining}/${rateLimit.limit}, resets at ${rateLimit.resetDate}"
+    } catch (_: Exception) {
+      "Could not fetch rate limit info"
+    }
   }
 
   private fun toVersion(ruleId: RuleLibraryId, release: GHRelease): RuleVersion {
@@ -101,6 +163,10 @@ class GithubRulesResolver(private val gitHubClient: GitHub) : RulesResolver {
   }
 
   companion object {
+    private const val DEFAULT_PER_REPO_TIMEOUT_SECONDS = 60L
+    private const val DEFAULT_MAX_RETRIES = 2
+    private const val INITIAL_BACKOFF_MS = 2000L
+
     private val sha256Regex = "\\b[A-Fa-f0-9]{64}\\b".toRegex()
     private val urlRegex = """(?<=")(https://github\.com/.*?)(?=")""".toRegex()
 
@@ -132,6 +198,7 @@ private fun testUrl(url: String): Boolean {
     val requestHead = HttpRequest.newBuilder()
       .method("HEAD", HttpRequest.BodyPublishers.noBody())
       .uri(uri)
+      .timeout(Duration.ofSeconds(30))
       .build()
     val httpResponse = httpClient.send(requestHead, HttpResponse.BodyHandlers.discarding())
     return httpResponse.statusCode() < 300
