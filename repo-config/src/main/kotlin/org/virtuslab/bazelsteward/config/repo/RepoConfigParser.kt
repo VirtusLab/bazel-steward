@@ -6,6 +6,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.networknt.schema.JsonSchema
 import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.PathType
+import com.networknt.schema.SchemaValidatorsConfig
 import com.networknt.schema.SpecVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,6 +19,7 @@ import org.virtuslab.bazelsteward.core.library.BumpingStrategy
 import org.virtuslab.bazelsteward.core.library.GroupId
 import org.virtuslab.bazelsteward.core.library.VersioningSchema
 import java.nio.file.Path
+import java.util.Locale
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 
@@ -83,7 +86,12 @@ class RepoConfigParser {
   private fun loadSchema(): JsonSchema {
     val schemaText = javaClass.classLoader.getResource("repo-config-schema.json")?.readText()
       ?: throw Exception("Could not find schema to validate configuration file")
-    return JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909).getSchema(schemaText)
+    val validatorsConfig = SchemaValidatorsConfig.builder()
+      .locale(Locale.ENGLISH)
+      .pathType(PathType.LEGACY)
+      .build()
+    return JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909)
+      .getSchema(schemaText, validatorsConfig)
   }
 
   private fun removeComments(text: String) = text
