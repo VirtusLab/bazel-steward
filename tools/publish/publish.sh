@@ -9,7 +9,7 @@ set -euo pipefail
 # Nexus 2 tooling (like bazel_sonatype) continues to work. After upload,
 # the deployment must be released via the Portal UI or Portal API.
 #
-# See: https://central.sonatype.org/pages/ossrh-eol/
+# See: https://central.sonatype.org/pages/ossrh-eol
 
 readonly CENTRAL_PORTAL_API="https://ossrh-staging-api.central.sonatype.com/service/local"
 readonly BUILD_FILE="app/BUILD.bazel"
