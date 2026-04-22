@@ -1,3 +1,32 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
 exports_files([
     "pom-template.xml",
+    "set_version.py",
+    "version.bzl",
 ])
+
+py_library(
+    name = "central_portal",
+    srcs = ["central_portal.py"],
+    imports = ["../.."],
+    visibility = ["//visibility:private"],
+)
+
+py_binary(
+    name = "release_staged",
+    srcs = ["release_staged.py"],
+    imports = ["../.."],
+    main = "release_staged.py",
+    visibility = ["//visibility:public"],
+    deps = [":central_portal"],
+)
+
+py_test(
+    name = "central_portal_test",
+    srcs = ["central_portal_test.py"],
+    imports = ["../.."],
+    main = "central_portal_test.py",
+    tags = ["unit"],
+    deps = [":central_portal"],
+)

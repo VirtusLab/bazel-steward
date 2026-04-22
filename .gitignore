@@ -8,3 +8,4 @@ bazel-out
 bazel-testlogs
 .DS_Store
 _site/
+tools/publish/__pycache__/
