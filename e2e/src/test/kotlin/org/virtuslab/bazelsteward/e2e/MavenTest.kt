@@ -10,7 +10,18 @@ class MavenTest : E2EBase() {
   @Test
   fun `Maven trivial local test`(@TempDir tempDir: Path) {
     val project = "maven/trivial"
-    runBazelSteward(tempDir, project)
+    runBazelStewardWith(tempDir, project) {
+      it.withGitHubRulesResolver(
+        RuleVersionsResolverMock(
+          mapOf(
+            "rules_jvm_external" to "5.3",
+            "rules_kotlin" to "v1.8.0",
+            "bazel-skylib" to "1.4.2",
+            "rules_scala" to "20220301",
+          ),
+        ),
+      )
+    }
     val expectedBranches = expectedBranchPrefixes(
       "io.arrow-kt/arrow-core",
       "io.arrow-kt/arrow-fx-coroutines",

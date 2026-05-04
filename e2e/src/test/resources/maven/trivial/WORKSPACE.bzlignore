@@ -2,17 +2,33 @@ workspace(name = "maven-trivial")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# rules_jvm_external - for maven dependencies
-RULES_JVM_EXTERNAL_TAG = "4.4.2"
+# rules_python - required by Bazel 8 builtins autoload
+RULES_PYTHON_TAG = "1.6.3"
 
-RULES_JVM_EXTERNAL_SHA = "735602f50813eb2ea93ca3f5e43b1959bd80b213b836a07a62a29d757670b77b"
+http_archive(
+    name = "rules_python",
+    strip_prefix = "rules_python-{}".format(RULES_PYTHON_TAG),
+    url = "https://github.com/bazelbuild/rules_python/releases/download/{}/rules_python-{}.tar.gz".format(RULES_PYTHON_TAG, RULES_PYTHON_TAG),
+)
+
+# rules_jvm_external - for maven dependencies
+RULES_JVM_EXTERNAL_TAG = "5.2"
+RULES_JVM_EXTERNAL_SHA = "f86fd42a809e1871ca0aabe89db0d440451219c3ce46c58da240c7dcdc00125f"
 
 http_archive(
     name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
     sha256 = RULES_JVM_EXTERNAL_SHA,
-    strip_prefix = "rules_jvm_external-{}".format(RULES_JVM_EXTERNAL_TAG),
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(RULES_JVM_EXTERNAL_TAG),
+    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/%s/rules_jvm_external-%s.tar.gz" % (RULES_JVM_EXTERNAL_TAG, RULES_JVM_EXTERNAL_TAG),
 )
+
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
 
 IO_BAZEL_KOTLIN_RULES_TAG = "v1.7.0"
 
@@ -52,18 +68,6 @@ http_archive(
     strip_prefix = "rules_scala-{}".format(IO_BAZEL_RULES_SCALA_TAG),
     url = "https://github.com/bazelbuild/rules_scala/releases/download/{}/rules_scala-{}.zip".format(IO_BAZEL_RULES_SCALA_TAG, IO_BAZEL_RULES_SCALA_TAG),
 )
-
-load("@io_bazel_rules_scala//:scala_config.bzl", "scala_config")
-
-scala_config(scala_version = "2.13.6")
-
-load("@io_bazel_rules_scala//scala:toolchains.bzl", "scala_register_toolchains")
-
-scala_register_toolchains()
-
-load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
-
-scala_repositories()
 
 # maven deps
 load("@rules_jvm_external//:defs.bzl", "maven_install")

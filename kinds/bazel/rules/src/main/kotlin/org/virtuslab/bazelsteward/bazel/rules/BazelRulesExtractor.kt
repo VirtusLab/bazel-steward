@@ -129,6 +129,19 @@ class BazelRulesExtractor {
       }
     }
 
+    val percentTupleMatch = Regex("""(?s)^("[^"]*"|'[^']*')\s*%\s*\((.*)\)$""")
+      .matchEntire(normalized)
+    if (percentTupleMatch != null) {
+      val template = unquote(percentTupleMatch.groupValues[1])
+      val args = percentTupleMatch.groupValues[2]
+        .split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+        .mapNotNull { evaluateStringExpression(it, variables) }
+
+      return args.fold(template) { result, arg -> result.replaceFirst("%s", arg) }
+    }
+
     val percentMatch = Regex("""(?s)^("[^"]*"|'[^']*')\s*%\s*([A-Za-z_][A-Za-z0-9_]*)$""")
       .matchEntire(normalized)
     if (percentMatch != null) {
