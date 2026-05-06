@@ -12,10 +12,16 @@ java_binary(
 
 java_export(
     name = "maven",
-    srcs = glob(["src/main/kotlin/**/*.kt"]),
+    srcs = glob(
+        ["src/main/kotlin/**/*.kt"],
+        allow_empty = True,
+    ),
     maven_coordinates = "org.virtuslab:bazel-steward:0.0.0",
     pom_template = "//tools/publish:pom-template.xml",
-    resources = glob(["src/main/resources/**"]),
+    resources = glob(
+        ["src/main/resources/**"],
+        allow_empty = True,
+    ),
     visibility = ["//visibility:public"],
     runtime_deps = [
         "//app/src/main",

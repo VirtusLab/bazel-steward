@@ -9,8 +9,10 @@ import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesDependencyKind
 import org.virtuslab.bazelsteward.bazel.rules.BazelRulesExtractor
 import org.virtuslab.bazelsteward.bazel.rules.RuleLibraryId
+import org.virtuslab.bazelsteward.bazel.rules.RuleVersion
 import org.virtuslab.bazelsteward.bazel.rules.RulesResolver
 import org.virtuslab.bazelsteward.bazel.version.BazelVersionDependencyKind
+import org.virtuslab.bazelsteward.bzlmod.BzlModDependencyKind
 import org.virtuslab.bazelsteward.core.Environment
 import org.virtuslab.bazelsteward.core.GitBranch
 import org.virtuslab.bazelsteward.core.GitPlatform
@@ -27,6 +29,7 @@ import org.virtuslab.bazelsteward.maven.MavenDependencyKind
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import org.virtuslab.bazelsteward.maven.MavenRepository
 import java.nio.file.Path
+import java.time.Instant
 import kotlin.io.path.readText
 
 open class E2EBase : IntegrationTestBase() {
@@ -225,6 +228,14 @@ open class E2EBase : IntegrationTestBase() {
     )
   }
 
+  protected fun App.withBazelVersionAndBzlModOnly(): App {
+    return this.copy(
+      dependencyKinds = this.dependencyKinds.filter {
+        it is BazelVersionDependencyKind || it is BzlModDependencyKind
+      },
+    )
+  }
+
   protected fun App.withGitHostClient(gitPlatform: GitPlatform, pushToRemote: Boolean = true): App {
     return this.copy(
       pullRequestManager = this.pullRequestManager.copy(
@@ -259,6 +270,32 @@ open class E2EBase : IntegrationTestBase() {
   class GithubRulesResolverMock(private val expectedVersion: Version) : RulesResolver {
     override fun resolveRuleVersions(ruleId: RuleLibraryId): List<Version> {
       return listOf(expectedVersion)
+    }
+  }
+
+  class RuleVersionsResolverMock(
+    private val versions: Map<String, String>,
+    private val sha256: String = "0".repeat(64),
+  ) : RulesResolver {
+    override fun resolveRuleVersions(ruleId: RuleLibraryId): List<Version> {
+      val tag = versions[ruleId.name] ?: return emptyList()
+      return listOf(
+        RuleVersion.create(
+          ruleId.downloadUrlFor(tag),
+          sha256,
+          tag,
+          date = Instant.now(),
+        ),
+      )
+    }
+
+    private fun RuleLibraryId.downloadUrlFor(tag: String): String {
+      val artifact = artifactName.replace(this.tag, tag)
+      return when (this) {
+        is RuleLibraryId.ReleaseArtifact -> "https://github.com/$repoName/$ruleName/releases/download/$tag/$artifact"
+        is RuleLibraryId.ArchiveTagRuleId -> "https://github.com/$repoName/$ruleName/archive/refs/tags/$artifact"
+        is RuleLibraryId.ArchiveRuleId -> "https://github.com/$repoName/$ruleName/archive/$artifact"
+      }
     }
   }
 }
