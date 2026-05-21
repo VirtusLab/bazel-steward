@@ -25,18 +25,18 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 11
+        java-version: 17
     - name: Download release
       if: ${{ inputs.use-release == 'true' }}
       run: |
         TAG_PATTERN=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
         if [[ $TAG_PATTERN == v* ]] ;
         then
-          TAG_NAME=$(gh release list -L 100 --repo $REPOSITORY | grep -Eo '^'"$TAG_PATTERN"'[\.0-9]*' | sort -Vr | head -n 1)
+          TAG_NAME=$(gh release list -L 100 --repo $REPOSITORY | grep -Eo '^'"$TAG_PATTERN"'[\.0-9]*$' | sort -Vr | head -n 1)
         else
           TAG_NAME=$TAG_PATTERN
         fi
