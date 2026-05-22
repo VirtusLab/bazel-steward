@@ -10,7 +10,9 @@ class BzlModTest : E2EBase() {
   @Test
   fun `bzlmod basic update test`(@TempDir tempDir: Path) {
     val project = "bzlmod/example"
-    runBazelSteward(tempDir, project)
+    runBazelStewardWith(tempDir, project) {
+      it.withBazelVersionAndBzlModOnly()
+    }
     val expectedBranches = expectedBranchPrefixes(
       "bazel",
       "bazel_skylib",

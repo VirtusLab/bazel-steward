@@ -1,6 +1,6 @@
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("//tools/build_rules:lint.bzl", "lint")
 load("//tools/build_rules:junit5.bzl", "kt_junit5_test")
+load("//tools/build_rules:lint.bzl", "lint")
 
 def default_target_name():
     _, _, target_name = native.package_name().rpartition("/")
