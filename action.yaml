@@ -1,5 +1,8 @@
 name: "Bazel Steward"
 description: "Automatically searches bazel repositories for dependencies and updates them"
+# GitHub release tag for bazel-steward.jar when the action is pinned to a commit SHA.
+# Update this field when cutting a release.
+release-tag: v1.7.3
 author: ""
 inputs:
   configuration-path:
@@ -33,22 +36,17 @@ runs:
     - name: Download release
       if: ${{ inputs.use-release == 'true' }}
       run: |
-        TAG_PATTERN=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
-        if [[ $TAG_PATTERN == v* ]] ;
-        then
-          TAG_NAME=$(gh release list -L 100 --repo $REPOSITORY | grep -Eo '^'"$TAG_PATTERN"'(\.[0-9]+)*'$'\t' | sort -Vr | head -n 1)
-        else
-          TAG_NAME=$TAG_PATTERN
-        fi
-        echo $TAG_NAME
-        gh release download $TAG_NAME --pattern bazel-steward.jar --repo $REPOSITORY
+        ACTION_REF=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
+        TAG_NAME=$(java -jar "${{ github.action_path }}/action/resolve-release-tag.jar" "$ACTION_REF" "${{ github.action_path }}" "$REPOSITORY")
+        echo "$TAG_NAME"
+        gh release download "$TAG_NAME" --pattern bazel-steward.jar --repo "$REPOSITORY"
       env:
         GH_TOKEN: ${{ github.token }}
         REPOSITORY: VirtusLab/bazel-steward
       shell: bash
     - name: Build jar file
       if: ${{ inputs.use-release != 'true' }}
-      uses: ./.github
+      uses: ${{ github.action_path }}/.github
     - name: Move obtained bazel-steward.jar
       run: mv ./bazel-steward.jar /tmp/bazel-steward.jar
       shell: bash
