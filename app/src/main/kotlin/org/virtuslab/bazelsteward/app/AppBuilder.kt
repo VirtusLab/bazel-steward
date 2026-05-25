@@ -38,6 +38,15 @@ import kotlin.io.path.Path
 private val logger = KotlinLogging.logger {}
 
 object AppBuilder {
+  suspend fun resolveBaseBranch(gitClient: GitClient): String {
+    val symbolicName = gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
+    return if (symbolicName == "HEAD") {
+      gitClient.run("rev-parse", "HEAD").trim()
+    } else {
+      symbolicName
+    }
+  }
+
   fun fromArgs(args: Array<String>, env: Environment): App {
     val parser = ArgParser("bazel-steward")
     val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan")
@@ -83,9 +92,7 @@ object AppBuilder {
       ?: (if (github) GithubPlatform.resolveRepoPath(env, Path(".")) else Path("."))
 
     val gitClient = GitClient(repositoryRoot)
-    val baseBranchName = baseBranch ?: runBlocking {
-      gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
-    }
+    val baseBranchName = baseBranch ?: runBlocking { resolveBaseBranch(gitClient) }
     val gitAuthor = runBlocking { gitClient.getAuthor() }
 
     val appConfig = AppConfig(
