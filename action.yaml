@@ -48,14 +48,24 @@ runs:
       shell: bash
     - name: Build jar file
       if: ${{ inputs.use-release != 'true' }}
-      uses: ./.github
+      shell: bash
+      run: |
+        set -euo pipefail
+        CONTEXT="${GITHUB_ACTION_PATH}"
+        IMAGE="bazel-steward-build-$$"
+        docker build -f "${CONTEXT}/Dockerfile" -t "${IMAGE}" "${CONTEXT}"
+        CID=$(docker create "${IMAGE}")
+        docker cp "${CID}:/opt/bazel-steward.jar" ./bazel-steward.jar
+        docker rm "${CID}"
     - name: Move obtained bazel-steward.jar
       run: mv ./bazel-steward.jar /tmp/bazel-steward.jar
       shell: bash
     - name: Check if git user is set
       id: check_git_user
       run: |
-        if git config user.name; then
+        if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+          echo "user_exists=skip" >> $GITHUB_ENV
+        elif git config user.name >/dev/null 2>&1; then
           echo "user_exists=true" >> $GITHUB_ENV
         else
           echo "user_exists=false" >> $GITHUB_ENV

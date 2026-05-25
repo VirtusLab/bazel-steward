@@ -1,0 +1,4 @@
+common --enable_workspace
+common --noenable_bzlmod
+build --java_language_version=17
+build --tool_java_language_version=17
