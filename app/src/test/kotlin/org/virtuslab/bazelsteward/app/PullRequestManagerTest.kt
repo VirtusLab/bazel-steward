@@ -8,7 +8,6 @@ import org.junit.jupiter.api.io.TempDir
 import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Error
 import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Ok
 import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Skipped
-import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestsLimitsProvider
@@ -19,6 +18,7 @@ import org.virtuslab.bazelsteward.core.GitPlatform.PrStatus
 import org.virtuslab.bazelsteward.core.NewPullRequest
 import org.virtuslab.bazelsteward.core.common.CommitRequest
 import org.virtuslab.bazelsteward.core.common.FileChange
+import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.core.common.GitOperations
 import org.virtuslab.bazelsteward.fixture.IntegrationTestBase
 import org.virtuslab.bazelsteward.fixture.MockGitPlatform

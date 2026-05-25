@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.virtuslab.bazelsteward.core.common.FileChange
+import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
@@ -12,12 +13,10 @@ import org.virtuslab.bazelsteward.core.replacement.PythonFunctionCallHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyInStringLiteralHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
-import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.fixture.loadTextFileFromResources
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
 import kotlin.io.path.Path
-import kotlin.io.path.readText
 
 class VersionReplacementHeuristicTest {
 
