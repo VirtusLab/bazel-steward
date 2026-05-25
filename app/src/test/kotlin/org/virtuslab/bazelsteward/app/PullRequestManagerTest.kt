@@ -1,11 +1,14 @@
 package org.virtuslab.bazelsteward.app
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Error
 import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Ok
 import org.virtuslab.bazelsteward.app.PullRequestManager.Result.Skipped
+import org.virtuslab.bazelsteward.core.common.GitClient
 import org.virtuslab.bazelsteward.app.provider.PostUpdateHookProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestConfigProvider
 import org.virtuslab.bazelsteward.app.provider.PullRequestsLimitsProvider
@@ -49,6 +52,27 @@ class PullRequestManagerTest : IntegrationTestBase() {
     runBlocking {
       val results = pullRequestManager.applySuggestions(listOf(prSuggestion))
       results[prSuggestion] shouldBe Ok
+    }
+  }
+
+  @Test
+  fun `should return error when git push fails`(@TempDir tempDir: Path) {
+    val branchPrefix = "test-prefix"
+    val config = createPullRequestsConfig(branchPrefix, PullRequestLimits(10, 10))
+    val gitPlatform = mockGitPlatform(emptyMap())
+    val workspace = prepareWorkspace(tempDir, "dummy")
+
+    runBlocking {
+      GitClient(workspace).run("remote", "remove", "origin")
+    }
+
+    val pullRequestManager = createPullRequestManager(config, gitPlatform, workspace, pushToRemote = true)
+    val branchName = "test-prefix/group-name/artifact-name/version-test-new"
+    val prSuggestion = createPullRequestSuggestion(workspace, branchName)
+
+    runBlocking {
+      val results = pullRequestManager.applySuggestions(listOf(prSuggestion))
+      results[prSuggestion].shouldBeInstanceOf<Error>()
     }
   }
 
@@ -120,11 +144,11 @@ class PullRequestManagerTest : IntegrationTestBase() {
     config: PullRequestsConfig,
     gitPlatform: MockGitPlatform,
     workspace: Path,
+    pushToRemote: Boolean = false,
   ): PullRequestManager {
     val git = GitOperations(workspace, "master")
 
     val postUpdateHooks = PostUpdateHookProvider(emptyList(), emptyList())
-    val pushToRemote = false
 
     val updateAllPullRequests = false
     val pullRequestsConfigProvider = PullRequestConfigProvider(listOf(config), emptyList())

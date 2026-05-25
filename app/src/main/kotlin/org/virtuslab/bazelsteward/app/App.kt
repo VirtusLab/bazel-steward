@@ -18,6 +18,8 @@ private val logger = KotlinLogging.logger {}
 
 typealias AppResult = Map<PullRequestSuggestion, PullRequestManager.Result>
 
+fun AppResult.exitCode(): Int = if (values.any { it is PullRequestManager.Result.Error }) 1 else 0
+
 data class App(
   val gitOperations: GitOperations,
   val dependencyKinds: List<DependencyKind<*>>,
