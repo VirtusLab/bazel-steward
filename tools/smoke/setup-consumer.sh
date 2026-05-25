@@ -21,7 +21,12 @@ fi
 cp -a "${CONSUMER_TEMPLATE}/." "${WORKSPACE}/"
 
 if [[ ! -d "${WORKSPACE}/.git" ]]; then
+  GIT_USER_NAME="${GIT_USER_NAME:-github-actions[bot]}"
+  GIT_USER_EMAIL="${GIT_USER_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"
+
   git -C "${WORKSPACE}" init -q
+  git -C "${WORKSPACE}" config user.name "${GIT_USER_NAME}"
+  git -C "${WORKSPACE}" config user.email "${GIT_USER_EMAIL}"
   git -C "${WORKSPACE}" checkout -b main
   git -C "${WORKSPACE}" add -A
   git -C "${WORKSPACE}" commit -q -m "Initial smoke consumer repo"
