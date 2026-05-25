@@ -9,8 +9,8 @@ alias(
 java_binary(
     name = "resolve_release_tag_cli",
     main_class = "org.virtuslab.bazelsteward.action.ResolveReleaseTagMainKt",
+    visibility = ["//visibility:public"],
     runtime_deps = [
         "//action/src/main/kotlin/org/virtuslab/bazelsteward/action",
     ],
-    visibility = ["//visibility:public"],
 )
