@@ -1,0 +1,39 @@
+# Install: pip install pre-commit  (or: brew install pre-commit)
+# Setup:  pre-commit install
+# Run all: pre-commit run --all-files
+#
+# Hooks mirror CI (.github/workflows/tests.yml):
+#   - buildifier job (v8.0.3, -mode=check)
+#   - klint job (Bazel ktlint_test / ktlint_fix with //:lint_config)
+
+default_install_hook_types: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Catches invalid workflow YAML before CI; not a separate CI job.
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        files: ^\.github/
+
+  - repo: https://github.com/keith/pre-commit-buildifier
+    rev: 8.0.3
+    hooks:
+      - id: buildifier
+
+  - repo: local
+    hooks:
+      - id: ktlint-fix
+        name: ktlint (bazel autofix)
+        entry: tools/pre-commit/ktlint.sh fix
+        language: script
+        files: \.(kt|kts)$
+        pass_filenames: true
+
+      - id: ktlint-check
+        name: ktlint (bazel check)
+        entry: tools/pre-commit/ktlint.sh check
+        language: script
+        files: \.(kt|kts)$
+        pass_filenames: true

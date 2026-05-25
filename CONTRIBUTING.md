@@ -1,3 +1,27 @@
+## Pre-commit hooks
+
+CI runs [buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier) and Bazel [ktlint](https://github.com/bazelbuild/rules_kotlin) checks. To catch and auto-fix those issues before push, install [pre-commit](https://pre-commit.com/):
+
+```sh
+pip install pre-commit   # or: brew install pre-commit
+pre-commit install
+```
+
+On each commit, hooks format Starlark/Bazel files and fix Kotlin style for changed files (using the same Bazel `*_lint_fix` / `*_lint_test` targets as CI). Re-stage any auto-fixed files and commit again.
+
+To run everything manually (e.g. after a large edit):
+
+```sh
+pre-commit run --all-files
+```
+
+To fix all Kotlin lint violations in the repo (slower; same as `tools/lint_kotlin.sh`):
+
+```sh
+bazel test //... --test_tag_filters=lint --keep_going || true
+tools/lint_kotlin.sh
+```
+
 ## How to work on the Project with IntelliJ
 
 **Note:** Be sure to install:
