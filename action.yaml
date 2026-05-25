@@ -63,7 +63,9 @@ runs:
     - name: Check if git user is set
       id: check_git_user
       run: |
-        if git config user.name; then
+        if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+          echo "user_exists=skip" >> $GITHUB_ENV
+        elif git config user.name >/dev/null 2>&1; then
           echo "user_exists=true" >> $GITHUB_ENV
         else
           echo "user_exists=false" >> $GITHUB_ENV

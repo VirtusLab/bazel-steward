@@ -63,7 +63,6 @@ jobs:
         with:
           use-release: "false"
           push-to-remote: "false"
-          additional-args: "--analyze-only"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   buildifier:
