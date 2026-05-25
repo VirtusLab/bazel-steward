@@ -51,7 +51,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        CONTEXT="${GITHUB_ACTION_PATH}/.."
+        CONTEXT="${GITHUB_ACTION_PATH}"
         IMAGE="bazel-steward-build-$$"
         docker build -f "${CONTEXT}/Dockerfile" -t "${IMAGE}" "${CONTEXT}"
         CID=$(docker create "${IMAGE}")
