@@ -50,6 +50,22 @@ jobs:
         with:
           use-release: "false"
           push-to-remote: "false"
+  action-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: action-src
+      - name: Materialize consumer repo at workspace root
+        run: ./action-src/tools/smoke/setup-consumer.sh
+      - name: Run bazel-steward from consumer (remote ref, use-release false)
+        uses: VirtusLab/bazel-steward@${{ github.sha }}
+        with:
+          use-release: "false"
+          push-to-remote: "false"
+          additional-args: "--analyze-only"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   buildifier:
     runs-on: ubuntu-latest
     steps:
