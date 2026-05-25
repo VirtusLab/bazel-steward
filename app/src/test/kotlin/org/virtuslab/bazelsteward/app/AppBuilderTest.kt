@@ -1,6 +1,8 @@
 package org.virtuslab.bazelsteward.app
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldMatch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -27,6 +29,35 @@ class AppBuilderTest {
       val resolved = AppBuilder.resolveBaseBranch(git)
       resolved shouldMatch Regex("[0-9a-f]{40}")
       resolved shouldBe sha
+    }
+  }
+
+  @Test
+  fun `ensureWorkspaceIsAcceptable accepts a clean workspace`(@TempDir tempDir: Path) {
+    val git = initRepo(tempDir, "main")
+    runBlocking {
+      AppBuilder.ensureWorkspaceIsAcceptable(git, allowDirtyWorkspace = false)
+      AppBuilder.ensureWorkspaceIsAcceptable(git, allowDirtyWorkspace = true)
+    }
+  }
+
+  @Test
+  fun `ensureWorkspaceIsAcceptable rejects a dirty workspace by default`(@TempDir tempDir: Path) {
+    val git = initRepo(tempDir, "main")
+    tempDir.resolve("README.md").writeText("local edit\n")
+    val failure = shouldThrow<AppBuilder.DirtyWorkspaceException> {
+      runBlocking { AppBuilder.ensureWorkspaceIsAcceptable(git, allowDirtyWorkspace = false) }
+    }
+    failure.message shouldContain "README.md"
+    failure.message shouldContain "--allow-dirty-workspace"
+  }
+
+  @Test
+  fun `ensureWorkspaceIsAcceptable allows a dirty workspace when opted in`(@TempDir tempDir: Path) {
+    val git = initRepo(tempDir, "main")
+    tempDir.resolve("README.md").writeText("local edit\n")
+    runBlocking {
+      AppBuilder.ensureWorkspaceIsAcceptable(git, allowDirtyWorkspace = true)
     }
   }
 

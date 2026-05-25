@@ -49,7 +49,7 @@ class GitOperations(repositoryRoot: Path, private val baseBranch: String) {
   }
 
   suspend fun createBranchWithCommits(branch: GitBranch, commits: List<CommitRequest>) {
-    git.checkout(baseBranch, force = true)
+    checkoutBaseBranch()
     git.checkout(branch.name, newBranch = true)
     commits.forEach { commit ->
       commit.changes.groupBy { it.file }.forEach { (path, changes) ->
