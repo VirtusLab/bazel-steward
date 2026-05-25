@@ -1,0 +1,1 @@
+workspace(name = "bazel_steward_smoke_consumer")

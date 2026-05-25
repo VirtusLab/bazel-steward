@@ -1,5 +1,10 @@
 name: "Build project in docker file and copy it to workspace"
-description: ""
+description: |
+  Deprecated. Use the root composite action (VirtusLab/bazel-steward) with use-release: false instead.
+  This docker action will be removed in the next major release.
+deprecationMessage: >-
+  The .github docker action is deprecated and will be removed in the next major release.
+  Use VirtusLab/bazel-steward@<ref> with use-release: false.
 author: ""
 runs:
   using: "docker"
