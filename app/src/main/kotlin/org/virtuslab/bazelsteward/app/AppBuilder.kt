@@ -53,13 +53,17 @@ object AppBuilder {
     val status = gitClient.run("status", "--porcelain").trim()
     if (status.isEmpty()) return
     val indented = status.lines().joinToString("\n") { "  $it" }
-    val message = "Working tree has uncommitted changes:\n$indented\n" +
-      "Commit or stash them before running bazel-steward, " +
-      "or rerun with --allow-dirty-workspace to discard them."
     if (allowDirtyWorkspace) {
-      logger.warn { message }
+      logger.warn {
+        "Working tree has uncommitted changes:\n$indented\n" +
+          "These will be discarded because --allow-dirty-workspace was passed."
+      }
     } else {
-      throw DirtyWorkspaceException(message)
+      throw DirtyWorkspaceException(
+        "Working tree has uncommitted changes:\n$indented\n" +
+          "Commit or stash them before running bazel-steward, " +
+          "or rerun with --allow-dirty-workspace to discard them.",
+      )
     }
   }
 
