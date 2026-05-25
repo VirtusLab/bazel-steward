@@ -48,7 +48,7 @@ runs:
       shell: bash
     - name: Build jar file
       if: ${{ inputs.use-release != 'true' }}
-      uses: ./.github
+      uses: VirtusLab/bazel-steward/.github@${{ github.action_ref || github.sha }}
     - name: Move obtained bazel-steward.jar
       run: mv ./bazel-steward.jar /tmp/bazel-steward.jar
       shell: bash
