@@ -58,8 +58,8 @@ jobs:
           path: action-src
       - name: Materialize consumer repo at workspace root
         run: ./action-src/tools/smoke/setup-consumer.sh
-      - name: Run bazel-steward from consumer (remote ref, use-release false)
-        uses: VirtusLab/bazel-steward@${{ github.sha }}
+      - name: Run bazel-steward from consumer (use-release false)
+        uses: ./action-src
         with:
           use-release: "false"
           push-to-remote: "false"
