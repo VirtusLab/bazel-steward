@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Materializes a minimal consumer repo at GITHUB_WORKSPACE root (CI layout).
-# The consumer has no .github docker action — see issue #459.
+# The consumer has no .github/ action — see issue #459.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

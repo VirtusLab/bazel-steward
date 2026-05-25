@@ -48,7 +48,15 @@ runs:
       shell: bash
     - name: Build jar file
       if: ${{ inputs.use-release != 'true' }}
-      uses: VirtusLab/bazel-steward/.github@${{ github.action_ref || github.sha }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        CONTEXT="${GITHUB_ACTION_PATH}/.."
+        IMAGE="bazel-steward-build-$$"
+        docker build -f "${CONTEXT}/Dockerfile" -t "${IMAGE}" "${CONTEXT}"
+        CID=$(docker create "${IMAGE}")
+        docker cp "${CID}:/opt/bazel-steward.jar" ./bazel-steward.jar
+        docker rm "${CID}"
     - name: Move obtained bazel-steward.jar
       run: mv ./bazel-steward.jar /tmp/bazel-steward.jar
       shell: bash
