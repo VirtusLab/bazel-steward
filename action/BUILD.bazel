@@ -1,0 +1,16 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+alias(
+    name = "resolve_release_tag",
+    actual = "//action/src/main/kotlin/org/virtuslab/bazelsteward/action",
+    visibility = ["//visibility:public"],
+)
+
+java_binary(
+    name = "resolve_release_tag_cli",
+    main_class = "org.virtuslab.bazelsteward.action.ResolveReleaseTagMainKt",
+    visibility = ["//visibility:public"],
+    runtime_deps = [
+        "//action/src/main/kotlin/org/virtuslab/bazelsteward/action",
+    ],
+)

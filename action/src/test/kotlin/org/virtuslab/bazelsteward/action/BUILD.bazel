@@ -1,0 +1,9 @@
+load("//tools/build_rules:rules.bzl", "unit_tests")
+
+unit_tests(
+    srcs = glob(["**/*.kt"]),
+    test_package = "org.virtuslab.bazelsteward.action",
+    deps = [
+        "//action:resolve_release_tag",
+    ],
+)
