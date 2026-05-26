@@ -22,10 +22,15 @@ repos:
     hooks:
       - id: buildifier
 
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+
   - repo: local
     hooks:
       - id: ktlint
-        name: ktlint (bazel format)
+        name: ktlint (kotlin formatter and linter)
         entry: tools/pre-commit/ktlint.sh
         language: script
         files: \.(kt|kts)$

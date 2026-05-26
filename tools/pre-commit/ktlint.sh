@@ -4,6 +4,12 @@ set -euo pipefail
 
 readonly LINT_FIX_SUFFIX="_lint_fix"
 
+KTLINT_TARGETS_FILE=""
+
+remove_ktlint_targets_file() {
+  rm -f "${KTLINT_TARGETS_FILE}"
+}
+
 find_bazel_package_for_file() {
   local file_path="$1"
   local dir
@@ -57,17 +63,16 @@ main() {
 
   cd "$(git rev-parse --show-toplevel)"
 
-  local targets_file
-  targets_file="$(mktemp)"
-  trap "rm -f '${targets_file}'" EXIT
+  KTLINT_TARGETS_FILE="$(mktemp)"
+  trap remove_ktlint_targets_file EXIT
 
-  collect_lint_fix_targets "$targets_file" "$@"
+  collect_lint_fix_targets "$KTLINT_TARGETS_FILE" "$@"
 
-  if [ ! -s "$targets_file" ]; then
+  if [ ! -s "$KTLINT_TARGETS_FILE" ]; then
     exit 0
   fi
 
-  run_bazel_lint_fix "$targets_file"
+  run_bazel_lint_fix "$KTLINT_TARGETS_FILE"
 }
 
 main "$@"
