@@ -2,9 +2,10 @@
 # Setup:  pre-commit install
 # Run all: pre-commit run --all-files
 #
-# Hooks mirror CI (.github/workflows/tests.yml):
-#   - buildifier job (v8.0.3, -mode=check)
-#   - klint job (Bazel ktlint_test / ktlint_fix with //:lint_config)
+# CI (.github/workflows/tests.yml):
+#   - pre-commit job: all hooks except ktlint (--all-files, SKIP=ktlint)
+#   - ktlint-hook job: ktlint hook only on changed .kt/.kts files
+#   - bazel-test klint matrix: full repo via Bazel ktlint_test
 
 default_install_hook_types: [pre-commit]
 

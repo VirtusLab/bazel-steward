@@ -39,6 +39,45 @@ jobs:
         run: bazel test //... --keep_going --test_tag_filters=${{ matrix.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+      - uses: pre-commit/action@v3.0.1
+        env:
+          SKIP: ktlint
+        with:
+          extra_args: --all-files
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock', 'maven_install.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+      - name: Run ktlint pre-commit hook on changed Kotlin files
+        env:
+          FROM_REF: >-
+            ${{ github.event_name == 'pull_request'
+                && github.event.pull_request.base.sha
+                || github.event.before }}
+        run: |
+          set -euo pipefail
+          from_ref="${FROM_REF}"
+          if [ -z "${from_ref}" ] || [ "${from_ref}" = "0000000000000000000000000000000000000000" ]; then
+            from_ref="HEAD^"
+          fi
+          pre-commit run ktlint --from-ref "${from_ref}" --to-ref HEAD
+
   docker-build-test:
     runs-on: ubuntu-latest
     steps:
@@ -50,17 +89,3 @@ jobs:
         with:
           use-release: "false"
           push-to-remote: "false"
-  buildifier:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install buildifier
-        run: |
-          set -euo pipefail
-          BUILDIFIER_VERSION=v8.0.3
-          curl -sSLo /usr/local/bin/buildifier \
-            "https://github.com/bazelbuild/buildtools/releases/download/${BUILDIFIER_VERSION}/buildifier-linux-amd64"
-          chmod +x /usr/local/bin/buildifier
-      - name: Run buildifier
-        run: buildifier -r -mode=check .
-      - run: git diff --exit-code
