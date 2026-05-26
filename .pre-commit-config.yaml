@@ -3,7 +3,6 @@
 #   - pre-commit job: yaml + buildifier + shellcheck (--all-files,
 #                     SKIP=pretty-format-kotlin)
 #   - ktlint job:     pretty-format-kotlin on changed .kt/.kts (needs Java)
-#   - bazel-test klint matrix: full repo via Bazel ktlint_test
 
 default_install_hook_types: [pre-commit]
 

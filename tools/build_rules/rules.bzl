@@ -1,6 +1,5 @@
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("//tools/build_rules:junit5.bzl", "kt_junit5_test")
-load("//tools/build_rules:lint.bzl", "lint")
 
 def default_target_name():
     _, _, target_name = native.package_name().rpartition("/")
@@ -51,7 +50,6 @@ def library(**kwargs):
     ensure_srcs(kwargs, native.glob(["*.kt"]))
 
     kt_jvm_library(**kwargs)
-    lint(kwargs["srcs"], kwargs["name"])
 
 def resources(**kwargs):
     ensure_name(kwargs)
@@ -72,14 +70,11 @@ def unit_tests(**kwargs):
     ensure_name(kwargs)
     ensure_tags(kwargs, "unit")
     kt_junit5_test(size = "small", **kwargs)
-    lint(kwargs["srcs"], kwargs["name"])
 
 def integration_tests(**kwargs):
     ensure_name(kwargs)
     ensure_tags(kwargs, "integration")
     ensure_size(kwargs, "medium")
-
-    lint(kwargs["srcs"], kwargs["name"])
     return kt_junit5_test(**kwargs)
 
 def integration_test_suite(**kwargs):

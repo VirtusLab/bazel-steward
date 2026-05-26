@@ -20,8 +20,6 @@ jobs:
             tag: unit
           - name: integration
             tag: integration
-          - name: klint
-            tag: lint
     name: ${{ matrix.name }}-tests
     steps:
       - uses: actions/checkout@v4
