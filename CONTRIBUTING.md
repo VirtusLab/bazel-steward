@@ -7,7 +7,7 @@ pip install pre-commit   # or: brew install pre-commit
 pre-commit install --install-hooks
 ```
 
-`--install-hooks` pre-warms each hook's environment so your first commit isn't delayed by tool downloads. The Kotlin formatter (`pretty-format-kotlin` from [`macisamuele/language-formatters-pre-commit-hooks`](https://github.com/macisamuele/language-formatters-pre-commit-hooks)) runs `ktlint` directly — it needs a JDK on `PATH` and downloads a single, sha256-pinned `ktlint` jar to `~/.cache/pre-commit/` on first use. The pinned version matches `rules_kotlin`'s `PINTEREST_KTLINT` entry in `versions.bzl`, so CI's `bazel-test klint` matrix and the local hook stay in sync — when you bump `rules_kotlin`, update `--ktlint-version` and `--formatter-jar-checksum` in `.pre-commit-config.yaml` to match.
+`--install-hooks` pre-warms each hook's environment so your first commit isn't delayed by tool downloads. The Kotlin formatter (`pretty-format-kotlin` from [`macisamuele/language-formatters-pre-commit-hooks`](https://github.com/macisamuele/language-formatters-pre-commit-hooks)) runs `ktlint` directly — it needs a JDK on `PATH` and downloads a single, sha256-pinned `ktlint` jar to `~/.cache/pre-commit/` on first use. The pinned version matches `rules_kotlin`'s `PINTEREST_KTLINT` entry in `versions.bzl`, so local runs and CI stay in sync — when you bump `rules_kotlin`, update `--ktlint-version` and `--formatter-jar-checksum` in `.pre-commit-config.yaml` to match.
 
 On commit, hooks run against staged files. If a hook reformats a file, pre-commit fails — stage the result and commit again. CI may run additional checks; see [`.github/workflows/`](.github/workflows/).
 

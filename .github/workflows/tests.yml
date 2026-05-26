@@ -45,6 +45,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up JDK 17 (for pretty-format-kotlin / ktlint)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
@@ -52,7 +57,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit-|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
       - uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files
@@ -66,6 +71,16 @@ jobs:
       - name: Deprecation notice
         run: |
           echo "::warning title=Deprecated check::The 'buildifier' job is a no-op stub. Buildifier now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
+
+  # Deprecated: kept only to satisfy branch protection until the required check
+  # is switched from `klint` to `pre-commit`. Kotlin formatting now runs inside
+  # the `pre-commit` job via pretty-format-kotlin.
+  klint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'klint' job is a no-op stub. Kotlin formatting now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
 
   docker-build-test:
     runs-on: ubuntu-latest
