@@ -65,8 +65,18 @@ object ReleaseTagResolver {
       ?.trim()
       ?.trim('"', '\'')
       ?: error("release-tag is not set in $actionYaml (required when action ref is not a v* tag)")
+    return validateReleaseTag(tag, actionYaml.toString())
+  }
+
+  fun validateReleaseTag(tag: String, source: String = "release-tag"): String {
     if (tag.isEmpty()) {
-      error("release-tag is empty in $actionYaml")
+      error("release-tag is empty in $source")
+    }
+    if (!tag.matches(RELEASE_TAG_PATTERN)) {
+      error(
+        "release-tag must match vMAJOR.MINOR.PATCH with optional pre-release suffix " +
+          "(e.g. v1.7.4 or v1.7.4-rc1), got $tag in $source",
+      )
     }
     return tag
   }
@@ -93,4 +103,6 @@ object ReleaseTagResolver {
   }
 
   private val VERSION_SUFFIX = Regex("(\\.\\d+)+")
+
+  private val RELEASE_TAG_PATTERN = Regex("^v[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$")
 }
