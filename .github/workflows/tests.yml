@@ -47,59 +47,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-      - uses: pre-commit/action@v3.0.1
-        env:
-          SKIP: pretty-format-kotlin
-        with:
-          extra_args: --all-files
-
-  ktlint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-      - name: Install pre-commit
-        run: pip install pre-commit
+          python-version: '3.14'
       - name: Cache pre-commit (incl. ktlint jar)
         uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit-ktlint-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-      - name: Compute from-ref
-        id: refs
-        env:
-          FROM_REF: >-
-            ${{ github.event_name == 'pull_request'
-                && github.event.pull_request.base.sha
-                || github.event.before }}
-          BASE_REF: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
-        run: |
-          set -euo pipefail
-          from_ref="${FROM_REF}"
-          if [ -z "${from_ref}" ] || [ "${from_ref}" = "0000000000000000000000000000000000000000" ]; then
-            from_ref="HEAD^"
-          fi
-          if ! git cat-file -e "${from_ref}^{commit}" 2>/dev/null; then
-            from_ref="$(git merge-base "origin/${BASE_REF}" HEAD)"
-          fi
-          echo "from_ref=${from_ref}" >> "$GITHUB_OUTPUT"
-      - name: Run pretty-format-kotlin on changed Kotlin files
-        run: |
-          pre-commit run pretty-format-kotlin \
-            --from-ref "${{ steps.refs.outputs.from_ref }}" \
-            --to-ref HEAD \
-            --show-diff-on-failure \
-            --color always
+          key: pre-commit-|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files
 
   # Deprecated: kept only to satisfy branch protection until the required check
   # is switched from `buildifier` to `pre-commit`. Real buildifier execution
