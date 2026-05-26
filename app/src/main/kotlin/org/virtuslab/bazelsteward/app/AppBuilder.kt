@@ -38,6 +38,35 @@ import kotlin.io.path.Path
 private val logger = KotlinLogging.logger {}
 
 object AppBuilder {
+  class DirtyWorkspaceException(message: String) : IllegalStateException(message)
+
+  suspend fun resolveBaseBranch(gitClient: GitClient): String {
+    val symbolicName = gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
+    return if (symbolicName == "HEAD") {
+      gitClient.run("rev-parse", "HEAD").trim()
+    } else {
+      symbolicName
+    }
+  }
+
+  suspend fun ensureWorkspaceIsAcceptable(gitClient: GitClient, allowDirtyWorkspace: Boolean) {
+    val status = gitClient.run("status", "--porcelain").trim()
+    if (status.isEmpty()) return
+    val indented = status.lines().joinToString("\n") { "  $it" }
+    if (allowDirtyWorkspace) {
+      logger.warn {
+        "Working tree has uncommitted changes:\n$indented\n" +
+          "These will be discarded because --allow-dirty-workspace was passed."
+      }
+    } else {
+      throw DirtyWorkspaceException(
+        "Working tree has uncommitted changes:\n$indented\n" +
+          "Commit or stash them before running bazel-steward, " +
+          "or rerun with --allow-dirty-workspace to discard them.",
+      )
+    }
+  }
+
   fun fromArgs(args: Array<String>, env: Environment): App {
     val parser = ArgParser("bazel-steward")
     val repository by parser.argument(ArgType.String, description = "Location of the local repository to scan")
@@ -76,6 +105,11 @@ object AppBuilder {
       fullName = "no-internal-config",
       description = "Do not load internal default config",
     ).default(false)
+    val allowDirtyWorkspace by parser.option(
+      ArgType.Boolean,
+      fullName = "allow-dirty-workspace",
+      description = "Allow running on a dirty workspace; uncommitted changes will be discarded",
+    ).default(false)
 
     parser.parse(args)
 
@@ -83,9 +117,8 @@ object AppBuilder {
       ?: (if (github) GithubPlatform.resolveRepoPath(env, Path(".")) else Path("."))
 
     val gitClient = GitClient(repositoryRoot)
-    val baseBranchName = baseBranch ?: runBlocking {
-      gitClient.run("rev-parse", "--abbrev-ref", "HEAD").trim()
-    }
+    runBlocking { ensureWorkspaceIsAcceptable(gitClient, allowDirtyWorkspace) }
+    val baseBranchName = baseBranch ?: runBlocking { resolveBaseBranch(gitClient) }
     val gitAuthor = runBlocking { gitClient.getAuthor() }
 
     val appConfig = AppConfig(

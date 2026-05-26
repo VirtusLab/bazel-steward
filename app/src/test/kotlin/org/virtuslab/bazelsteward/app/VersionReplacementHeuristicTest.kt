@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.virtuslab.bazelsteward.core.common.FileChange
+import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
@@ -15,6 +16,7 @@ import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
 import org.virtuslab.bazelsteward.fixture.loadTextFileFromResources
 import org.virtuslab.bazelsteward.maven.MavenCoordinates
 import org.virtuslab.bazelsteward.maven.MavenLibraryId
+import kotlin.io.path.Path
 
 class VersionReplacementHeuristicTest {
 
@@ -28,6 +30,17 @@ class VersionReplacementHeuristicTest {
   val positionOf852: Int = 3326
   val positionOfJunitJupiter581: Int = 3432
   val positionOf1_99_99: Int = 3526
+
+  @Test
+  fun `should update coursier maven coordinate in MODULE bazel without breaking quotes`() {
+    val content = loadTextFileFromResources("MODULE.bazel.snippet").content
+    val library = library("io.get-coursier", "interface", "1.0.19")
+    val change = resolveUpdatesIn(content, library, version("1.0.28"))!!
+    change.length shouldBe 6
+    val updated = content.replaceRange(change.offset, change.offset + change.length, change.replacement)
+    updated.lines()[2] shouldBe """        "io.get-coursier:interface:1.0.28","""
+    updated.lines()[2].count { it == '"' } shouldBe 2
+  }
 
   @Nested
   @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -248,5 +261,18 @@ class VersionReplacementHeuristicTest {
     vararg heuristics: VersionReplacementHeuristic = allHeuristics,
   ): FileChange? {
     return resolver.resolve(files, UpdateSuggestion(library, version("999.999.999")), heuristics.toList())?.fileChanges?.firstOrNull()
+  }
+
+  private fun resolveUpdatesIn(
+    content: String,
+    library: MavenCoordinates,
+    suggested: SemanticVersion,
+    vararg heuristics: VersionReplacementHeuristic = allHeuristics,
+  ): FileChange? {
+    val file = object : TextFile {
+      override val path = Path("MODULE.bazel")
+      override val content = content
+    }
+    return resolver.resolve(listOf(file), UpdateSuggestion(library, suggested), heuristics.toList())?.fileChanges?.firstOrNull()
   }
 }

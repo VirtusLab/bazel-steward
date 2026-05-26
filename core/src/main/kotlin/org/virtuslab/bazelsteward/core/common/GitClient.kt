@@ -10,9 +10,10 @@ class GitClient(private val repositoryRoot: Path) {
     private val git = runBlocking { CommandRunner.runForOutput(listOf("sh", "-c", "which git")).trim() }
   }
 
-  suspend fun checkout(target: String, newBranch: Boolean = false) {
+  suspend fun checkout(target: String, newBranch: Boolean = false, force: Boolean = false) {
     val b = if (newBranch) "-b" else null
-    run("checkout", quiet, b, target)
+    val forceFlag = if (force) "--force" else null
+    run("checkout", quiet, forceFlag, b, target)
   }
 
   suspend fun deleteBranch(branchName: String) {
