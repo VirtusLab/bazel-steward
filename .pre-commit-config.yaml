@@ -1,0 +1,30 @@
+# Hooks for local development. See CONTRIBUTING.md for setup.
+# CI runs them with --all-files.
+
+default_install_hook_types: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+
+  - repo: https://github.com/keith/pre-commit-buildifier
+    rev: 8.0.3
+    hooks:
+      - id: buildifier
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.16.0
+    hooks:
+      - id: pretty-format-kotlin
+        args:
+          - --autofix
+          - --ktlint-version=1.6.0
+          - --formatter-jar-checksum=5ba1ac917a06b0f02daaa60d10abbedd2220d60216af670c67a45b91c74cf8bb

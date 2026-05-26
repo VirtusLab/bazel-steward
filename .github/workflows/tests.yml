@@ -20,8 +20,6 @@ jobs:
             tag: unit
           - name: integration
             tag: integration
-          - name: klint
-            tag: lint
     name: ${{ matrix.name }}-tests
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +40,48 @@ jobs:
         run: bazel test //... --keep_going --test_tag_filters=${{ matrix.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17 (for pretty-format-kotlin / ktlint)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Cache pre-commit (incl. ktlint jar)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+      - uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files
+
+  # Deprecated: kept only to satisfy branch protection until the required check
+  # is switched from `buildifier` to `pre-commit`. Real buildifier execution
+  # happens inside the `pre-commit` job via keith/pre-commit-buildifier.
+  buildifier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'buildifier' job is a no-op stub. Buildifier now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
+
+  # Deprecated: kept only to satisfy branch protection until the required check
+  # is switched from `klint-tests` to `pre-commit`. Kotlin formatting now runs
+  # inside the `pre-commit` job via pretty-format-kotlin.
+  klint-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'klint-tests' job is a no-op stub. Kotlin formatting now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
+
   docker-build-test:
     runs-on: ubuntu-latest
     steps:
@@ -53,6 +93,7 @@ jobs:
         with:
           use-release: "false"
           push-to-remote: "false"
+
   action-smoke-test:
     runs-on: ubuntu-latest
     permissions:
@@ -71,17 +112,3 @@ jobs:
           push-to-remote: "false"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  buildifier:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install buildifier
-        run: |
-          set -euo pipefail
-          BUILDIFIER_VERSION=v8.0.3
-          curl -sSLo /usr/local/bin/buildifier \
-            "https://github.com/bazelbuild/buildtools/releases/download/${BUILDIFIER_VERSION}/buildifier-linux-amd64"
-          chmod +x /usr/local/bin/buildifier
-      - name: Run buildifier
-        run: buildifier -r -mode=check .
-      - run: git diff --exit-code
