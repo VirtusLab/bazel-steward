@@ -7,7 +7,7 @@ pip install pre-commit   # or: brew install pre-commit
 pre-commit install
 ```
 
-On each commit, hooks format Starlark/Bazel files and fix Kotlin style for changed files (using the same Bazel `*_lint_fix` / `*_lint_test` targets as CI). Re-stage any auto-fixed files and commit again.
+On each commit, hooks format Starlark/Bazel files and fix Kotlin style for changed files (using the same Bazel `*_lint_fix` / `*_lint_test` targets as CI, resolved per file via `attr('srcs', …)`). Re-stage any auto-fixed files and commit again.
 
 To run everything manually (e.g. after a large edit):
 

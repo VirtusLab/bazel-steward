@@ -31,11 +31,14 @@ nearest_build_package() {
 
 for file in "$@"; do
   pkg="$(nearest_build_package "$file")" || continue
+  base="$(basename "$file")"
   suffix="_lint_fix"
   if [ "$mode" = "check" ]; then
     suffix="_lint_test"
   fi
-  bazel query "filter('${suffix}\$', kind('.*', ${pkg}:all))" 2>/dev/null >>"$targets_file" || true
+  # Match the lint target whose srcs include this file (e.g. e2e_*Test.kt_lint_fix),
+  # not every *_lint_* target in the package.
+  bazel query "filter('${suffix}\$', attr('srcs', '${base}', ${pkg}:all))" 2>/dev/null >>"$targets_file" || true
 done
 
 if [ ! -s "$targets_file" ]; then
