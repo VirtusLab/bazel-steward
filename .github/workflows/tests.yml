@@ -73,14 +73,14 @@ jobs:
           echo "::warning title=Deprecated check::The 'buildifier' job is a no-op stub. Buildifier now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
 
   # Deprecated: kept only to satisfy branch protection until the required check
-  # is switched from `klint` to `pre-commit`. Kotlin formatting now runs inside
-  # the `pre-commit` job via pretty-format-kotlin.
-  klint:
+  # is switched from `klint-tests` to `pre-commit`. Kotlin formatting now runs
+  # inside the `pre-commit` job via pretty-format-kotlin.
+  klint-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Deprecation notice
         run: |
-          echo "::warning title=Deprecated check::The 'klint' job is a no-op stub. Kotlin formatting now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
+          echo "::warning title=Deprecated check::The 'klint-tests' job is a no-op stub. Kotlin formatting now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
 
   docker-build-test:
     runs-on: ubuntu-latest
