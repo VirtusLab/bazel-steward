@@ -44,15 +44,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
       - uses: pre-commit/action@v3.0.1
         env:
           SKIP: ktlint
         with:
           extra_args: --all-files
-      - uses: actions/setup-java@v4
+
+  ktlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
@@ -70,13 +83,27 @@ jobs:
             ${{ github.event_name == 'pull_request'
                 && github.event.pull_request.base.sha
                 || github.event.before }}
+          BASE_REF: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
         run: |
           set -euo pipefail
           from_ref="${FROM_REF}"
           if [ -z "${from_ref}" ] || [ "${from_ref}" = "0000000000000000000000000000000000000000" ]; then
             from_ref="HEAD^"
           fi
+          if ! git cat-file -e "${from_ref}^{commit}" 2>/dev/null; then
+            from_ref="$(git merge-base "origin/${BASE_REF}" HEAD)"
+          fi
           pre-commit run ktlint --from-ref "${from_ref}" --to-ref HEAD
+
+  # Deprecated: kept only to satisfy branch protection until the required check
+  # is switched from `buildifier` to `pre-commit`. Real buildifier execution
+  # happens inside the `pre-commit` job via keith/pre-commit-buildifier.
+  buildifier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'buildifier' job is a no-op stub. Buildifier now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
 
   docker-build-test:
     runs-on: ubuntu-latest

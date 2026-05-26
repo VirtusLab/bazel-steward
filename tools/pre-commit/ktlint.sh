@@ -4,19 +4,19 @@ set -euo pipefail
 
 readonly LINT_FIX_SUFFIX="_lint_fix"
 
-KTLINT_TARGETS_FILE=""
-
-remove_ktlint_targets_file() {
-  rm -f "${KTLINT_TARGETS_FILE}"
-}
-
 find_bazel_package_for_file() {
   local file_path="$1"
+  local repo_root="$2"
   local dir
+
+  case "$file_path" in
+    "$repo_root"/*) file_path="${file_path#"$repo_root"/}" ;;
+  esac
+
   dir="$(dirname "$file_path")"
-  while [ "$dir" != "." ] && [ "$dir" != "/" ]; do
+  while [ "$dir" != "." ] && [ "$dir" != "/" ] && [ "$dir" != "$repo_root" ]; do
     if [ -f "$dir/BUILD.bazel" ] || [ -f "$dir/BUILD" ]; then
-      printf '//%s' "${dir#./}"
+      printf '//%s' "$dir"
       return 0
     fi
     dir="$(dirname "$dir")"
@@ -24,36 +24,30 @@ find_bazel_package_for_file() {
   return 1
 }
 
-query_lint_fix_targets_for_file() {
-  local file_path="$1"
-  local bazel_package
-  local source_basename
-
-  bazel_package="$(find_bazel_package_for_file "$file_path")" || return 0
-  source_basename="$(basename "$file_path")"
-
-  # One target per source when macros define per-file srcs (e.g. e2e_*Test.kt_lint_fix).
-  bazel query "filter('${LINT_FIX_SUFFIX}\$', attr('srcs', '${source_basename}', ${bazel_package}:all))" \
-    2>/dev/null || true
+escape_regex() {
+  printf '%s' "$1" | sed 's/[][\\.^$*+?(){}|]/\\&/g'
 }
 
-collect_lint_fix_targets() {
-  local output_file="$1"
+build_union_query() {
+  local repo_root="$1"
   shift
 
-  local file_path
+  local first=1
+  local file_path package basename basename_re
   for file_path in "$@"; do
-    query_lint_fix_targets_for_file "$file_path" >>"$output_file"
+    if ! package="$(find_bazel_package_for_file "$file_path" "$repo_root")"; then
+      continue
+    fi
+    basename="$(basename "$file_path")"
+    basename_re="$(escape_regex "$basename")"
+    if [ "$first" -eq 1 ]; then
+      first=0
+    else
+      printf ' union '
+    fi
+    printf "filter('%s\$', attr('srcs', '%s', %s:all))" \
+      "$LINT_FIX_SUFFIX" "$basename_re" "$package"
   done
-}
-
-run_bazel_lint_fix() {
-  local targets_file="$1"
-  local target
-
-  while IFS= read -r target; do
-    [ -n "$target" ] && bazel run "$target"
-  done < <(sort -u "$targets_file")
 }
 
 main() {
@@ -61,18 +55,30 @@ main() {
     exit 0
   fi
 
-  cd "$(git rev-parse --show-toplevel)"
+  local repo_root
+  repo_root="$(git rev-parse --show-toplevel)"
+  cd "$repo_root"
 
-  KTLINT_TARGETS_FILE="$(mktemp)"
-  trap remove_ktlint_targets_file EXIT
+  local query
+  query="$(build_union_query "$repo_root" "$@")"
 
-  collect_lint_fix_targets "$KTLINT_TARGETS_FILE" "$@"
-
-  if [ ! -s "$KTLINT_TARGETS_FILE" ]; then
+  if [ -z "$query" ]; then
     exit 0
   fi
 
-  run_bazel_lint_fix "$KTLINT_TARGETS_FILE"
+  local targets
+  targets="$(bazel query "$query")"
+
+  if [ -z "$targets" ]; then
+    exit 0
+  fi
+
+  local target
+  while IFS= read -r target; do
+    if [ -n "$target" ]; then
+      bazel run "$target"
+    fi
+  done < <(printf '%s\n' "$targets" | sort -u)
 }
 
 main "$@"

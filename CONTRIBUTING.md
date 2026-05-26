@@ -4,15 +4,23 @@ We use [pre-commit](https://pre-commit.com/) for local checks before commits. Wh
 
 ```sh
 pip install pre-commit   # or: brew install pre-commit
-pre-commit install
+pre-commit install --install-hooks
 ```
 
-On commit, hooks run against staged files. If a hook reformats a file, pre-commit fails—stage the result and commit again. CI may run additional checks; see [`.github/workflows/`](.github/workflows/).
+`--install-hooks` pre-warms each hook's environment so your first commit isn't delayed by tool downloads. The `ktlint` hook shells out to Bazel — the first run will pull `rules_kotlin` and may take a few minutes; subsequent runs reuse the Bazel cache.
 
-To run all hooks manually:
+On commit, hooks run against staged files. If a hook reformats a file, pre-commit fails — stage the result and commit again. CI may run additional checks; see [`.github/workflows/`](.github/workflows/).
+
+To run every hook against the whole repo:
 
 ```sh
 pre-commit run --all-files
+```
+
+To re-run only the Kotlin formatter (handy after a large refactor):
+
+```sh
+pre-commit run ktlint --all-files
 ```
 
 ## How to work on the Project with IntelliJ
