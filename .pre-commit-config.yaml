@@ -1,7 +1,8 @@
 # Hooks for local development. See CONTRIBUTING.md for setup.
 # CI mirrors this config in .github/workflows/tests.yml:
-#   - pre-commit job: yaml + buildifier + shellcheck (--all-files, SKIP=ktlint)
-#   - ktlint job:     ktlint hook on changed .kt/.kts files (uses Bazel)
+#   - pre-commit job: yaml + buildifier + shellcheck (--all-files,
+#                     SKIP=pretty-format-kotlin)
+#   - ktlint job:     pretty-format-kotlin on changed .kt/.kts (needs Java)
 #   - bazel-test klint matrix: full repo via Bazel ktlint_test
 
 default_install_hook_types: [pre-commit]
@@ -23,11 +24,14 @@ repos:
     hooks:
       - id: shellcheck
 
-  - repo: local
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.16.0
     hooks:
-      - id: ktlint
-        name: ktlint (kotlin formatter and linter)
-        entry: tools/pre-commit/ktlint.sh
-        language: script
-        files: \.(kt|kts)$
-        pass_filenames: true
+      # Keep --ktlint-version and --formatter-jar-checksum in sync with
+      # PINTEREST_KTLINT in rules_kotlin's versions.bzl, so this hook matches
+      # the `bazel test //... --test_tag_filters=lint` matrix in CI.
+      - id: pretty-format-kotlin
+        args:
+          - --autofix
+          - --ktlint-version=1.6.0
+          - --formatter-jar-checksum=5ba1ac917a06b0f02daaa60d10abbedd2220d60216af670c67a45b91c74cf8bb

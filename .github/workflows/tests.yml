@@ -49,7 +49,7 @@ jobs:
           python-version: '3.x'
       - uses: pre-commit/action@v3.0.1
         env:
-          SKIP: ktlint
+          SKIP: pretty-format-kotlin
         with:
           extra_args: --all-files
 
@@ -62,22 +62,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Install pre-commit
-        run: pip install pre-commit
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Cache Bazel
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Cache pre-commit (incl. ktlint jar)
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock', 'maven_install.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bazel-
-      - name: Run ktlint pre-commit hook on changed Kotlin files
+          path: ~/.cache/pre-commit
+          key: pre-commit-ktlint-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Compute from-ref
+        id: refs
         env:
           FROM_REF: >-
             ${{ github.event_name == 'pull_request'
@@ -93,7 +91,14 @@ jobs:
           if ! git cat-file -e "${from_ref}^{commit}" 2>/dev/null; then
             from_ref="$(git merge-base "origin/${BASE_REF}" HEAD)"
           fi
-          pre-commit run ktlint --from-ref "${from_ref}" --to-ref HEAD
+          echo "from_ref=${from_ref}" >> "$GITHUB_OUTPUT"
+      - name: Run pretty-format-kotlin on changed Kotlin files
+        run: |
+          pre-commit run pretty-format-kotlin \
+            --from-ref "${{ steps.refs.outputs.from_ref }}" \
+            --to-ref HEAD \
+            --show-diff-on-failure \
+            --color always
 
   # Deprecated: kept only to satisfy branch protection until the required check
   # is switched from `buildifier` to `pre-commit`. Real buildifier execution

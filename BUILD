@@ -13,3 +13,9 @@ ktlint_config(
     editorconfig = ".editorconfig",
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "pre_commit_config",
+    srcs = [".pre-commit-config.yaml"],
+    visibility = ["//tools/lint:__pkg__"],
+)
