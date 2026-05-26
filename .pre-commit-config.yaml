@@ -24,16 +24,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: ktlint-fix
-        name: ktlint (bazel autofix)
-        entry: tools/pre-commit/ktlint.sh fix
-        language: script
-        files: \.(kt|kts)$
-        pass_filenames: true
-
-      - id: ktlint-check
-        name: ktlint (bazel check)
-        entry: tools/pre-commit/ktlint.sh check
+      - id: ktlint
+        name: ktlint (bazel format)
+        entry: tools/pre-commit/ktlint.sh
         language: script
         files: \.(kt|kts)$
         pass_filenames: true
