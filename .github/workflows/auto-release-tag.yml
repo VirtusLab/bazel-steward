@@ -34,9 +34,13 @@ jobs:
           ACTION_TAG="$(read_release_tag "$GITHUB_WORKSPACE")"
 
           PREV_ACTION_TAG=""
-          if git rev-parse HEAD^ >/dev/null 2>&1; then
+          BEFORE_SHA="${{ github.event.before }}"
+          if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            if ! git cat-file -e "${BEFORE_SHA}^{commit}" >/dev/null 2>&1; then
+              git fetch --no-tags --depth=1 origin "$BEFORE_SHA"
+            fi
             mkdir -p /tmp/prev-action
-            git show HEAD^:action.yaml > /tmp/prev-action/action.yaml
+            git show "$BEFORE_SHA:action.yaml" > /tmp/prev-action/action.yaml
             PREV_ACTION_TAG="$(read_release_tag /tmp/prev-action || true)"
           fi
 
