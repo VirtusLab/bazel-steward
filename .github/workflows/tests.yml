@@ -18,8 +18,14 @@ jobs:
         include:
           - name: unit
             tag: unit
-          - name: integration
+            target: "//..."
+          - name: integration-core
             tag: integration
+            # All integration tests except the large rules suite, which runs separately.
+            target: "//... -//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
+          - name: integration-rules
+            tag: integration
+            target: "//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
     name: ${{ matrix.name }}-tests
     steps:
       - uses: actions/checkout@v4
@@ -28,16 +34,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Cache Bazel
+      - name: Cache Bazel repository cache
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache/bazel
+          path: ~/.cache/bazel
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock', 'maven_install.json') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
+      - name: Cache Bazel disk cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/bazel-disk-cache
+          key: ${{ runner.os }}-bazel-disk-${{ matrix.name }}-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock', 'maven_install.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-disk-${{ matrix.name }}-
       - name: Run tests
-        run: bazel test //... --keep_going --test_tag_filters=${{ matrix.tag }}
+        run: bazel test --keep_going --test_tag_filters=${{ matrix.tag }} --config=ci -- ${{ matrix.target }} 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -52,7 +64,7 @@ jobs:
           java-version: 17
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.14'
+          python-version: '3.12'
       - name: Cache pre-commit (incl. ktlint jar)
         uses: actions/cache@v4
         with:
@@ -82,19 +94,46 @@ jobs:
         run: |
           echo "::warning title=Deprecated check::The 'klint-tests' job is a no-op stub. Kotlin formatting now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
 
+  # Deprecated: kept only to satisfy branch protection. Replaced by
+  # test-smoke-steward-on-its-repo.
   docker-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'docker-build-test' job is a no-op stub. Update branch protection to require 'test-smoke-steward-on-its-repo' instead, then remove this stub."
+
+  # Deprecated: kept only to satisfy branch protection. Replaced by the
+  # integration-core-tests and integration-rules-tests matrix entries.
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'integration-tests' job is a no-op stub. Update branch protection to require 'integration-core-tests' and 'integration-rules-tests' instead, then remove this stub."
+
+  # Runs steward against the bazel-steward repo itself (real MODULE.bazel,
+  # maven_install.json, full git history) to catch regressions on real-world input.
+  test-smoke-steward-on-its-repo:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Integration tests
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Run steward on this repo
         uses: ./
         with:
           use-release: "false"
           push-to-remote: "false"
+        env:
+          DOCKER_CACHE_FROM: type=gha,scope=docker-steward
+          DOCKER_CACHE_TO: type=gha,mode=max,scope=docker-steward
 
-  action-smoke-test:
+  # Runs steward from a separate action-src checkout against a minimal consumer
+  # fixture, verifying the cross-repo consumption pattern (issue #459).
+  test-smoke-steward-on-external-repo:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -103,6 +142,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: action-src
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Materialize consumer repo at workspace root
         run: ./action-src/tools/smoke/setup-consumer.sh
       - name: Run bazel-steward from consumer (use-release false)
@@ -112,3 +153,5 @@ jobs:
           push-to-remote: "false"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_CACHE_FROM: type=gha,scope=docker-steward
+          DOCKER_CACHE_TO: type=gha,mode=max,scope=docker-steward

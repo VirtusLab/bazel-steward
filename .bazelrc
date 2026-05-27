@@ -11,3 +11,6 @@ build --tool_java_language_version=17
 build --tool_java_runtime_version=remotejdk_17
 
 test --test_output=errors
+
+# CI profile: enables a disk cache for compiled outputs across runs.
+build:ci --disk_cache=/tmp/bazel-disk-cache
