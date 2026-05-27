@@ -22,7 +22,7 @@ jobs:
           - name: integration-core
             tag: integration
             # All integration tests except the large rules suite, which runs separately.
-            target: "//... -//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
+            target: "//... -- -//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
           - name: integration-rules
             tag: integration
             target: "//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
