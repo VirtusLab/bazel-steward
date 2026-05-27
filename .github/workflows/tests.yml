@@ -94,6 +94,24 @@ jobs:
         run: |
           echo "::warning title=Deprecated check::The 'klint-tests' job is a no-op stub. Kotlin formatting now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
 
+  # Deprecated: kept only to satisfy branch protection. Replaced by
+  # test-smoke-steward-on-its-repo.
+  docker-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'docker-build-test' job is a no-op stub. Update branch protection to require 'test-smoke-steward-on-its-repo' instead, then remove this stub."
+
+  # Deprecated: kept only to satisfy branch protection. Replaced by the
+  # integration-core-tests and integration-rules-tests matrix entries.
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "::warning title=Deprecated check::The 'integration-tests' job is a no-op stub. Update branch protection to require 'integration-core-tests' and 'integration-rules-tests' instead, then remove this stub."
+
   # Runs steward against the bazel-steward repo itself (real MODULE.bazel,
   # maven_install.json, full git history) to catch regressions on real-world input.
   test-smoke-steward-on-its-repo:
