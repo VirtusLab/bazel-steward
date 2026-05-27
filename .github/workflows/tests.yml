@@ -22,7 +22,7 @@ jobs:
           - name: integration-core
             tag: integration
             # All integration tests except the large rules suite, which runs separately.
-            target: "//... -- -//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
+            target: "//... -//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
           - name: integration-rules
             tag: integration
             target: "//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
@@ -49,7 +49,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bazel-disk-${{ matrix.name }}-
       - name: Run tests
-        run: bazel test ${{ matrix.target }} --keep_going --test_tag_filters=${{ matrix.tag }} --config=ci
+        run: bazel test --keep_going --test_tag_filters=${{ matrix.tag }} --config=ci -- ${{ matrix.target }} 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
