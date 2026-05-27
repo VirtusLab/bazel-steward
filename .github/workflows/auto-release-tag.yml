@@ -1,0 +1,63 @@
+name: Push release tag
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - action.yaml
+
+permissions:
+  contents: write
+
+jobs:
+  push-release-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Push tag when release-tag was bumped
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          read_release_tag() {
+            bazel run //action:resolve_release_tag_cli -- --read-action-yaml "$1"
+          }
+
+          ACTION_TAG="$(read_release_tag "$GITHUB_WORKSPACE")"
+
+          PREV_ACTION_TAG=""
+          BEFORE_SHA="${{ github.event.before }}"
+          if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            if ! git cat-file -e "${BEFORE_SHA}^{commit}" >/dev/null 2>&1; then
+              git fetch --no-tags --depth=1 origin "$BEFORE_SHA"
+            fi
+            mkdir -p /tmp/prev-action
+            git show "$BEFORE_SHA:action.yaml" > /tmp/prev-action/action.yaml
+            PREV_ACTION_TAG="$(read_release_tag /tmp/prev-action || true)"
+          fi
+
+          if [ "$ACTION_TAG" = "$PREV_ACTION_TAG" ]; then
+            echo "release-tag unchanged ($ACTION_TAG), skipping tag push"
+            exit 0
+          fi
+
+          echo "release-tag bumped: ${PREV_ACTION_TAG:-<none>} -> $ACTION_TAG"
+
+          if [ -n "$(git ls-remote --tags origin "refs/tags/${ACTION_TAG}")" ]; then
+            echo "Tag $ACTION_TAG already exists on origin, skipping tag push"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$ACTION_TAG" "$GITHUB_SHA"
+          git push origin "$ACTION_TAG"
+          echo "Pushed tag $ACTION_TAG at $GITHUB_SHA"

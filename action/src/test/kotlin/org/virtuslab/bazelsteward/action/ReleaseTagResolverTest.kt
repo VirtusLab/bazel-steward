@@ -59,6 +59,46 @@ class ReleaseTagResolverTest {
     ReleaseTagResolver.matchesTagPattern("v1.7.3", "v1.7") shouldBe true
   }
 
+  @Test
+  fun `validateReleaseTag accepts stable and pre-release tags`() {
+    ReleaseTagResolver.validateReleaseTag("v1.7.4") shouldBe "v1.7.4"
+    ReleaseTagResolver.validateReleaseTag("v1.7.4-rc1") shouldBe "v1.7.4-rc1"
+    ReleaseTagResolver.validateReleaseTag("v2.0.0-beta.2") shouldBe "v2.0.0-beta.2"
+  }
+
+  @Test
+  fun `validateReleaseTag rejects malformed tags`() {
+    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("") }
+    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("1.7.4") }
+    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("v1.7") }
+    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("v1.7.2.1") }
+  }
+
+  @Test
+  fun `readReleaseTagFromActionYaml accepts rc tag`(@TempDir tempDir: Path) {
+    writeActionYaml(tempDir, "v1.7.4-rc1")
+    ReleaseTagResolver.readReleaseTagFromActionYaml(tempDir) shouldBe "v1.7.4-rc1"
+  }
+
+  @Test
+  fun `readReleaseTagFromActionYaml rejects invalid tag`(@TempDir tempDir: Path) {
+    writeActionYaml(tempDir, "v1.7")
+    shouldThrow<IllegalStateException> {
+      ReleaseTagResolver.readReleaseTagFromActionYaml(tempDir)
+    }
+  }
+
+  @Test
+  fun `commit SHA falls back to rc release-tag in action yaml`(@TempDir tempDir: Path) {
+    writeActionYaml(tempDir, "v1.7.4-rc1")
+    ReleaseTagResolver.resolve(
+      "15ba5fa2b7eb9d9f2e67edb8cb355130b96d7a4d",
+      tempDir,
+      "VirtusLab/bazel-steward",
+      fakeGh,
+    ) shouldBe "v1.7.4-rc1"
+  }
+
   private fun writeActionYaml(dir: Path, releaseTag: String) {
     Files.writeString(
       dir.resolve("action.yaml"),

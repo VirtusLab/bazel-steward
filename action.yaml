@@ -1,7 +1,8 @@
 name: "Bazel Steward"
 description: "Automatically searches bazel repositories for dependencies and updates them"
 # GitHub release tag for bazel-steward.jar when the action is pinned to a commit SHA.
-# Update this field when cutting a release.
+# Must be vMAJOR.MINOR.PATCH with optional pre-release suffix (e.g. v1.7.4 or v1.7.4-rc1).
+# Bump this field in a PR to main; after merge, CI creates and pushes the tag if it does not exist yet.
 release-tag: v1.7.4
 author: ""
 inputs:

@@ -12,22 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Verify action release-tag matches git tag
-        if: github.ref_type == 'tag'
-        run: |
-          set -euo pipefail
-          GIT_TAG="${GITHUB_REF#refs/tags/}"
-          ACTION_TAG="$(
-            grep -E '^[[:space:]]*release-tag:[[:space:]]*' action.yaml \
-              | head -n 1 \
-              | sed -E 's/^[[:space:]]*release-tag:[[:space:]]*//' \
-              | sed -E 's/^["'\''"]|["'\''"]$//g' \
-              | tr -d '\r'
-          )"
-          if [ "$GIT_TAG" != "$ACTION_TAG" ]; then
-            echo "action.yaml release-tag ($ACTION_TAG) must match git tag ($GIT_TAG)"
-            exit 1
-          fi
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -35,6 +19,16 @@ jobs:
           java-version: 17
       - run: bazel build //app:app_deploy.jar //action:resolve_release_tag_cli_deploy.jar
         name: Build project jars
+      - name: Verify action release-tag matches git tag
+        if: github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          GIT_TAG="${GITHUB_REF#refs/tags/}"
+          ACTION_TAG="$(bazel run //action:resolve_release_tag_cli -- --read-action-yaml "$GITHUB_WORKSPACE")"
+          if [ "$GIT_TAG" != "$ACTION_TAG" ]; then
+            echo "action.yaml release-tag ($ACTION_TAG) must match git tag ($GIT_TAG)"
+            exit 1
+          fi
       - run: mv bazel-bin/app/app_deploy.jar bazel-steward.jar
         name: Rename steward jar
       - run: cp bazel-bin/action/resolve_release_tag_cli_deploy.jar action/resolve-release-tag.jar
