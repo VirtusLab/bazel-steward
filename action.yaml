@@ -52,7 +52,13 @@ runs:
         set -euo pipefail
         CONTEXT="${GITHUB_ACTION_PATH}"
         IMAGE="bazel-steward-build-$$"
-        docker build -f "${CONTEXT}/Dockerfile" -t "${IMAGE}" "${CONTEXT}"
+        docker buildx build \
+          ${DOCKER_CACHE_FROM:+--cache-from "${DOCKER_CACHE_FROM}"} \
+          ${DOCKER_CACHE_TO:+--cache-to "${DOCKER_CACHE_TO}"} \
+          --load \
+          -t "${IMAGE}" \
+          -f "${CONTEXT}/Dockerfile" \
+          "${CONTEXT}"
         CID=$(docker create "${IMAGE}")
         docker cp "${CID}:/opt/bazel-steward.jar" ./bazel-steward.jar
         docker rm "${CID}"
