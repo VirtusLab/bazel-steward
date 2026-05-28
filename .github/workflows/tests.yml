@@ -10,21 +10,44 @@ permissions:
   contents: read
 
 jobs:
-  bazel-test:
+  unit-tests:
+    runs-on: ubuntu-latest
+    name: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Cache Bazel repository cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock', 'maven_install.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+      - name: Cache Bazel disk cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/bazel-disk-cache
+          key: ${{ runner.os }}-bazel-disk-unit-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock', 'maven_install.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-disk-unit-
+      - name: Run tests
+        run: bazel test --keep_going --test_tag_filters=unit --config=ci -- //...
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  integration-shard-tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: unit
-            tag: unit
-            target: "//..."
           - name: integration-core
-            tag: integration
-            # All integration tests except the large rules suite, which runs separately.
             target: "//... -//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
           - name: integration-rules
-            tag: integration
             target: "//e2e/src/test/kotlin/org/virtuslab/bazelsteward/e2e/rules:all"
     name: ${{ matrix.name }}-tests
     steps:
@@ -48,13 +71,23 @@ jobs:
           key: ${{ runner.os }}-bazel-disk-${{ matrix.name }}-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock', 'maven_install.json') }}
           restore-keys: |
             ${{ runner.os }}-bazel-disk-${{ matrix.name }}-
-      - name: Run tests
-        run: bazel test --keep_going --test_tag_filters=${{ matrix.tag }} --config=ci -- ${{ matrix.target }} 
+      - name: Run integration tests
+        run: bazel test --keep_going --test_tag_filters=integration --config=ci -- ${{ matrix.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  pre-commit:
+  integration-tests:
     runs-on: ubuntu-latest
+    name: integration-tests
+    needs:
+      - integration-shard-tests
+    steps:
+      - name: Integration umbrella passed
+        run: echo "All integration test jobs passed."
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    name: static-analysis
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17 (for pretty-format-kotlin / ktlint)
@@ -75,42 +108,33 @@ jobs:
           extra_args: --all-files
 
   # Deprecated: kept only to satisfy branch protection until the required check
-  # is switched from `buildifier` to `pre-commit`. Real buildifier execution
-  # happens inside the `pre-commit` job via keith/pre-commit-buildifier.
+  # is switched from `buildifier` to `static-analysis`. Real buildifier
+  # execution happens inside the `static-analysis` job.
   buildifier:
     runs-on: ubuntu-latest
     steps:
       - name: Deprecation notice
         run: |
-          echo "::warning title=Deprecated check::The 'buildifier' job is a no-op stub. Buildifier now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
+          echo "::warning title=Deprecated check::The 'buildifier' job is a no-op stub. Buildifier now runs inside the 'static-analysis' job. Update branch protection to require 'static-analysis' instead, then remove this stub."
 
   # Deprecated: kept only to satisfy branch protection until the required check
-  # is switched from `klint-tests` to `pre-commit`. Kotlin formatting now runs
-  # inside the `pre-commit` job via pretty-format-kotlin.
+  # is switched from `klint-tests` to `static-analysis`. Kotlin formatting now
+  # runs inside the `static-analysis` job via pretty-format-kotlin.
   klint-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Deprecation notice
         run: |
-          echo "::warning title=Deprecated check::The 'klint-tests' job is a no-op stub. Kotlin formatting now runs inside the 'pre-commit' job. Update branch protection to require 'pre-commit' instead, then remove this stub."
+          echo "::warning title=Deprecated check::The 'klint-tests' job is a no-op stub. Kotlin formatting now runs inside the 'static-analysis' job. Update branch protection to require 'static-analysis' instead, then remove this stub."
 
   # Deprecated: kept only to satisfy branch protection. Replaced by
-  # test-smoke-steward-on-its-repo.
+  # the `smoke-tests` umbrella check.
   docker-build-test:
     runs-on: ubuntu-latest
     steps:
       - name: Deprecation notice
         run: |
-          echo "::warning title=Deprecated check::The 'docker-build-test' job is a no-op stub. Update branch protection to require 'test-smoke-steward-on-its-repo' instead, then remove this stub."
-
-  # Deprecated: kept only to satisfy branch protection. Replaced by the
-  # integration-core-tests and integration-rules-tests matrix entries.
-  integration-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deprecation notice
-        run: |
-          echo "::warning title=Deprecated check::The 'integration-tests' job is a no-op stub. Update branch protection to require 'integration-core-tests' and 'integration-rules-tests' instead, then remove this stub."
+          echo "::warning title=Deprecated check::The 'docker-build-test' job is a no-op stub. Smoke coverage now runs under 'smoke-tests'. Update branch protection to require 'smoke-tests' instead, then remove this stub."
 
   # Runs steward against the bazel-steward repo itself (real MODULE.bazel,
   # maven_install.json, full git history) to catch regressions on real-world input.
@@ -155,3 +179,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_CACHE_FROM: type=gha,scope=docker-steward
           DOCKER_CACHE_TO: type=gha,mode=max,scope=docker-steward
+
+  smoke-tests:
+    runs-on: ubuntu-latest
+    name: smoke-tests
+    needs:
+      - test-smoke-steward-on-its-repo
+      - test-smoke-steward-on-external-repo
+    steps:
+      - name: Smoke umbrella passed
+        run: echo "All smoke test jobs passed."
