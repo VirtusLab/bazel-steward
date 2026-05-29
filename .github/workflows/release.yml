@@ -17,20 +17,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-      - run: bazel build //app:app_deploy.jar
-        name: Build steward jar
-      - name: Verify action release-tag matches git tag
-        if: github.ref_type == 'tag'
-        run: |
-          set -euo pipefail
-          GIT_TAG="${GITHUB_REF#refs/tags/}"
-          ACTION_TAG="$(bazel run //action:resolve_release_tag_cli -- --read-action-yaml "$GITHUB_WORKSPACE")"
-          if [ "$GIT_TAG" != "$ACTION_TAG" ]; then
-            echo "action.yaml release-tag ($ACTION_TAG) must match git tag ($GIT_TAG)"
-            exit 1
-          fi
+      - run: bazel build //app:app_deploy.jar //action:resolve_release_tag_cli_deploy.jar
+        name: Build jars
       - run: mv bazel-bin/app/app_deploy.jar bazel-steward.jar
         name: Rename steward jar
+      - run: cp bazel-bin/action/resolve_release_tag_cli_deploy.jar resolve-release-tag.jar
+        name: Rename resolve-release-tag jar
       - uses: marvinpinto/action-automatic-releases@v1.2.1
         name: Publish
         with:
@@ -40,6 +32,7 @@ jobs:
           automatic_release_tag: ${{ github.ref_type != 'tag' && 'latest' || null }}
           files: |
             bazel-steward.jar
+            resolve-release-tag.jar
   maven-release:
     runs-on: "ubuntu-latest"
     if: github.ref_type == 'tag'
