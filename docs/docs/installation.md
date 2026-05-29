@@ -79,7 +79,11 @@ There are more variables that can be further used to customize how Bazel Steward
     github-personal-token: ''
     
     # Additional arguments to Bazel Steward
-    # Example: "--base-branch dev --update-all-prs"
+    # Example: "--base-branch dev --update-all-prs --allow-dirty-workspace"
+    # Warning: with --allow-dirty-workspace, local uncommitted/untracked changes
+    # may be discarded when Bazel Steward switches branches.
+    # If you need to keep generated local artifacts (for example cache files),
+    # add them to .gitignore so they are ignored by Bazel Steward.
     additional-args: ''    
 ```
 
