@@ -31,8 +31,6 @@ class ProcessGhReleaseMetadataProvider : GhReleaseMetadataProvider {
       "gh",
       "api",
       "--paginate",
-      "--repo",
-      repository,
       "repos/$repository/tags?per_page=100",
       "--jq",
       ".[] | [.name, .commit.sha] | @tsv",
@@ -61,8 +59,6 @@ class ProcessGhReleaseMetadataProvider : GhReleaseMetadataProvider {
     val process = ProcessBuilder(
       "gh",
       "api",
-      "--repo",
-      repository,
       "repos/$repository/commits/$ref",
       "--jq",
       ".sha",

@@ -33,8 +33,11 @@ runs:
     - name: Download release
       if: ${{ inputs.use-release == 'true' }}
       run: |
+        set -euo pipefail
         ACTION_REF=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
-        TAG_NAME=$(java -jar "${{ github.action_path }}/action/resolve-release-tag.jar" "$ACTION_REF" "$REPOSITORY")
+        RESOLVER_DIR=$(mktemp -d)
+        gh release download --pattern resolve-release-tag.jar --repo "$REPOSITORY" --dir "$RESOLVER_DIR"
+        TAG_NAME=$(java -jar "$RESOLVER_DIR/resolve-release-tag.jar" "$ACTION_REF" "$REPOSITORY")
         echo "$TAG_NAME"
         gh release download "$TAG_NAME" --pattern bazel-steward.jar --repo "$REPOSITORY"
       env:
