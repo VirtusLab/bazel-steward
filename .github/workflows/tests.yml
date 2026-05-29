@@ -107,35 +107,6 @@ jobs:
         with:
           extra_args: --all-files
 
-  # Deprecated: kept only to satisfy branch protection until the required check
-  # is switched from `buildifier` to `static-analysis`. Real buildifier
-  # execution happens inside the `static-analysis` job.
-  buildifier:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deprecation notice
-        run: |
-          echo "::warning title=Deprecated check::The 'buildifier' job is a no-op stub. Buildifier now runs inside the 'static-analysis' job. Update branch protection to require 'static-analysis' instead, then remove this stub."
-
-  # Deprecated: kept only to satisfy branch protection until the required check
-  # is switched from `klint-tests` to `static-analysis`. Kotlin formatting now
-  # runs inside the `static-analysis` job via pretty-format-kotlin.
-  klint-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deprecation notice
-        run: |
-          echo "::warning title=Deprecated check::The 'klint-tests' job is a no-op stub. Kotlin formatting now runs inside the 'static-analysis' job. Update branch protection to require 'static-analysis' instead, then remove this stub."
-
-  # Deprecated: kept only to satisfy branch protection. Replaced by
-  # the `smoke-tests` umbrella check.
-  docker-build-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deprecation notice
-        run: |
-          echo "::warning title=Deprecated check::The 'docker-build-test' job is a no-op stub. Smoke coverage now runs under 'smoke-tests'. Update branch protection to require 'smoke-tests' instead, then remove this stub."
-
   # Runs steward against the bazel-steward repo itself (real MODULE.bazel,
   # maven_install.json, full git history) to catch regressions on real-world input.
   test-smoke-steward-on-its-repo:
