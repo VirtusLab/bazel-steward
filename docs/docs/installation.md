@@ -130,7 +130,11 @@ coursier launch org.virtuslab:bazel-steward:1.7.1 --main org.virtuslab.bazelstew
 ```
 
 ## GitHub Releases
-Bazel Steward publishes a fat JAR under GitHub Releases. The same JAR is also used in GitHub Actions. You can simply download it and run using the `java` command.
+Each GitHub Release ships two JARs:
+* `bazel-steward.jar` - the fat JAR with the application itself. This is the same JAR that GitHub Actions runs.
+* `resolve-release-tag.jar` - a small helper used by the Action to figure out which release tag to download for a given action ref. You don't need it when running Bazel Steward directly.
+
+Download `bazel-steward.jar` and run it using the `java` command.
 
 ```
 wget https://github.com/VirtusLab/bazel-steward/releases/download/v1.5.0/bazel-steward.jar
