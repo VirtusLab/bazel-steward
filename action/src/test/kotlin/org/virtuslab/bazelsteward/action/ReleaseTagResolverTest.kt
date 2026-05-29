@@ -3,19 +3,27 @@ package org.virtuslab.bazelsteward.action
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.nio.file.Files
-import java.nio.file.Path
 
 class ReleaseTagResolverTest {
+  private val taggedCommitSha = "15ba5fa2b7eb9d9f2e67edb8cb355130b96d7a4d"
+  private val otherCommitSha = "cccccccccccccccccccccccccccccccccccccccc"
   private val fakeReleases = listOf(
     "v1.7.2-rc9\tRC",
     "v1.7.2\tRelease 1.7.2",
     "v1.7.2.1\tPatch",
     "v1.7.3\tRelease 1.7.3",
   )
-
-  private val fakeGh = GhReleaseLister { fakeReleases }
+  private val fakeTags = listOf(
+    RepositoryTag("v1.7.2", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+    RepositoryTag("v1.7.2.1", taggedCommitSha),
+    RepositoryTag("v1.7.3", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"),
+    RepositoryTag("v1.7.2-rc9", taggedCommitSha),
+  )
+  private val fakeGh = FakeMetadataProvider(
+    releases = fakeReleases,
+    tags = fakeTags,
+    refs = mapOf("main" to taggedCommitSha, "develop" to otherCommitSha),
+  )
 
   @Test
   fun `v prefix resolves to latest matching stable release`() {
@@ -28,27 +36,34 @@ class ReleaseTagResolverTest {
   }
 
   @Test
-  fun `commit SHA falls back to release-tag in action yaml`(@TempDir tempDir: Path) {
-    writeActionYaml(tempDir, "v1.7.2")
+  fun `commit SHA resolves to release tag pointing to the same commit`() {
     ReleaseTagResolver.resolve(
-      "15ba5fa2b7eb9d9f2e67edb8cb355130b96d7a4d",
-      tempDir,
+      taggedCommitSha,
       "VirtusLab/bazel-steward",
       fakeGh,
-    ) shouldBe "v1.7.2"
+    ) shouldBe "v1.7.2.1"
   }
 
   @Test
-  fun `branch ref falls back to release-tag in action yaml`(@TempDir tempDir: Path) {
-    writeActionYaml(tempDir, "v1.7.2")
-    ReleaseTagResolver.resolve("main", tempDir, "VirtusLab/bazel-steward", fakeGh) shouldBe "v1.7.2"
+  fun `branch ref resolves to release tag via branch head commit`() {
+    ReleaseTagResolver.resolve("main", "VirtusLab/bazel-steward", fakeGh) shouldBe "v1.7.2.1"
   }
 
   @Test
-  fun `missing release-tag fails for non-v ref`(@TempDir tempDir: Path) {
-    writeActionYamlWithoutReleaseTag(tempDir)
+  fun `unknown branch ref fails`() {
     shouldThrow<IllegalStateException> {
-      ReleaseTagResolver.resolve("deadbeef", tempDir, "VirtusLab/bazel-steward", fakeGh)
+      ReleaseTagResolver.resolve("non-existing-branch", "VirtusLab/bazel-steward", fakeGh)
+    }
+  }
+
+  @Test
+  fun `commit SHA without matching release tag fails`() {
+    shouldThrow<IllegalStateException> {
+      ReleaseTagResolver.resolve(
+        otherCommitSha,
+        "VirtusLab/bazel-steward",
+        fakeGh,
+      )
     }
   }
 
@@ -60,69 +75,41 @@ class ReleaseTagResolverTest {
   }
 
   @Test
-  fun `validateReleaseTag accepts stable and pre-release tags`() {
-    ReleaseTagResolver.validateReleaseTag("v1.7.4") shouldBe "v1.7.4"
-    ReleaseTagResolver.validateReleaseTag("v1.7.4-rc1") shouldBe "v1.7.4-rc1"
-    ReleaseTagResolver.validateReleaseTag("v2.0.0-beta.2") shouldBe "v2.0.0-beta.2"
+  fun `short commit SHA resolves to release tag`() {
+    val shortSha = taggedCommitSha.take(12)
+    ReleaseTagResolver.resolve(shortSha, "VirtusLab/bazel-steward", fakeGh) shouldBe "v1.7.2.1"
   }
 
   @Test
-  fun `validateReleaseTag rejects malformed tags`() {
-    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("") }
-    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("1.7.4") }
-    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("v1.7") }
-    shouldThrow<IllegalStateException> { ReleaseTagResolver.validateReleaseTag("v1.7.2.1") }
-  }
-
-  @Test
-  fun `readReleaseTagFromActionYaml accepts rc tag`(@TempDir tempDir: Path) {
-    writeActionYaml(tempDir, "v1.7.4-rc1")
-    ReleaseTagResolver.readReleaseTagFromActionYaml(tempDir) shouldBe "v1.7.4-rc1"
-  }
-
-  @Test
-  fun `readReleaseTagFromActionYaml rejects invalid tag`(@TempDir tempDir: Path) {
-    writeActionYaml(tempDir, "v1.7")
+  fun `ref resolving to commit without release tag fails`() {
     shouldThrow<IllegalStateException> {
-      ReleaseTagResolver.readReleaseTagFromActionYaml(tempDir)
+      ReleaseTagResolver.resolve("develop", "VirtusLab/bazel-steward", fakeGh)
     }
   }
 
   @Test
-  fun `commit SHA falls back to rc release-tag in action yaml`(@TempDir tempDir: Path) {
-    writeActionYaml(tempDir, "v1.7.4-rc1")
+  fun `commit SHA can resolve to rc release tag`() {
+    val rcOnlyGh = FakeMetadataProvider(
+      releases = listOf("v1.7.2-rc9\tRC"),
+      tags = listOf(RepositoryTag("v1.7.2-rc9", taggedCommitSha)),
+      refs = mapOf("main" to taggedCommitSha),
+    )
     ReleaseTagResolver.resolve(
-      "15ba5fa2b7eb9d9f2e67edb8cb355130b96d7a4d",
-      tempDir,
+      taggedCommitSha,
       "VirtusLab/bazel-steward",
-      fakeGh,
-    ) shouldBe "v1.7.4-rc1"
+      rcOnlyGh,
+    ) shouldBe "v1.7.2-rc9"
   }
 
-  private fun writeActionYaml(dir: Path, releaseTag: String) {
-    Files.writeString(
-      dir.resolve("action.yaml"),
-      """
-      name: "Bazel Steward"
-      release-tag: $releaseTag
-      inputs: {}
-      runs:
-        using: composite
-        steps: []
-      """.trimIndent(),
-    )
-  }
+  private class FakeMetadataProvider(
+    private val releases: List<String>,
+    private val tags: List<RepositoryTag>,
+    private val refs: Map<String, String>,
+  ) : GhReleaseMetadataProvider {
+    override fun listReleases(repository: String): List<String> = releases
 
-  private fun writeActionYamlWithoutReleaseTag(dir: Path) {
-    Files.writeString(
-      dir.resolve("action.yaml"),
-      """
-      name: "Bazel Steward"
-      inputs: {}
-      runs:
-        using: composite
-        steps: []
-      """.trimIndent(),
-    )
+    override fun listTags(repository: String): List<RepositoryTag> = tags
+
+    override fun resolveRefToCommitSha(repository: String, ref: String): String? = refs[ref]
   }
 }

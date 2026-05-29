@@ -19,16 +19,6 @@ jobs:
           java-version: 17
       - run: bazel build //app:app_deploy.jar
         name: Build steward jar
-      - name: Verify action release-tag matches git tag
-        if: github.ref_type == 'tag'
-        run: |
-          set -euo pipefail
-          GIT_TAG="${GITHUB_REF#refs/tags/}"
-          ACTION_TAG="$(bazel run //action:resolve_release_tag_cli -- --read-action-yaml "$GITHUB_WORKSPACE")"
-          if [ "$GIT_TAG" != "$ACTION_TAG" ]; then
-            echo "action.yaml release-tag ($ACTION_TAG) must match git tag ($GIT_TAG)"
-            exit 1
-          fi
       - run: mv bazel-bin/app/app_deploy.jar bazel-steward.jar
         name: Rename steward jar
       - uses: marvinpinto/action-automatic-releases@v1.2.1

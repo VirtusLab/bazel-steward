@@ -1,9 +1,5 @@
 name: "Bazel Steward"
 description: "Automatically searches bazel repositories for dependencies and updates them"
-# GitHub release tag for bazel-steward.jar when the action is pinned to a commit SHA.
-# Must be vMAJOR.MINOR.PATCH with optional pre-release suffix (e.g. v1.7.4 or v1.7.4-rc1).
-# Bump this field in a PR to main; after merge, CI creates and pushes the tag if it does not exist yet.
-release-tag: v1.7.4
 author: ""
 inputs:
   configuration-path:
@@ -38,7 +34,7 @@ runs:
       if: ${{ inputs.use-release == 'true' }}
       run: |
         ACTION_REF=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
-        TAG_NAME=$(java -jar "${{ github.action_path }}/action/resolve-release-tag.jar" "$ACTION_REF" "${{ github.action_path }}" "$REPOSITORY")
+        TAG_NAME=$(java -jar "${{ github.action_path }}/action/resolve-release-tag.jar" "$ACTION_REF" "$REPOSITORY")
         echo "$TAG_NAME"
         gh release download "$TAG_NAME" --pattern bazel-steward.jar --repo "$REPOSITORY"
       env:
