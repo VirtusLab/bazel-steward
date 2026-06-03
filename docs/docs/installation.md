@@ -55,6 +55,8 @@ This means pinning `@main` with `use-release: "true"` will fail most of the time
 
 If you want to run from `@main`, use `use-release: "false"` so the jar is rebuilt from source.
 
+When `use-release: "true"`, the action resolves the release tag with an embedded Python script. It checks for `python3 >= 3.11` on the runner and installs Python automatically when needed.
+
 Make sure to allow Github Actions to create pull requests and give it write access so that Bazel Steward can push branches. You can find these settings
 under `Settings / Actions / General / Workflow permissions`.
 
@@ -130,9 +132,8 @@ coursier launch org.virtuslab:bazel-steward:1.7.1 --main org.virtuslab.bazelstew
 ```
 
 ## GitHub Releases
-Each GitHub Release ships two JARs:
+Each GitHub Release ships one JAR:
 * `bazel-steward.jar` - the fat JAR with the application itself. This is the same JAR that GitHub Actions runs.
-* `resolve-release-tag.jar` - a small helper used by the Action to figure out which release tag to download for a given action ref. You don't need it when running Bazel Steward directly.
 
 Download `bazel-steward.jar` and run it using the `java` command.
 

@@ -1,16 +1,14 @@
-load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
-alias(
-    name = "resolve_release_tag",
-    actual = "//action/src/main/kotlin/org/virtuslab/bazelsteward/action",
+py_library(
+    name = "release_tag_resolver_lib",
+    srcs = ["release_tag_resolver.py"],
     visibility = ["//visibility:public"],
 )
 
-java_binary(
-    name = "resolve_release_tag_cli",
-    main_class = "org.virtuslab.bazelsteward.action.ResolveReleaseTagMainKt",
+py_binary(
+    name = "resolve_release_tag",
+    srcs = ["release_tag_resolver.py"],
+    main = "release_tag_resolver.py",
     visibility = ["//visibility:public"],
-    runtime_deps = [
-        "//action/src/main/kotlin/org/virtuslab/bazelsteward/action",
-    ],
 )

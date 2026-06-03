@@ -30,14 +30,27 @@ runs:
       with:
         distribution: 'temurin'
         java-version: 17
+    - name: Check Python version
+      id: check_python
+      shell: bash
+      run: |
+        set -euo pipefail
+        if command -v python3 >/dev/null 2>&1 && python3 -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)"; then
+          echo "needs_setup=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "needs_setup=true" >> "$GITHUB_OUTPUT"
+        fi
+    - name: Set up Python 3.11
+      if: steps.check_python.outputs.needs_setup == 'true'
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
     - name: Download release
       if: ${{ inputs.use-release == 'true' }}
       run: |
         set -euo pipefail
-        ACTION_REF=$(echo "${{ github.action_path }}" | grep -Po "(?<=\/)[^\/]*$")
-        RESOLVER_DIR=$(mktemp -d)
-        gh release download --pattern resolve-release-tag.jar --repo "$REPOSITORY" --dir "$RESOLVER_DIR"
-        TAG_NAME=$(java -jar "$RESOLVER_DIR/resolve-release-tag.jar" "$ACTION_REF" "$REPOSITORY")
+        ACTION_REF=$(basename "${{ github.action_path }}")
+        TAG_NAME=$(python3 "${{ github.action_path }}/action/release_tag_resolver.py" "$ACTION_REF" "$REPOSITORY")
         echo "$TAG_NAME"
         gh release download "$TAG_NAME" --pattern bazel-steward.jar --repo "$REPOSITORY"
       env:
