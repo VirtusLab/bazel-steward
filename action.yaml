@@ -49,11 +49,14 @@ runs:
       if: ${{ inputs.use-release == 'true' }}
       run: |
         set -euo pipefail
-        ACTION_REF=$(basename "${{ github.action_path }}")
+        if [ -z "$ACTION_REF" ]; then
+          ACTION_REF=$(basename "${{ github.action_path }}")
+        fi
         TAG_NAME=$(python3 "${{ github.action_path }}/action/release_tag_resolver.py" "$ACTION_REF" "$REPOSITORY")
         echo "$TAG_NAME"
         gh release download "$TAG_NAME" --pattern bazel-steward.jar --repo "$REPOSITORY"
       env:
+        ACTION_REF: ${{ github.action_ref }}
         GH_TOKEN: ${{ github.token }}
         REPOSITORY: VirtusLab/bazel-steward
       shell: bash

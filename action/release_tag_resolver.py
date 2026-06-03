@@ -7,7 +7,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from functools import cmp_to_key
-from typing import Iterable, Protocol
+from typing import Protocol
 
 COMMIT_SHA_PATTERN = re.compile(r"^[0-9a-fA-F]{7,40}$")
 FULL_COMMIT_SHA_PATTERN = re.compile(r"^[0-9a-fA-F]{40}$")
@@ -42,7 +42,19 @@ class ProcessGhReleaseMetadataProvider:
         return completed.returncode, f"{completed.stdout}{completed.stderr}"
 
     def list_releases(self, repository: str) -> list[str]:
-        exit_code, output = self._run("gh", "release", "list", "-L", "100", "--repo", repository)
+        exit_code, output = self._run(
+            "gh",
+            "release",
+            "list",
+            "-L",
+            "100",
+            "--repo",
+            repository,
+            "--json",
+            "tagName",
+            "--jq",
+            ".[].tagName",
+        )
         if exit_code != 0:
             raise RuntimeError(f"gh release list failed for {repository} (exit {exit_code}): {output}")
         return [line for line in output.splitlines() if line.strip()]
@@ -192,10 +204,10 @@ class ReleaseTagResolver:
 
     @staticmethod
     def extract_release_tag(line: str) -> str | None:
-        parts = line.split("\t", maxsplit=1)
-        if len(parts) != 2:
+        tag = line.strip()
+        if not tag or "\t" in tag:
             return None
-        return parts[0]
+        return tag
 
     @staticmethod
     def matches_commit_sha(commit_sha: str, commit_sha_ref: str) -> bool:

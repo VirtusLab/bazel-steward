@@ -23,10 +23,10 @@ class ReleaseTagResolverTest(unittest.TestCase):
     tagged_commit_sha = "15ba5fa2b7eb9d9f2e67edb8cb355130b96d7a4d"
     other_commit_sha = "cccccccccccccccccccccccccccccccccccccccc"
     fake_releases = [
-        "v1.7.2-rc9\tRC",
-        "v1.7.2\tRelease 1.7.2",
-        "v1.7.2.1\tPatch",
-        "v1.7.3\tRelease 1.7.3",
+        "v1.7.2-rc9",
+        "v1.7.2",
+        "v1.7.2.1",
+        "v1.7.3",
     ]
     fake_tags = [
         RepositoryTag("v1.7.2", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
@@ -89,6 +89,11 @@ class ReleaseTagResolverTest(unittest.TestCase):
         self.assertFalse(ReleaseTagResolver.matches_tag_pattern("v1.7.2-rc9", "v1.7.2"))
         self.assertTrue(ReleaseTagResolver.matches_tag_pattern("v1.7.3", "v1.7"))
 
+    def test_human_readable_gh_release_table_line_is_not_treated_as_release_tag(self):
+        self.assertIsNone(
+            ReleaseTagResolver.extract_release_tag("Release 1.7.2\tLatest\tv1.7.2\tabout 1 day ago"),
+        )
+
     def test_short_commit_sha_resolves_to_release_tag(self):
         short_sha = self.tagged_commit_sha[:12]
         self.assertEqual(
@@ -108,7 +113,7 @@ class ReleaseTagResolverTest(unittest.TestCase):
 
     def test_commit_sha_can_resolve_to_rc_release_tag(self):
         rc_only_provider = FakeMetadataProvider(
-            releases=["v1.7.2-rc9\tRC"],
+            releases=["v1.7.2-rc9"],
             tags=[RepositoryTag("v1.7.2-rc9", self.tagged_commit_sha)],
             refs={"main": self.tagged_commit_sha},
         )
