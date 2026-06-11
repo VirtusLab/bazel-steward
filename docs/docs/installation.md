@@ -38,6 +38,25 @@ jobs:
           github-personal-token: 'XXXXXXXXXXXXXXXXXX' # used for triggering workflows, read below
 ```
 
+## Action ref and release behavior
+
+The GitHub Action supports two execution modes:
+
+* `use-release: "true"` (default): download and run the prebuilt `bazel-steward.jar` from GitHub Releases.
+* `use-release: "false"`: rebuild the jar from source in the checked-out action ref.
+
+When `use-release: "true"`, Bazel Steward requires a release tag for the resolved action commit:
+
+* `@v...` resolves to a matching release tag.
+* `@<commit-sha>` requires that SHA to be pointed to by a release tag.
+* branch refs (for example `@main`) are resolved to branch HEAD and then require a release tag on that commit.
+
+This means pinning `@main` with `use-release: "true"` will fail most of the time, because HEAD of `main` is usually unreleased.
+
+If you want to run from `@main`, use `use-release: "false"` so the jar is rebuilt from source.
+
+When `use-release: "true"`, the action resolves the release tag with an embedded Python script. It checks for `python3 >= 3.11` on the runner and installs Python automatically when needed.
+
 Make sure to allow Github Actions to create pull requests and give it write access so that Bazel Steward can push branches. You can find these settings
 under `Settings / Actions / General / Workflow permissions`.
 
@@ -117,7 +136,10 @@ coursier launch org.virtuslab:bazel-steward:1.7.1 --main org.virtuslab.bazelstew
 ```
 
 ## GitHub Releases
-Bazel Steward publishes a fat JAR under GitHub Releases. The same JAR is also used in GitHub Actions. You can simply download it and run using the `java` command.
+Each GitHub Release ships one JAR:
+* `bazel-steward.jar` - the fat JAR with the application itself. This is the same JAR that GitHub Actions runs.
+
+Download `bazel-steward.jar` and run it using the `java` command.
 
 ```
 wget https://github.com/VirtusLab/bazel-steward/releases/download/v1.5.0/bazel-steward.jar

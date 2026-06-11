@@ -1,0 +1,9 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+py_test(
+    name = "release_tag_resolver_test",
+    srcs = ["release_tag_resolver_test.py"],
+    python_version = "PY3",
+    tags = ["unit"],
+    deps = ["//action:release_tag_resolver_lib"],
+)

@@ -1,5 +1,0 @@
-load("//tools/build_rules:rules.bzl", "library")
-
-library(
-    srcs = glob(["**/*.kt"]),
-)
