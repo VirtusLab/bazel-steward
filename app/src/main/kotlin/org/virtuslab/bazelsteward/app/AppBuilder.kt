@@ -108,7 +108,7 @@ object AppBuilder {
     val allowDirtyWorkspace by parser.option(
       ArgType.Boolean,
       fullName = "allow-dirty-workspace",
-      description = "Allow running on a dirty workspace; uncommitted changes will be discarded",
+      description = "Allow running on a dirty workspace. Bazel Steward may discard local uncommitted/untracked changes while switching branches. Add persistent generated artifacts (for example cache files) to .gitignore.",
     ).default(false)
 
     parser.parse(args)
