@@ -13,26 +13,36 @@ object WholeLibraryHeuristic : VersionReplacementHeuristic {
     val regexes = markers.map { marker ->
       (marker + currentVersion).map { """(${Regex.escape(it)})""" }.reduce { acc, s -> "$acc.*$s" }.toRegex()
     }
-    val matchResult = regexes.firstNotNullOfOrNull { regex ->
+    val matches = regexes.firstNotNullOfOrNull { regex ->
       files.firstNotNullOfOrNull { textFile ->
         regex.findAll(textFile.content)
           .map { MatchedText(it, textFile.path) }
-          .sortedBy { it.matchedText.length }
-          .firstOrNull()
+          .toList()
+          .takeIf { it.isNotEmpty() }
       }
     } ?: return null
-    val versionOffset = matchResult.offsetLastMatchGroup ?: return null
 
-    return LibraryUpdate(
-      updateSuggestion,
-      listOf(
-        FileChange(
-          matchResult.origin,
-          versionOffset,
-          updateSuggestion.currentLibrary.version.value.length,
-          updateSuggestion.suggestedVersion.value,
-        ),
-      ),
-    )
+    // Artifacts that differ only by a classifier (e.g. "g:a:1.0" and
+    // "g:a:1.0:linux-x64") are reported identically by rules_jvm_external, so
+    // they collapse into a single update yet occur on several lines. Update
+    // every occurrence whose match is as tight as the tightest one. Looser
+    // matches are spurious spillover from a prefix collision (e.g. the marker
+    // for "junit-jupiter" also matching inside "junit-jupiter-engine").
+    val minLength = matches.minOf { it.matchedText.length }
+    val fileChanges = matches
+      .filter { it.matchedText.length == minLength }
+      .mapNotNull { match ->
+        match.offsetLastMatchGroup?.let { versionOffset ->
+          FileChange(
+            match.origin,
+            versionOffset,
+            updateSuggestion.currentLibrary.version.value.length,
+            updateSuggestion.suggestedVersion.value,
+          )
+        }
+      }
+      .ifEmpty { return null }
+
+    return LibraryUpdate(updateSuggestion, fileChanges)
   }
 }

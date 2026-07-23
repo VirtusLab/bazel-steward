@@ -8,6 +8,8 @@ import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
+import org.virtuslab.bazelsteward.core.library.SimpleVersion
+import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 import org.virtuslab.bazelsteward.core.replacement.PythonFunctionCallHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyInStringLiteralHeuristic
@@ -40,6 +42,27 @@ class VersionReplacementHeuristicTest {
     val updated = content.replaceRange(change.offset, change.offset + change.length, change.replacement)
     updated.lines()[2] shouldBe """        "io.get-coursier:interface:1.0.28","""
     updated.lines()[2].count { it == '"' } shouldBe 2
+  }
+
+  @Test
+  fun `should update every classifier variant of the same artifact in one pass`() {
+    val content = listOf(
+      """    "tools.profiler:async-profiler:4.4",""",
+      """    "tools.profiler:async-profiler:4.4:linux-arm64",""",
+      """    "tools.profiler:async-profiler:4.4:linux-x64",""",
+      """    "tools.profiler:async-profiler:4.4:macos",""",
+    ).joinToString("\n")
+    // rules_jvm_external strips classifiers, so all four artifacts collapse into
+    // a single update for tools.profiler:async-profiler 4.4 -> 4.5.
+    val library = MavenCoordinates.of("tools.profiler", "async-profiler", "4.4")
+    val changes = resolveAllUpdatesIn(content, library, SimpleVersion("4.5"), WholeLibraryHeuristic)
+
+    changes.map { it.replacement }.distinct() shouldBe listOf("4.5")
+    changes.size shouldBe 4
+
+    val updated = content.applyChanges(changes)
+    updated.lines().count { it.contains("async-profiler:4.5") } shouldBe 4
+    updated.lines().count { it.contains("async-profiler:4.4") } shouldBe 0
   }
 
   @Nested
@@ -275,4 +298,23 @@ class VersionReplacementHeuristicTest {
     }
     return resolver.resolve(listOf(file), UpdateSuggestion(library, suggested), heuristics.toList())?.fileChanges?.firstOrNull()
   }
+
+  private fun resolveAllUpdatesIn(
+    content: String,
+    library: MavenCoordinates,
+    suggested: Version,
+    vararg heuristics: VersionReplacementHeuristic = allHeuristics,
+  ): List<FileChange> {
+    val file = object : TextFile {
+      override val path = Path("MODULE.bazel")
+      override val content = content
+    }
+    return resolver.resolve(listOf(file), UpdateSuggestion(library, suggested), heuristics.toList())?.fileChanges.orEmpty()
+  }
+
+  private fun String.applyChanges(changes: List<FileChange>): String =
+    changes.sortedByDescending { it.offset }
+      .fold(this) { acc, change ->
+        acc.replaceRange(change.offset, change.offset + change.length, change.replacement)
+      }
 }
