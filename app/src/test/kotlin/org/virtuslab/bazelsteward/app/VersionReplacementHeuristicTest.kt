@@ -4,14 +4,18 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.virtuslab.bazelsteward.bzlmod.BazelModule
+import org.virtuslab.bazelsteward.bzlmod.BazelModuleId
 import org.virtuslab.bazelsteward.core.common.FileChange
 import org.virtuslab.bazelsteward.core.common.TextFile
 import org.virtuslab.bazelsteward.core.common.UpdateSuggestion
+import org.virtuslab.bazelsteward.core.library.Library
 import org.virtuslab.bazelsteward.core.library.SemanticVersion
 import org.virtuslab.bazelsteward.core.library.SimpleVersion
 import org.virtuslab.bazelsteward.core.library.Version
 import org.virtuslab.bazelsteward.core.replacement.LibraryUpdateResolver
 import org.virtuslab.bazelsteward.core.replacement.PythonFunctionCallHeuristic
+import org.virtuslab.bazelsteward.core.replacement.VersionOnlyHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionOnlyInStringLiteralHeuristic
 import org.virtuslab.bazelsteward.core.replacement.VersionReplacementHeuristic
 import org.virtuslab.bazelsteward.core.replacement.WholeLibraryHeuristic
@@ -63,6 +67,42 @@ class VersionReplacementHeuristicTest {
     val updated = content.applyChanges(changes)
     updated.lines().count { it.contains("async-profiler:4.5") } shouldBe 4
     updated.lines().count { it.contains("async-profiler:4.4") } shouldBe 0
+  }
+
+  @Test
+  fun `should not bump a bazel_dep that happens to share the version of an undeclared maven artifact`() {
+    // error_prone_annotations comes in transitively through another module's maven.install,
+    // so it is not declared anywhere in the repo. Its version string must not be matched
+    // against the unrelated rules_python bazel_dep.
+    val content = """
+      bazel_dep(name = "rules_python", version = "2.5.1")
+
+      maven.install(
+          artifacts = [
+              "com.softwaremill.sttp.tapir:tapir-core_3:1.14.1",
+          ],
+      )
+    """.trimIndent()
+    val library = library("com.google.errorprone", "error_prone_annotations", "2.5.1")
+    resolveUpdatesIn(content, library, version("2.52.0")) shouldBe null
+  }
+
+  @Test
+  fun `should not update a version that occurs once in each of several files`() {
+    val library = library("io.grpc", "grpc-core", "1.2.0")
+    val files = listOf(
+      textFile("deps.bzl", """GRPC_VERSION = "1.2.0""""),
+      textFile("other.bzl", """OTHER_VERSION = "1.2.0""""),
+    )
+    resolveUpdatesInFiles(files, library, version("1.3.0"), VersionOnlyInStringLiteralHeuristic) shouldBe null
+  }
+
+  @Test
+  fun `version only heuristic should still match a version inside a call naming the library`() {
+    val content = """bazel_dep(name = "rules_python", version = "2.5.1")"""
+    val module = BazelModule(BazelModuleId("rules_python"), version("2.5.1"))
+    val change = resolveUpdatesInFiles(listOf(textFile("MODULE.bazel", content)), module, version("2.6.0"), VersionOnlyHeuristic)!!
+    change.offset shouldBe content.indexOf("2.5.1")
   }
 
   @Nested
@@ -297,6 +337,19 @@ class VersionReplacementHeuristicTest {
       override val content = content
     }
     return resolver.resolve(listOf(file), UpdateSuggestion(library, suggested), heuristics.toList())?.fileChanges?.firstOrNull()
+  }
+
+  private fun resolveUpdatesInFiles(
+    files: List<TextFile>,
+    library: Library,
+    suggested: Version,
+    vararg heuristics: VersionReplacementHeuristic = allHeuristics,
+  ): FileChange? =
+    resolver.resolve(files, UpdateSuggestion(library, suggested), heuristics.toList())?.fileChanges?.firstOrNull()
+
+  private fun textFile(path: String, content: String): TextFile = object : TextFile {
+    override val path = Path(path)
+    override val content = content
   }
 
   private fun resolveAllUpdatesIn(
